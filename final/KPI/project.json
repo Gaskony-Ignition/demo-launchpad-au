@@ -1,5 +1,5 @@
 {
-  "title": "Launchpad KPI (AU)",
+  "title": "Launchpad KPI (AU) (dev)",
   "description": "Australian port of the Inductive Automation Launchpad KPI example. Plant KPI overview, configurable dashboard, trending and alarms over 61 simulated instrument tags. Metric at source (degC, kPa); tags live flat under [Launchpad]KPI/.",
   "enabled": true,
   "inheritable": false,

@@ -48,6 +48,21 @@ d["doGet"]["require-auth"] = True
 json.dump(d, open(p, "w"), indent=2)' "$1"
 }
 
+# Every released project carries its version in the Title (workspace CLAUDE.md):
+# project.json's "title" becomes "<Project Title> <version>" so that landing on a
+# gateway's Config -> Projects list shows what is actually running. The working
+# copy under final/ keeps a "(dev)" title instead -- this is the one place that
+# turns it into a release title, and it only ever touches the packaged copy in
+# dist/, never final/ itself. VERSION above is the only place the number lives.
+stamp_title() {
+  python3 -c '
+import json, sys
+p, title = sys.argv[1], sys.argv[2]
+d = json.load(open(p))
+d["title"] = title
+json.dump(d, open(p, "w"), indent=2)' "$1" "$2"
+}
+
 rm -rf "$DIST"
 mkdir -p "$DIST"
 
@@ -64,9 +79,11 @@ for PKG in oee kpi; do
 
   echo "--> $TITLE"
 
-  # project export, with the installer endpoint closed
+  # project export, with the title stamped to this release's version and the
+  # installer endpoint closed
   rm -rf "$DIST/proj-$PKG"
   cp -r "$HERE/final/$PROJ" "$DIST/proj-$PKG"
+  stamp_title "$DIST/proj-$PKG/project.json" "$TITLE $VERSION"
   harden "$DIST/proj-$PKG/com.inductiveautomation.webdev/resources/$ENDPOINT/config.json"
   ( cd "$DIST/proj-$PKG" && zip -qr "$STAGE/Projects/$PROJ.zip" . )
   rm -rf "$DIST/proj-$PKG"
