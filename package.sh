@@ -63,6 +63,19 @@ d["title"] = title
 json.dump(d, open(p, "w"), indent=2)' "$1" "$2"
 }
 
+# Same rule, applied to the Description: Config -> Projects only shows that
+# column, not the Title, so the version has to land there too (workspace
+# CLAUDE.md, 24/08/2026). Suffix rather than replace -- the existing prose
+# stays intact -- and again only ever touches the packaged copy in dist/.
+append_desc_suffix() {
+  python3 -c '
+import json, sys
+p, version = sys.argv[1], sys.argv[2]
+d = json.load(open(p))
+d["description"] = d["description"] + " · v" + version
+json.dump(d, open(p, "w"), indent=2)' "$1" "$2"
+}
+
 rm -rf "$DIST"
 mkdir -p "$DIST"
 
@@ -84,6 +97,7 @@ for PKG in oee kpi; do
   rm -rf "$DIST/proj-$PKG"
   cp -r "$HERE/final/$PROJ" "$DIST/proj-$PKG"
   stamp_title "$DIST/proj-$PKG/project.json" "$TITLE $VERSION"
+  append_desc_suffix "$DIST/proj-$PKG/project.json" "$VERSION"
   harden "$DIST/proj-$PKG/com.inductiveautomation.webdev/resources/$ENDPOINT/config.json"
   ( cd "$DIST/proj-$PKG" && zip -qr "$STAGE/Projects/$PROJ.zip" . )
   rm -rf "$DIST/proj-$PKG"
