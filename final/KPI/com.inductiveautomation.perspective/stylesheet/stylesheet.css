@@ -23,6 +23,11 @@
 
    The dashboard and bar-chart style classes already read Ignition's own theme
    variables directly (--neutral-*, --label); those are left as they were.
+
+   One thing CANNOT be themed rather than should not: ia.chart.simple-gauge's
+   arc.color / arcBackground.color are written into SVG presentation attributes,
+   not into CSS, so a var() there does not resolve and the gauge renders BLACK.
+   Tried and reverted 27/08/2026 -- its two colours stay literal.
    =========================================================================== */
 
 :root {
