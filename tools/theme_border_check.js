@@ -39,8 +39,22 @@ const UA='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)
 const URL = process.argv[2];
 const THEMES = process.argv.slice(3);
 const MEASURE = () => {
-  const out = { containerBorder: getComputedStyle(document.documentElement)
-                  .getPropertyValue('--containerBorder').trim(), els: {} };
+  // Ask the question by DOING what .ia_inputField does, rather than matching the
+  // variable's text against a regex and hoping the regex agrees with the CSS parser.
+  // A throwaway element takes `border: var(--containerBorder)`; if the value is a
+  // bare colour the shorthand is invalid and the computed width comes back 0px.
+  // This also stops the check pinning a width, which its own rule forbids -- the
+  // earlier version tested /^1px solid / and would have failed a theme that
+  // legitimately said 2px.
+  const raw = getComputedStyle(document.documentElement)
+                .getPropertyValue('--containerBorder').trim();
+  const probe = document.createElement('div');
+  probe.style.border = 'var(--containerBorder)';
+  document.body.appendChild(probe);
+  const probed = getComputedStyle(probe).borderTopWidth;
+  probe.remove();
+  const out = { containerBorder: raw, borderVarUsable: probed !== '0px',
+                probedWidth: probed, els: {} };
   for (const sel of ['.ia_inputField', '.ia_dropdown', '.ia_button--primary']) {
     const e = document.querySelector(sel);
     if (!e) { out.els[sel] = 'absent'; continue; }
@@ -64,7 +78,7 @@ const MEASURE = () => {
     if (!(await opt.count())) { console.log(`  MISSING ${label}`); bad++; continue; }
     await opt.click(); await p.waitForTimeout(6000);
     const r = await p.evaluate(MEASURE);
-    const shorthandOk = /^1px solid /.test(r.containerBorder);
+    const shorthandOk = r.borderVarUsable;
     const isDrawn = (v) => /^(?!0px)\d+(\.\d+)?px (solid|dashed|dotted) /.test(v)
                            && !/rgba\(0, 0, 0, 0\)/.test(v);
     const drawn = Object.entries(r.els)
@@ -79,7 +93,15 @@ const MEASURE = () => {
     const asserted = drawn.filter(d => !BORDERED_BY_PROJECT.some(x => d.startsWith(x + '=')));
     const ok = shorthandOk && asserted.length > 0 && asserted.every(d => d.includes('drawn'));
     if (!ok) bad++;
-    console.log(`  ${ok ? 'ok  ' : 'FAIL'}  ${theme.padEnd(16)} --containerBorder="${r.containerBorder}"  ${drawn.join('  ')}`);
+    // Name the fault, not its symptom: "NOT A SHORTHAND (#d3dbd8)" says what to go
+    // and fix, where "0/2 bordered" only says something is wrong.
+    const varState = shorthandOk
+      ? `border-var: ok (${r.containerBorder})`
+      : `border-var: NOT A SHORTHAND (${r.containerBorder})`;
+    const assertState = asserted.length
+      ? drawn.join('  ')
+      : 'NOTHING ASSERTABLE ON SCREEN';
+    console.log(`  ${ok ? 'ok  ' : 'FAIL'}  ${theme.padEnd(16)} ${varState}  ${assertState}`);
   }
   await b.close();
   console.log(bad ? `\n${bad} theme(s) FAILED` : '\nevery theme draws the borders Ignition asks for');
