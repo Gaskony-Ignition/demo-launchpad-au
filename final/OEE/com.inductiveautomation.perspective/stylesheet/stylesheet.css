@@ -67,9 +67,23 @@
    also override a light theme's own `color-scheme: light` and leave its form
    controls and scrollbars rendering dark. `html` is an element selector
    (specificity 0,0,1) against a theme's `:root` (0,1,0), so any theme that
-   declares its own scheme wins regardless of order, and this only applies on
-   the themes that declare none -- which is Ignition's stock six, whose default
-   here is dark. */
+   declares its own scheme wins regardless of order, and this applies only where
+   nothing else has an opinion.
+
+   Which themes those are depends on the gateway, and it is worth knowing which:
+
+     * all ten Gaskony custom themes declare their own, always;
+     * the four stock VARIANTS (dark-cool, dark-warm, light-cool, light-warm)
+       declare one ONLY on a gateway where the Gaskony Theme Installer has been
+       run -- it writes a gaskony-additions.css into each and imports it. On a
+       vanilla gateway they declare nothing;
+     * base `light` and `dark` live inside the Perspective jar and never declare
+       one.
+
+   Measured 28/08/2026 on two gateways, one of each kind. So on a vanilla gateway
+   this dark default covers all six stock themes -- including the three light
+   ones, where it is the wrong answer and their controls render dark. Running the
+   Theme Installer fixes exactly that for the four variants. */
 html {
 	color-scheme: dark;
 }
