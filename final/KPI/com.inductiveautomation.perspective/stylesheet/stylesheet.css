@@ -83,7 +83,13 @@
    Measured 28/08/2026 on two gateways, one of each kind. So on a vanilla gateway
    this dark default covers all six stock themes -- including the three light
    ones, where it is the wrong answer and their controls render dark. Running the
-   Theme Installer fixes exactly that for the four variants. */
+   Theme Installer fixes exactly that for the four variants.
+
+   That residual cannot be closed in CSS. Perspective puts the active theme's name
+   NOWHERE in the DOM -- no class and no data attribute on html, body or
+   #app-container; the only trace is the href of the stylesheet it links. So there
+   is no selector to key a per-theme answer off, and no `[class*="dark"]` trick.
+   Checked directly, not assumed. Running the Theme Installer is the only fix. */
 html {
 	color-scheme: dark;
 }

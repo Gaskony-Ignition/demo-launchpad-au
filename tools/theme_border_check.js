@@ -19,6 +19,17 @@
 //     project class with its own border, so it stays green whatever the theme does --
 //     verified by deleting the repair and watching the buttons pass while every input
 //     failed. It is reported, never asserted on.
+//   * Treat "nothing assertable on this screen" as a FAILURE, not a pass. Demonstrated
+//     by pointing the probes at a selector that exists nowhere: both themes report
+//     FAIL even though the variable is correct and the excluded button is drawn.
+//
+// In one line: assert only on controls Ignition styles itself, never pin a value, and
+// treat nothing-assertable as a failure.
+//
+// The load-bearing assertion is the VARIABLE, not the elements. If --containerBorder
+// computes to a bare colour the run fails whatever any control on screen is doing, so
+// a page where every control happens to be project-styled still cannot go green for
+// the wrong reason. The element probes corroborate it.
 //
 // Negative-tested 28/08/2026: with the repair removed, the six stock themes pass and
 // all ten custom ones fail with `0px none`. A check that has never failed is not a
@@ -59,10 +70,13 @@ const MEASURE = () => {
     const drawn = Object.entries(r.els)
       .filter(([, v]) => v !== 'absent')
       .map(([k, v]) => `${k}=${isDrawn(v) ? 'drawn ' + v.split(' ')[0] : 'MISSING(' + v + ')'}`);
-    // assert only on the controls Ignition styles itself. A project style class
-    // that sets its own border cannot fail, so including one would only make the
-    // check green for the wrong reason.
-    const asserted = drawn.filter(d => !d.startsWith('.ia_button'));
+    // Assert only on the controls Ignition styles itself. A project style class that
+    // sets its own border cannot fail, so including one would only make the check
+    // green for the wrong reason. Explicit list rather than a prefix match: if a
+    // project class ever gives .ia_dropdown a border of its own, that probe has to be
+    // moved here deliberately, not silently absorbed by a pattern.
+    const BORDERED_BY_PROJECT = ['.ia_button--primary', '.ia_button--secondary'];
+    const asserted = drawn.filter(d => !BORDERED_BY_PROJECT.some(x => d.startsWith(x + '=')));
     const ok = shorthandOk && asserted.length > 0 && asserted.every(d => d.includes('drawn'));
     if (!ok) bad++;
     console.log(`  ${ok ? 'ok  ' : 'FAIL'}  ${theme.padEnd(16)} --containerBorder="${r.containerBorder}"  ${drawn.join('  ')}`);
