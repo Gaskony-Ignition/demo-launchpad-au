@@ -183,7 +183,13 @@ html {
    Verify this one by computed style, never by screenshot: on several of the packs
    the border colour sits close enough to the card that a crop cannot settle it.
 
-   Remove once the theme pack emits a shorthand again. */
+   FIXED UPSTREAM in ignition-themes v1.5.1 (28/08/2026): mapping.py now emits
+   the shorthand, so this is a no-op against a v1.5.1 pack exactly as it is
+   against a stock theme. It STAYS anyway, and the condition for removing it is
+   not "the pack is fixed" but "every gateway that runs this project has
+   reinstalled the pack" -- a gateway still carrying v1.4.0 or v1.5.0 themes
+   loses every border the moment this block goes. Drop it when that is true of
+   the estate, not when the upstream commit lands. */
 :root {
 	--containerBorder: 1px solid var(--border);
 }
