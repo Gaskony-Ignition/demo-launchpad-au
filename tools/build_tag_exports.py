@@ -3,7 +3,7 @@
 
 On 8.3 the tags live on disk as config resources, one tags.json per folder. A
 Designer tag import wants the opposite shape: a single root node with a nested
-tags[] array. This rebuilds that shape so the Exchange packages carry an export
+tags[] array. This rebuilds that shape so the Setup payload carries an export
 anyone can bring in through the Designer, whether or not they can reach the
 gateway filesystem.
 

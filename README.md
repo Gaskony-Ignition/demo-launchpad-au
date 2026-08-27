@@ -27,23 +27,34 @@ no PLC, no OPC server, no field device.
 ![KPI dashboard](docs/images/kpi-dashboard.png)
 *Dashboard — ten widget types, editable from the running session.*
 
-![OEE Settings showing the Gateway setup card with Set up this gateway and Check buttons](docs/images/oee-setup.png)
-*Settings — the whole install: import the project, press this.*
+![OEE Settings showing the Gateway setup card and the Appearance card's theme dropdown](docs/images/oee-setup.png)
+*Settings — the whole install is the first card. The second picks the theme.*
+
+![The same OEE overview rendered under the Nord light theme](docs/images/oee-overview-light-theme.png)
+*The same page under a light theme. Every colour but the chart series follows the
+gateway's Perspective theme.*
 
 ## What it does
 
 - **OEE** over seven lines — Availability, Performance, Quality and Utilisation per
   hour, shift and day, backed by SQL history.
 - **KPI** over 61 instrument tags — dashboard, trending and alarms.
-- **Self-contained.** The simulator and a SQLite database ship in the packages.
+- **Self-contained.** The simulator and a SQLite database ship inside the projects.
 - **A Setup button** that builds the gateway, and a **Check** button that reports it.
+- **Themed.** Both projects follow the gateway's Perspective theme — Ignition's own
+  six and any custom theme installed on the gateway. Pick one on Settings.
 
 ## How to use it
 
-1. Import `Projects/OEE.zip` and/or `Projects/KPI.zip` via **Platform → Projects →
-   Import Project**. Name them `OEE` and `KPI` — setup points the gateway scripting
-   project at `OEE` by name. Either installs on its own.
-2. Open the project's Settings screen and press **Set up this gateway**.
+Two ordinary Ignition project exports. There is nothing to unpack and nothing to load
+by hand.
+
+1. Download `OEE-<version>.zip` and/or `KPI-<version>.zip` from the
+   [latest release](../../releases/latest).
+2. Import each via **Platform → Projects → Import Project**. Name them `OEE` and
+   `KPI` — setup points the gateway scripting project at `OEE` by name. Either
+   installs on its own.
+3. Open the project's Settings screen and press **Set up this gateway**.
 
 That's the install. The button creates the database, tag provider, historian, simulator
 and its programme, tags, UDT types, tables, shift roster and demo history. It only
@@ -53,8 +64,20 @@ It won't repoint a gateway scripting project already set to something else, and 
 use a database other than its own SQLite `Examples` — the schema is SQLite DDL, so
 pointing it at Postgres would half-build rather than fail cleanly.
 
-The `Tags/` and `Gateway/` folders are there if you'd rather load things by hand; you
-don't need them. For many gateways at once, `tools/install.sh` does the same over SSH.
+For many gateways at once, `tools/install.sh` does the same over SSH.
+
+### Themes
+
+Settings → **Appearance** picks the theme for your session. The dropdown lists
+Ignition's six, then every custom theme the gateway actually carries, read from its
+own config resources — install a theme and it appears without the projects changing.
+The shipped default is `dark-cool`, the stock theme closest to the palette this port
+started from. To change what everyone gets rather than just your session, set the
+project's theme in the Designer under Project Properties.
+
+Chart **series** colours stay put across themes on purpose: a pen that changes hue
+between two screens stops being recognisable, and these read on a light and a dark
+ground alike.
 
 ## What "AU" changes
 
@@ -66,8 +89,11 @@ The OEE engine, UDT structure and screen designs are the original's. What change
 - **The pages laid out to fit** at a normal window size — verified at 1920×1080 and
   1600×900 against the rendered DOM — with a trimmed header and reformatted Production
   Summary tables.
-- **`color-scheme: dark`**, so Chrome's auto dark mode stops repainting the chart SVGs
-  white.
+- **Theme-driven colour.** The original paints a fixed dark palette; here every colour
+  but the chart series resolves from the gateway's Perspective theme, so Ignition's
+  own six and any custom theme all work. A `color-scheme` declaration comes with it,
+  so Chrome's auto dark mode stops repainting the chart SVGs white — written against
+  `html` rather than `:root`, so a theme's own declaration still wins.
 - **Metric converted at source**, so tag metadata, axes, legends and history agree —
   a display-time conversion leaves the stored unit showing.
 - **DD/MM/YYYY and 24-hour time**, including the chart components' own formats. Line
@@ -92,6 +118,9 @@ The Launchpad projects are published by **Inductive Automation** on the
 [Ignition Exchange](https://inductiveautomation.com/exchange/); the original views,
 scripts and tag structures are theirs, and are **not redistributed here** — get them
 from the Exchange.
+
+These are delivered as two ordinary project exports rather than as Exchange
+resources, and are not published on the Exchange.
 
 The MIT licence in [LICENSE](LICENSE) covers the changed and added work in this
 repository, not Inductive Automation's underlying work. Ignition, Perspective and

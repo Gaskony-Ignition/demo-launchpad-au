@@ -3,7 +3,7 @@ def doGet(request, session):
 
 	GET /system/webdev/OEE/lp_init?action=initDemoTags
 	Actions: setupShifts | seedHistory | initDemoTags | resetDemoTags | initTables | heal | diag | intervals | status
-	Delete this resource before publishing the portable Exchange package.
+	package.sh closes it to unauthenticated callers in the released zip.
 	"""
 	action = request["params"].get("action", "status")
 	out = {"action": action}

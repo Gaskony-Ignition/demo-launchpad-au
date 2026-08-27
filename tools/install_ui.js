@@ -2,8 +2,8 @@
 // Platform > Projects > Import Project dialog, then press "Set up this gateway".
 //
 //   node tools/install_ui.js --url http://localhost:8091 \
-//        --zip OEE=dist/launchpad_oee_au.2.1.2.zip \
-//        --zip KPI=dist/launchpad_kpi_au.2.1.2.zip [--overwrite] [--no-setup]
+//        --zip OEE=dist/OEE-3.0.0.zip \
+//        --zip KPI=dist/KPI-3.0.0.zip [--overwrite] [--no-setup]
 //
 // This exists because `tools/install.sh` untars the projects straight into
 // data/projects, and untarring tolerates things the importer rejects. A resource
