@@ -7,8 +7,7 @@
 //
 // Exits non-zero if any check fails.
 const path = require('path');
-const { chromium } = require(path.join(
-  '/claude/ignition-claude-toolkit/plugins/ignition/skills/verify-view/tool/node_modules/playwright'));
+const { chromium } = require('./lib/toolkit').playwright('verify');
 
 function arg(n, d) { const i = process.argv.indexOf('--' + n); return i > -1 ? process.argv[i + 1] : d; }
 const URL = arg('url', 'http://localhost:8091').replace(/\/+$/, '');

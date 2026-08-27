@@ -54,7 +54,8 @@ echo "  deployed $PROJECT -> $CONTAINER"
 # Landing the files changes nothing on its own -- the gateway reads them on a project
 # scan, and there is no scriptable hook to ask for one from inside a project whose
 # scripts are themselves the stale copy. The toolkit drives the web UI's button.
-SCAN=/claude/ignition-claude-toolkit/plugins/ignition/skills/scan/tool/scan.js
+SCAN="${IGNITION_TOOLKIT:-/Home-Claude/ignition-claude-toolkit}/plugins/ignition/skills/scan/tool/scan.js"
+[ -f "$SCAN" ] || SCAN=/claude/ignition-claude-toolkit/plugins/ignition/skills/scan/tool/scan.js
 GATEWAY="${SCAN_GATEWAY:-module-testing}"
 if [ -f "$SCAN" ]; then
   node "$SCAN" --gateway "$GATEWAY"

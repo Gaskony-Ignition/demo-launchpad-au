@@ -18,8 +18,7 @@
 // Exits non-zero if an import fails or a Setup run does not reach SETUP COMPLETE.
 const path = require('path');
 const fs = require('fs');
-const { chromium } = require(path.join(
-  '/claude/ignition-claude-toolkit/plugins/ignition/skills/verify-view/tool/node_modules/playwright'));
+const { chromium } = require('./lib/toolkit').playwright('install_ui');
 
 function arg(n, d) { const i = process.argv.indexOf('--' + n); return i > -1 ? process.argv[i + 1] : d; }
 function args(n) {

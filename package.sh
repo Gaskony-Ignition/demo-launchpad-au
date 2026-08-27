@@ -1,40 +1,50 @@
 #!/usr/bin/env bash
-# Build the two Ignition Exchange resource packages.
+# Build the two importable Ignition project zips.
 #
-#   ./package.sh     -> dist/launchpad_oee_au.<version>.zip
-#                       dist/launchpad_kpi_au.<version>.zip
+#   ./package.sh                  -> dist/OEE.zip
+#                                    dist/KPI.zip            (dev titles)
+#   ./package.sh --release [VER]  -> dist/OEE-<VER>.zip
+#                                    dist/KPI-<VER>.zip
 #
-# Layout follows the same Exchange convention as the ACME Alarm Demo package:
+# These are plain project exports, nothing else: Platform > Projects > Import
+# Project takes them directly, and everything a gateway needs beyond the project
+# itself -- database, tag provider, historian, simulator, tags, tables, roster,
+# demo history -- is built by the Setup button on the project's own Settings page.
+# There is no separate resource package any more, no MANIFEST, and no Tags/ or
+# Gateway/ folder to unpack by hand.
 #
-#   MANIFEST                    name, version, minimum Ignition, modules
-#   README.md                   what it is, how to install, custom instructions
-#   LICENSE                     MIT
-#   Projects/<name>.zip         the project export
-#   Tags/                       tag + UDT exports, and the simulator programme
-#   Gateway/                    config resources a project import cannot create
-#                               for itself - tag provider, database connection,
-#                               historian, and (KPI) the simulator device
+# The zip is built from INSIDE the project directory (`cd final/OEE && zip -r`),
+# which is what the importer expects: a zip whose members start with project.json,
+# not with a wrapping folder.
 #
-# Gateway/ is an addition to the Exchange convention, not part of it; it is
-# described in each README's Custom Instructions, which is where an Exchange
-# resource is expected to put anything a plain project import does not cover.
-#
-# The two packages are independent: either installs on its own, and where they
-# overlap (tag provider, Examples database) both ship the same resource, so
-# installing the second over the first is a no-op.
+# VER defaults to the tag HEAD is exactly on, so cutting a release is
+#   git tag v3.0.0 && ./package.sh --release
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DIST="$HERE/dist"
-VERSION=2.1.8
 
-# The packages are built from the working tree, not from git, so a gitignored file
-# on disk ships without ever appearing in `git status`. That is exactly how a stray
+# The zips are built from the working tree, not from git, so a gitignored file on
+# disk ships without ever appearing in `git status`. That is exactly how a stray
 # __pycache__ went out inside a script resource in 2.1.0. Fail here rather than
 # discover it on someone else's gateway.
 python3 "$HERE/tools/check_resources.py" "$HERE/final/OEE" "$HERE/final/KPI"
 
 command -v zip >/dev/null || { echo "package: zip not installed" >&2; exit 2; }
+
+VERSION=""
+if [[ "${1:-}" == "--release" ]]; then
+  VERSION="${2:-}"
+  if [[ -z "$VERSION" ]]; then
+    VERSION="$(cd "$HERE" && git describe --tags --exact-match 2>/dev/null || true)"
+    [[ -n "$VERSION" ]] || {
+      echo "package.sh --release: no version given and HEAD is not exactly on a tag" >&2
+      exit 2; }
+  fi
+  VERSION="${VERSION#v}"   # tags are vX.Y.Z; the title wants the bare number
+elif [[ -n "${1:-}" ]]; then
+  echo "package: unknown argument $1" >&2; exit 2
+fi
 
 # The installer endpoints must be reachable unauthenticated to be driven from a
 # script, but they can truncate the example tables -- so the published copy
@@ -48,30 +58,17 @@ d["doGet"]["require-auth"] = True
 json.dump(d, open(p, "w"), indent=2)' "$1"
 }
 
-# Every released project carries its version in the Title (workspace CLAUDE.md):
-# project.json's "title" becomes "<Project Title> <version>" so that landing on a
-# gateway's Config -> Projects list shows what is actually running. The working
-# copy under final/ keeps a "(dev)" title instead -- this is the one place that
-# turns it into a release title, and it only ever touches the packaged copy in
-# dist/, never final/ itself. VERSION above is the only place the number lives.
-stamp_title() {
+# Every released project carries its version in the Title AND at the end of the
+# Description (workspace CLAUDE.md, 24/08/2026): Config > Projects shows only the
+# Description column, while the Title shows in the Edit drawer and on the
+# Perspective launch surfaces, so both are stamped. The working copy under final/
+# keeps a "(dev)" title, and this only ever touches the staged copy in dist/.
+stamp_version() {
   python3 -c '
-import json, sys
-p, title = sys.argv[1], sys.argv[2]
-d = json.load(open(p))
-d["title"] = title
-json.dump(d, open(p, "w"), indent=2)' "$1" "$2"
-}
-
-# Same rule, applied to the Description: Config -> Projects only shows that
-# column, not the Title, so the version has to land there too (workspace
-# CLAUDE.md, 24/08/2026). Suffix rather than replace -- the existing prose
-# stays intact -- and again only ever touches the packaged copy in dist/.
-append_desc_suffix() {
-  python3 -c '
-import json, sys
+import json, re, sys
 p, version = sys.argv[1], sys.argv[2]
 d = json.load(open(p))
+d["title"] = re.sub(r"\s*\(dev\)$", "", d["title"]) + " " + version
 d["description"] = d["description"] + " · v" + version
 json.dump(d, open(p, "w"), indent=2)' "$1" "$2"
 }
@@ -79,57 +76,38 @@ json.dump(d, open(p, "w"), indent=2)' "$1" "$2"
 rm -rf "$DIST"
 mkdir -p "$DIST"
 
-echo "--> tag exports"
-python3 "$HERE/tools/build_tag_exports.py" "$DIST/tags"
-
-for PKG in oee kpi; do
-  case "$PKG" in
-    oee) PROJ=OEE; SLUG=launchpad_oee_au; TITLE="Launchpad OEE (AU)"; ENDPOINT=lp_init ;;
-    kpi) PROJ=KPI; SLUG=launchpad_kpi_au; TITLE="Launchpad KPI (AU)"; ENDPOINT=kpi_init ;;
+for PROJ in OEE KPI; do
+  case "$PROJ" in
+    OEE) ENDPOINT=lp_init ;;
+    KPI) ENDPOINT=kpi_init ;;
   esac
-  STAGE="$DIST/stage-$PKG"
-  mkdir -p "$STAGE/Projects" "$STAGE/Tags" "$STAGE/Gateway"
+  STAGE="$DIST/stage-$PROJ"
+  cp -r "$HERE/final/$PROJ" "$STAGE"
 
-  echo "--> $TITLE"
+  harden "$STAGE/com.inductiveautomation.webdev/resources/$ENDPOINT/config.json"
 
-  # project export, with the title stamped to this release's version and the
-  # installer endpoint closed
-  rm -rf "$DIST/proj-$PKG"
-  cp -r "$HERE/final/$PROJ" "$DIST/proj-$PKG"
-  stamp_title "$DIST/proj-$PKG/project.json" "$TITLE $VERSION"
-  append_desc_suffix "$DIST/proj-$PKG/project.json" "$VERSION"
-  harden "$DIST/proj-$PKG/com.inductiveautomation.webdev/resources/$ENDPOINT/config.json"
-  ( cd "$DIST/proj-$PKG" && zip -qr "$STAGE/Projects/$PROJ.zip" . )
-  rm -rf "$DIST/proj-$PKG"
-
-  # gateway resources both packages need
-  ITEMS="tag-provider/launchpad database-connection/Examples historian-provider/launchpad"
-  # only KPI is driven by the simulator; the OEE demo lines are memory tags driven
-  # by their own tag event scripts, so shipping the device with OEE would be noise
-  [[ "$PKG" == "kpi" ]] && ITEMS="$ITEMS device/Launchpad"
-  for it in $ITEMS; do
-    mkdir -p "$STAGE/Gateway/$(dirname "$it")"
-    cp -r "$HERE/live-config/$it" "$STAGE/Gateway/$it"
-  done
-
-  cp "$HERE/exchange/$PKG/MANIFEST" "$STAGE/MANIFEST"
-  cp "$HERE/exchange/$PKG/README.md" "$STAGE/README.md"
-  cp "$HERE/exchange/LICENSE" "$STAGE/LICENSE"
-  # README screenshots -- the package must be self-contained inside the zip too.
-  # Written as a full `if` rather than `[ -d ... ] && cp ...`: under the
-  # `set -e` above, the && form exits the whole script for any package that
-  # happens to have no docs/ folder.
-  if [ -d "$HERE/exchange/$PKG/docs" ]; then
-    cp -r "$HERE/exchange/$PKG/docs" "$STAGE/docs"
+  if [[ -n "$VERSION" ]]; then
+    stamp_version "$STAGE/project.json" "$VERSION"
+    # ignition/global-props/data.bin is THIS RIG's Project Properties, serialised
+    # by Ignition. Nothing in either project needs it -- every named query names
+    # its own database ("Examples") and neither project has an identity provider
+    # -- so shipping it would only push this machine's settings onto whoever
+    # imports the zip. Excluded, a fresh import registers with no global-props
+    # resource at all and falls back to Ignition's own defaults. Note that an
+    # import over an EXISTING project with "Allow Overwrite" ticked is a
+    # resource-level replace, so it clears the target's Project Properties too.
+    rm -rf "$STAGE/ignition/global-props"
   fi
 
-  cp -r "$DIST/tags/$PKG/." "$STAGE/Tags/"
-  ( cd "$STAGE" && zip -qr "$DIST/$SLUG.$VERSION.zip" . )
+  # A release artefact carries its version in the FILENAME as well (Nigel,
+  # 26/08/2026) -- a bare downloaded zip is unidentifiable. Dev builds stay
+  # unversioned.
+  ZIP="$DIST/$PROJ${VERSION:+-$VERSION}.zip"
+  ( cd "$STAGE" && zip -qr "$ZIP" . )
   rm -rf "$STAGE"
-  echo "    dist/$SLUG.$VERSION.zip"
+  echo "  $(basename "$ZIP")"
 done
 
-rm -rf "$DIST/tags"
 echo
-echo "packages built:"
+echo "project zips built:"
 ls -1sh "$DIST"/*.zip

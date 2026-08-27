@@ -40,7 +40,8 @@ done
 [[ -n "$CONTAINER" && -n "$URL" && -n "$GATEWAY" ]] || {
   echo "install: --container, --url and --gateway are all required" >&2; exit 2; }
 
-TOOLKIT=/claude/ignition-claude-toolkit/plugins/ignition/skills
+TOOLKIT="${IGNITION_TOOLKIT:-/Home-Claude/ignition-claude-toolkit}/plugins/ignition/skills"
+[ -d "$TOOLKIT" ] || TOOLKIT=/claude/ignition-claude-toolkit/plugins/ignition/skills
 DATA=/usr/local/bin/ignition/data
 RES=$DATA/config/resources
 

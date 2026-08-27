@@ -19,8 +19,7 @@
 // The page has a refresh button that fixes all of it in one click, which is exactly
 // why it survived: anyone testing interactively presses it without thinking.
 const path = require('path');
-const { chromium } = require(path.join(
-  '/claude/ignition-claude-toolkit/plugins/ignition/skills/verify-view/tool/node_modules/playwright'));
+const { chromium } = require('./lib/toolkit').playwright('check_recovery');
 
 function arg(n, d) { const i = process.argv.indexOf('--' + n); return i > -1 ? process.argv[i + 1] : d; }
 const URL = arg('url', 'http://localhost:8091').replace(/\/+$/, '');

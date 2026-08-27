@@ -2,8 +2,7 @@
 // A static screenshot cannot answer this: headless Chromium draws overlay
 // scrollbars that are invisible unless a scroll is in progress.
 const path = require('path');
-const { chromium } = require(path.join(
-  '/claude/ignition-claude-toolkit/plugins/ignition/skills/verify-view/tool/node_modules/playwright'));
+const { chromium } = require('./lib/toolkit').playwright('check_scroll');
 
 const URL = process.argv[2] || 'http://localhost:8088/data/perspective/client/OEE/';
 const W = parseInt(process.argv[3] || '1366', 10);
