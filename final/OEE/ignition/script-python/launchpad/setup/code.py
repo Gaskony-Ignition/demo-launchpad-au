@@ -544,13 +544,50 @@ def shiftsEnabled():
 
 # --------------------------------------------------------------- build steps
 
+def existingDatabase():
+    """What a connection already called `Examples` actually is.
+
+    Returns "absent", "ours" for the SQLite one these projects are written against,
+    or the translator name of whatever else is sitting under that name.
+
+    A connection that cannot be read counts as NOT ours. Refusing costs a person one
+    message telling them exactly what to look at; guessing wrong costs them a
+    half-created schema in a database they chose.
+    """
+    p = os.path.join(_abs(RESOURCES), CORE, "database-connection", DATABASE,
+                     "config.json")
+    if not os.path.exists(p):
+        return "absent"
+    try:
+        translator = system.util.jsonDecode(_read(p)).get("translator") or ""
+    except:
+        return "unreadable"
+    return "ours" if str(translator).upper() == "SQLITE" else str(translator)
+
+
 def ensureDatabase(force=False):
     """Create the SQLite connection the projects are written against.
 
     No credentials are involved, which is the whole reason this can be automated: a
     Postgres or MSSQL connection would need a password nobody can supply from here.
+
+    Nothing here needs a connection to exist first -- on a gateway with no database
+    connections at all this is what makes the first one.
     """
-    if databaseReady(DATABASE) and not force:
+    kind = existingDatabase()
+    if kind not in ("absent", "ours"):
+        # databaseReady only asks whether the name answers SELECT 1, so a gateway
+        # that already has a connection called Examples pointing at Postgres reads as
+        # ready and every later step would run SQLite DDL against it -- half-building
+        # a schema in somebody else's database instead of stopping. The README has
+        # always said this does not happen; this is what makes that true.
+        # Kept short on purpose: _explain truncates a step's message at 180
+        # characters, and the half that matters is the instruction, not the reason.
+        raise Exception(
+            "a connection called '%s' already exists here and is %s, not SQLite. "
+            "This schema is SQLite DDL. Rename or remove it, then press Set up again"
+            % (DATABASE, kind))
+    if kind == "ours" and databaseReady(DATABASE) and not force:
         return "already connected"
     _configResource(CORE, "database-connection", DATABASE, {
         "connectURL": "jdbc:sqlite:${data}/%s.db" % DATABASE,
@@ -736,6 +773,17 @@ def run(progress=None, force=False, history=True, tags=False):
             LOG.warn("setup step %s failed: %s" % (name, traceback.format_exc()))
 
     step("database", lambda: ensureDatabase(force), "creating the database connection")
+    # The database is the one step nothing else may run past. Every resource below
+    # names it -- the tag provider's default datasource, the historian's store -- so
+    # carrying on after it fails leaves three resources pointing at whatever WAS
+    # under that name, which for the case ensureDatabase refuses (someone else's
+    # Postgres) is precisely the harm it refuses in order to avoid.
+    if report.get("database") == "FAILED":
+        reporter.note("stopping: nothing below can be built without the database")
+        report["ok"] = False
+        report["detail"] = reporter.finish(False, summary(report))
+        return report
+
     step("tagProvider", lambda: ensureTagProvider(force), "creating the tag provider")
     step("historian", lambda: ensureHistorian(force), "creating the tag historian")
     step("device", lambda: ensureDevice(force), "creating the simulator device")
