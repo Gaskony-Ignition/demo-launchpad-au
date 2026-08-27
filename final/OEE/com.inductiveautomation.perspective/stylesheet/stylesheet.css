@@ -87,20 +87,29 @@ html {
 	fill: var(--oee-ink);
 }
 
-/* Bound the form fields whatever the theme did.
+/* Repair --containerBorder, which Ignition consumes as a SHORTHAND.
 
-   Ignition's own .ia_inputField and .ia_dropdown draw their border with
-   `border: var(--containerBorder)`. In the six stock themes that variable is a
-   SHORTHAND -- `1px solid var(--border)` -- and the rule works. Every one of the
-   ten Gaskony custom themes redefines --containerBorder as a bare COLOUR
-   (`#d8dee9`), which makes the shorthand invalid, and the border disappears: on
-   a light custom theme the field is then white on a white card with nothing to
-   say where it is. Restating it here costs nothing on a stock theme -- same
-   width, same --border colour, later in the cascade -- and keeps every field
-   visible on the others. Remove once the theme pack emits a shorthand again. */
-.ia_inputField,
-.ia_dropdown {
-	border: 1px solid var(--oee-line);
+   Its own CSS says `border: var(--containerBorder)` in 85 separate rules -- every
+   input, dropdown, button, alarm table, accordion and dashboard tile. In the six
+   stock themes that variable holds `1px solid var(--border)` and they all work.
+   Every one of the ten Gaskony custom themes redefines it as a bare COLOUR
+   (`#d8dee9`), which makes all 85 declarations invalid at once, and the borders
+   simply vanish -- on a light custom theme a text field is then white on a white
+   card with nothing to say where it is.
+
+   Fixing the VARIABLE rather than the selectors is what covers all 85: an earlier
+   version of this restated the border on .ia_inputField and .ia_dropdown alone and
+   left the other 83 broken. This is a no-op on a stock theme (identical value) and
+   restores the contract on the others, using the theme's own --border colour
+   either way. It has to be `:root` and not `html` -- unlike color-scheme above,
+   here we WANT to outrank the theme, and this stylesheet loads after it.
+
+   Verify this one by computed style, never by screenshot: on several of the packs
+   the border colour sits close enough to the card that a crop cannot settle it.
+
+   Remove once the theme pack emits a shorthand again. */
+:root {
+	--containerBorder: 1px solid var(--border);
 }
 
 /* Custom scrollbars. Stock Ignition themes leave scrollbars at the browser
