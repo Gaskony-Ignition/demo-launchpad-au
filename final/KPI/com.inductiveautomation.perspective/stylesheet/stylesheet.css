@@ -1,21 +1,72 @@
 /* Direct stylesheet authoring is an advanced feature. Knowledge of CSS required.*/
 
+
+/* ===========================================================================
+   Theme mapping.
+
+   Every colour this project paints its chrome with resolves from the ACTIVE
+   PERSPECTIVE THEME, so changing the theme repaints the whole application --
+   Ignition's own six, and any custom theme installed on the gateway under
+   data/config/resources/core/com.inductiveautomation.perspective/themes/.
+   Pick one on the Settings page, or set session.props.theme.
+
+   Each var() carries the colour the AU port shipped with as its fallback. That
+   is what a theme which does not define the variable lands on, and it doubles
+   as the record of what the original looked like.
+
+   What is deliberately NOT themed: the CHART SERIES colours (the trend pens, the
+   bar-chart palettes, the tag-tree icons).
+   Those are data encoding rather than chrome -- a series that changes hue with
+   the theme stops being recognisable between two screens -- and they are chosen
+   to read on a light and a dark ground alike. The Ignition Launchpad wordmark
+   keeps its orange tick for the same reason: it is a mark, not a surface.
+
+   The dashboard and bar-chart style classes already read Ignition's own theme
+   variables directly (--neutral-*, --label); those are left as they were.
+   =========================================================================== */
+
 :root {
-	/* Tell Chrome the page is already dark. Without this, "auto dark mode for
-	   web contents" (chrome://flags/#enable-force-dark) repaints SVG fills and
-	   turns the charts WHITE on an otherwise-correct dark page. It is a client
-	   setting, so every server-side probe reads clean and no headless screenshot
-	   can reproduce it. */
+	/* --- surfaces ------------------------------------------------------- */
+	--kpi-background:  var(--containerRoot, #151518);   /* the page */
+	--kpi-card:        var(--container, #212121);       /* a card on the page */
+	--kpi-object:      var(--neutral-50, #7A7A7A);      /* a muted/disabled control */
+	--kpi-line:        var(--border, #767676);          /* hairlines and outlines */
+
+	/* --- ink ------------------------------------------------------------ */
+	--kpi-ink:         var(--label, #D8D8D8);           /* body text on a card */
+	--kpi-ink-strong:  var(--neutral-100, #FFFFFF);     /* headings, big numbers */
+	/* ink that sits ON a fill rather than on a surface -- an accent button, a
+	   selected nav tab. Ignition's own .ia_button--primary uses --neutral-10
+	   for exactly this, and it inverts with the theme the way the fill under
+	   it does. */
+	--kpi-ink-inverse: var(--neutral-10, #161616);
+
+	/* --- accents -------------------------------------------------------- */
+	--kpi-highlight:   var(--callToAction, #51C49E);    /* selection, primary action */
+
+	/* the two the KPI screens name for themselves: the primary reading and the
+	   secondary/target one drawn beside it */
+	--kpi-primary:     var(--callToAction, #62C3DA);
+	--kpi-secondary:   var(--warning, #FFB35E);
+}
+
+/* The project's own colour-scheme declaration, and the one place it is
+   deliberately NOT written as `:root`.
+
+   Without a declared scheme, Chrome's "auto dark mode for web contents"
+   (chrome://flags/#enable-force-dark) repaints SVG fills and turns the charts
+   WHITE on an otherwise-correct dark page. It is a client setting, so every
+   server-side probe reads clean and no headless screenshot can reproduce it.
+
+   But this stylesheet loads AFTER the theme's, so a `:root` rule here would
+   also override a light theme's own `color-scheme: light` and leave its form
+   controls and scrollbars rendering dark. `html` is an element selector
+   (specificity 0,0,1) against a theme's `:root` (0,1,0), so any theme that
+   declares its own scheme wins regardless of order, and this only applies on
+   the themes that declare none -- which is Ignition's stock six, whose default
+   here is dark. */
+html {
 	color-scheme: dark;
-
-	
-	--kpi-card: #212121;
-	--kpi-background: #151518;
-	--kpi-object: #7A7A7A;
-	--kpi-primary: #62C3DA;
-	--kpi-secondary: #FFB35E;
-	--kpi-highlight: #51C49E;
-
 }
 
 #launchpadDashboard > div > div > div > div {
@@ -73,3 +124,70 @@
 .ia_powerChartComponent__penDataDisplay__table__icon.collapse-icon {
 	height: 18px !important;
 }
+
+/* line chart x trace popup colors -- ink on the info box's own light ground,
+   which inverts with the theme the same way --kpi-ink-inverse does */
+.ia_timeSeriesChartComponent__labelText{
+	fill: var(--kpi-ink-inverse);
+	stroke: var(--neutral-90, #e9e9e9);
+	stroke-width: 6;
+	paint-order: stroke fill;
+}
+
+.ia_timeMarker > g > text{
+	fill: var(--kpi-ink);
+}
+
+/* Bound the form fields whatever the theme did.
+
+   Ignition's own .ia_inputField and .ia_dropdown draw their border with
+   `border: var(--containerBorder)`. In the six stock themes that variable is a
+   SHORTHAND -- `1px solid var(--border)` -- and the rule works. Every one of the
+   ten Gaskony custom themes redefines --containerBorder as a bare COLOUR
+   (`#d8dee9`), which makes the shorthand invalid, and the border disappears: on
+   a light custom theme the field is then white on a white card with nothing to
+   say where it is. Restating it here costs nothing on a stock theme -- same
+   width, same --border colour, later in the cascade -- and keeps every field
+   visible on the others. Remove once the theme pack emits a shorthand again. */
+.ia_inputField,
+.ia_dropdown {
+	border: 1px solid var(--kpi-line);
+}
+
+/* Custom scrollbars. Stock Ignition themes leave scrollbars at the browser
+   default, so they never follow the theme on their own; these track it.
+   `scrollbar-color` is what Chrome 121+ and Firefox read, the ::-webkit-*
+   block carries width and radius for older Chromium (Perspective Workstation). */
+
+* {
+	scrollbar-color: var(--kpi-line) transparent;
+	scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--kpi-line);
+	border-radius: 6px;
+	border: 2px solid transparent;
+	background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: var(--kpi-highlight);
+	background-clip: content-box;
+}
+
+/* The dropdown and select overrides that used to live here forced white text on
+   a fixed dark surface, to make Ignition's then light-by-default controls read
+   on this project's dark pages. The theme paints those controls correctly on
+   its own, in both directions, so the overrides are gone rather than fighting
+   it -- a dropdown under a light theme would have been white-on-white. */

@@ -130,7 +130,7 @@
             "borderStyle": "none",
             "borderTopLeftRadius": 10,
             "borderTopRightRadius": 10,
-            "color": "#FFFFFF",
+            "color": "var(--oee-ink-strong)",
             "marginTop": 6,
             "minHeight": "40px"
           }

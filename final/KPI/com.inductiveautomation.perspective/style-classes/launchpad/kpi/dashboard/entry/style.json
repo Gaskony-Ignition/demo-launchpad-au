@@ -1,7 +1,7 @@
 {
   "base": {
     "style": {
-      "backgroundColor": "#FFFFFF00",
+      "backgroundColor": "transparent",
       "borderColor": "var(--neutral-40)",
       "borderStyle": "solid",
       "borderWidth": "1px",

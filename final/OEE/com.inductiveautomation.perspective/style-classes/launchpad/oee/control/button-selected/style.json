@@ -9,7 +9,7 @@
       "borderTopRightRadius": "10px",
       "borderBottomLeftRadius": "10px",
       "borderBottomRightRadius": "10px",
-      "color": "#000000",
+      "color": "var(--oee-ink-inverse)",
       "fontFamily": "Noto Sans",
       "fontSize": "14px",
       "marginBottom": "0px",
@@ -23,8 +23,8 @@
       "pseudo": "disabled",
       "style": {
         "backgroundColor": "var(--oee-object)",
-        "borderColor": "#B4B4B4",
-        "color": "#B4B4B4"
+        "borderColor": "var(--oee-line)",
+        "color": "var(--oee-ink-muted)"
       }
     }
   ]

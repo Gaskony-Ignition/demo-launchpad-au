@@ -77,7 +77,7 @@
           "name": "GatewaySetup"
         },
         "position": {
-          "grow": 1,
+          "grow": 0,
           "shrink": 0
         },
         "props": {
@@ -246,6 +246,129 @@
               }
             },
             "type": "ia.display.label"
+          }
+        ]
+      },
+      {
+        "meta": {
+          "name": "Appearance"
+        },
+        "position": {
+          "grow": 0,
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "classes": "launchpad/oee/card"
+          }
+        },
+        "type": "ia.container.flex",
+        "children": [
+          {
+            "meta": {
+              "name": "Header"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "text": "Appearance",
+              "style": {
+                "classes": "launchpad/oee/text/header",
+                "textAlign": "left"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Info"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "text": "Repaints this session only. Ignition's six themes are always listed; any custom theme installed on this gateway follows them. To change what everyone gets, set the project's theme in the Designer.",
+              "style": {
+                "classes": "launchpad/oee/text/label",
+                "textAlign": "left",
+                "marginBottom": 10
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Row"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "direction": "row",
+              "alignItems": "center"
+            },
+            "type": "ia.container.flex",
+            "children": [
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "60px",
+                  "shrink": 0
+                },
+                "props": {
+                  "text": "Theme",
+                  "style": {
+                    "classes": "launchpad/oee/text/label",
+                    "textAlign": "left"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Theme"
+                },
+                "position": {
+                  "basis": "260px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.options": {
+                    "binding": {
+                      "config": {
+                        "struct": {}
+                      },
+                      "transforms": [
+                        {
+                          "code": "\treturn launchpad.ui.themeOptions()",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr-struct"
+                    }
+                  },
+                  "props.value": {
+                    "binding": {
+                      "config": {
+                        "bidirectional": true,
+                        "path": "session.props.theme"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "launchpad/oee/control/dropdown"
+                  }
+                },
+                "type": "ia.input.dropdown"
+              }
+            ]
           }
         ]
       },
@@ -1140,7 +1263,7 @@
                   "markdown": {
                     "escapeHtml": false
                   },
-                  "source": "Adjust this value for the \"good\" OEE value you are targeting.\n\nAll displays of the OEE value that change color will show as red if below this value, and blue if above this value.\n\nThis is not stored historically, it is only used for the live display of colors.",
+                  "source": "Adjust this value for the \"good\" OEE value you are targeting.\n\nAll displays of the OEE value that change color will show as red if below this value, and green if above it.\n\nThis is not stored historically, it is only used for the live display of colors.",
                   "style": {
                     "classes": "launchpad/oee/text/label",
                     "marginLeft": 20,

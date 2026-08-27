@@ -1,8 +1,8 @@
 {
   "base": {
     "style": {
-      "backgroundColor": "#151518",
-      "borderBottomColor": "#767676",
+      "backgroundColor": "var(--kpi-background)",
+      "borderBottomColor": "var(--kpi-line)",
       "borderBottomStyle": "solid",
       "borderBottomWidth": "1px",
       "borderLeftStyle": "none",

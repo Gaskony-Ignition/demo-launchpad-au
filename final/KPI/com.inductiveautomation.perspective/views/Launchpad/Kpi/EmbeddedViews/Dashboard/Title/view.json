@@ -74,7 +74,7 @@
         },
         "props": {
           "style": {
-            "classes": "Title/Text"
+            "classes": ""
           }
         },
         "type": "ia.display.label"
@@ -85,7 +85,7 @@
     },
     "props": {
       "style": {
-        "classes": "Title/Title"
+        "classes": ""
       }
     },
     "type": "ia.container.flex"

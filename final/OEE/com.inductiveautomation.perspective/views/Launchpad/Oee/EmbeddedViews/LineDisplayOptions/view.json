@@ -342,7 +342,7 @@
               "inputProps": {
                 "style": {
                   "classes": "launchpad/oee/control/text-entry",
-                  "color": "#FFFFFF"
+                  "color": "var(--oee-ink-strong)"
                 }
               },
               "style": {
@@ -439,7 +439,7 @@
               "inputProps": {
                 "style": {
                   "classes": "launchpad/oee/control/text-entry",
-                  "color": "#FFFFFF"
+                  "color": "var(--oee-ink-strong)"
                 }
               },
               "style": {

@@ -205,6 +205,129 @@
       },
       {
         "meta": {
+          "name": "Appearance"
+        },
+        "position": {
+          "grow": 0,
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "classes": "launchpad/kpi/card"
+          }
+        },
+        "type": "ia.container.flex",
+        "children": [
+          {
+            "meta": {
+              "name": "Header"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "text": "Appearance",
+              "style": {
+                "classes": "launchpad/kpi/text/label",
+                "textAlign": "left"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Info"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "text": "Repaints this session only. Ignition's six themes are always listed; any custom theme installed on this gateway follows them. To change what everyone gets, set the project's theme in the Designer.",
+              "style": {
+                "classes": "launchpad/kpi/text/label",
+                "textAlign": "left",
+                "marginBottom": 10
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Row"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "direction": "row",
+              "alignItems": "center"
+            },
+            "type": "ia.container.flex",
+            "children": [
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "60px",
+                  "shrink": 0
+                },
+                "props": {
+                  "text": "Theme",
+                  "style": {
+                    "classes": "launchpad/kpi/text/label",
+                    "textAlign": "left"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Theme"
+                },
+                "position": {
+                  "basis": "260px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.options": {
+                    "binding": {
+                      "config": {
+                        "struct": {}
+                      },
+                      "transforms": [
+                        {
+                          "code": "\treturn launchpad.ui.themeOptions()",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr-struct"
+                    }
+                  },
+                  "props.value": {
+                    "binding": {
+                      "config": {
+                        "bidirectional": true,
+                        "path": "session.props.theme"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "launchpad/kpi/control/dropdown"
+                  }
+                },
+                "type": "ia.input.dropdown"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "meta": {
           "name": "Maintenance"
         },
         "position": {

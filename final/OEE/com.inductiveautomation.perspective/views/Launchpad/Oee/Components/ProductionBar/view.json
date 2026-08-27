@@ -232,7 +232,7 @@
             },
             "props": {
               "style": {
-                "color": "#FFFFFF",
+                "color": "var(--oee-ink-strong)",
                 "fontSize": "14px",
                 "fontWeight": "bold",
                 "padding": 7,

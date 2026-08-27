@@ -5,7 +5,7 @@
       "borderTopRightRadius": "6px",
       "borderBottomLeftRadius": "6px",
       "borderBottomRightRadius": "6px",
-      "color": "#D8D8D8",
+      "color": "var(--oee-ink)",
       "fontSize": "14px"
     }
   }

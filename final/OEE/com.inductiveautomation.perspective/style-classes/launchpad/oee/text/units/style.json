@@ -1,7 +1,7 @@
 {
   "base": {
     "style": {
-      "color": "#D8D8D8",
+      "color": "var(--oee-ink)",
       "fontSize": "20px",
       "fontWeight": "normal",
       "textAlign": "center"

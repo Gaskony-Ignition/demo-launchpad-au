@@ -219,7 +219,7 @@
             }
           ],
           "style": {
-            "classes": "Launchpad/Kpi/Root",
+            "classes": "launchpad/kpi/root",
             "overflow": "hidden"
           },
           "timeAxis": {

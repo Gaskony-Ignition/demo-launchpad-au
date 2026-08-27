@@ -1243,7 +1243,7 @@
                       },
                       "cells": {
                         "style": {
-                          "color": "var(--oee-lightback)"
+                          "color": "var(--oee-ink)"
                         }
                       },
                       "columns": [
@@ -2546,7 +2546,7 @@
                       },
                       "cells": {
                         "style": {
-                          "color": "var(--oee-lightback)"
+                          "color": "var(--oee-ink)"
                         }
                       },
                       "columns": [
@@ -3733,7 +3733,7 @@
                       },
                       "cells": {
                         "style": {
-                          "color": "var(--oee-lightback)"
+                          "color": "var(--oee-ink)"
                         }
                       },
                       "columns": [
@@ -5016,7 +5016,7 @@
                       },
                       "cells": {
                         "style": {
-                          "color": "var(--oee-lightback)"
+                          "color": "var(--oee-ink)"
                         }
                       },
                       "columns": [
@@ -6550,7 +6550,7 @@
                       },
                       "cells": {
                         "style": {
-                          "color": "var(--oee-lightback)"
+                          "color": "var(--oee-ink)"
                         }
                       },
                       "columns": [
@@ -7819,7 +7819,7 @@
                       },
                       "cells": {
                         "style": {
-                          "color": "var(--oee-lightback)"
+                          "color": "var(--oee-ink)"
                         }
                       },
                       "columns": [
@@ -8992,7 +8992,7 @@
                       },
                       "cells": {
                         "style": {
-                          "color": "var(--oee-lightback)"
+                          "color": "var(--oee-ink)"
                         }
                       },
                       "columns": [
@@ -10261,7 +10261,7 @@
                       },
                       "cells": {
                         "style": {
-                          "color": "var(--oee-lightback)"
+                          "color": "var(--oee-ink)"
                         }
                       },
                       "columns": [

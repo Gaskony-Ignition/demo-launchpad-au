@@ -80,7 +80,7 @@
             },
             "props": {
               "style": {
-                "borderBottomColor": "#D3D3D3",
+                "borderBottomColor": "var(--kpi-line)",
                 "borderBottomStyle": "solid",
                 "borderBottomWidth": "1px",
                 "fontWeight": "bold",

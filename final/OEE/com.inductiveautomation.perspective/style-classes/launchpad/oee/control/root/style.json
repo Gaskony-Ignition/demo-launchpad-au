@@ -2,7 +2,7 @@
   "base": {
     "style": {
       "backgroundColor": "var(--oee-background)",
-      "borderBottomColor": "#767676",
+      "borderBottomColor": "var(--oee-line)",
       "borderBottomStyle": "solid",
       "borderBottomWidth": "1px",
       "borderLeftStyle": "none",

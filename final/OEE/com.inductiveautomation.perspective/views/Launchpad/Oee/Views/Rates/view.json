@@ -98,7 +98,7 @@
           },
           "cells": {
             "style": {
-              "color": "#000000"
+              "color": "var(--oee-ink-inverse)"
             }
           },
           "columns": [

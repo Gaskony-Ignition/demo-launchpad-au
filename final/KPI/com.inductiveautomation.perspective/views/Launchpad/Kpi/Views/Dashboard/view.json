@@ -13,7 +13,7 @@
         },
         "transforms": [
           {
-            "code": "\tdashboard \u003d self.params.dashboard\n\t\n\ttry:\n\t\tpaths \u003d value.split(\"/\")\n\t\tdashboard \u003d paths[-1]\n\texcept:\n\t\tpass\n\t\n\tself.session.custom.launchpad.dashboard.options.url \u003d dashboard \n\treturn dashboard",
+            "code": "\tdashboard = self.params.dashboard\n\t\n\ttry:\n\t\tpaths = value.split(\"/\")\n\t\tdashboard = paths[-1]\n\texcept:\n\t\tpass\n\t\n\tself.session.custom.launchpad.dashboard.options.url = dashboard \n\treturn dashboard",
             "type": "script"
           }
         ],
@@ -70,7 +70,7 @@
               },
               "transforms": [
                 {
-                  "code": "\treturn len(value) \u003e 0",
+                  "code": "\treturn len(value) > 0",
                   "type": "script"
                 }
               ],
@@ -101,7 +101,7 @@
     "props": {
       "direction": "column",
       "style": {
-        "classes": "Page"
+        "classes": ""
       }
     },
     "type": "ia.container.flex"

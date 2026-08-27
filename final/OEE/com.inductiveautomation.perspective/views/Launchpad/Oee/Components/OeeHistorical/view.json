@@ -315,7 +315,7 @@
                   "style": {
                     "backgroundColor": "var(--oee-gray-a)",
                     "classes": "launchpad/oee/text/label",
-                    "color": "var(--oee-font)",
+                    "color": "var(--oee-ink-inverse)",
                     "fontWeight": "bold",
                     "textAlign": "center"
                   },
@@ -369,7 +369,7 @@
                   "style": {
                     "backgroundColor": "var(--oee-gray-p)",
                     "classes": "launchpad/oee/text/label",
-                    "color": "var(--oee-font)",
+                    "color": "var(--oee-ink-inverse)",
                     "fontWeight": "bold",
                     "textAlign": "center"
                   },
@@ -423,7 +423,7 @@
                   "style": {
                     "backgroundColor": "var(--oee-gray-q)",
                     "classes": "launchpad/oee/text/label",
-                    "color": "var(--oee-font)",
+                    "color": "var(--oee-ink-inverse)",
                     "fontWeight": "bold",
                     "textAlign": "center"
                   },

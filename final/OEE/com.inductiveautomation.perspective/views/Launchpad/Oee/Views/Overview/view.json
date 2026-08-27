@@ -110,7 +110,7 @@
                           "basis": "30px"
                         },
                         "props": {
-                          "color": "#FFFFFF",
+                          "color": "var(--oee-ink-strong)",
                           "path": "material/location_on"
                         },
                         "type": "ia.display.icon"
@@ -435,7 +435,7 @@
                       "basis": "20px"
                     },
                     "props": {
-                      "color": "#FFFFFF",
+                      "color": "var(--oee-ink-strong)",
                       "path": "material/location_on"
                     },
                     "type": "ia.display.icon"

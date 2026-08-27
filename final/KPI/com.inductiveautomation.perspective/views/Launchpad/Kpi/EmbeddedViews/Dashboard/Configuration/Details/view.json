@@ -252,7 +252,7 @@
                         },
                         "onChange": {
                           "enabled": null,
-                          "script": "\tif origin \u003d\u003d \"Browser\":\n\t\tif currentValue.value:\n\t\t\tself.session.custom.launchpad.dashboard.objects.edit.grid \u003d \"stretch\"\n\t\telse:\n\t\t\tself.session.custom.launchpad.dashboard.objects.edit.grid \u003d \"fixed\""
+                          "script": "\tif origin == \"Browser\":\n\t\tif currentValue.value:\n\t\t\tself.session.custom.launchpad.dashboard.objects.edit.grid = \"stretch\"\n\t\telse:\n\t\t\tself.session.custom.launchpad.dashboard.objects.edit.grid = \"fixed\""
                         }
                       },
                       "props.indicatorValue": {
@@ -269,7 +269,7 @@
                       "states": [
                         {
                           "selectedStyle": {
-                            "backgroundColor": "#AAAAAA",
+                            "backgroundColor": "var(--kpi-object)",
                             "classes": ""
                           },
                           "text": "Fixed",
@@ -280,7 +280,7 @@
                         },
                         {
                           "selectedStyle": {
-                            "backgroundColor": "#AAAAAA",
+                            "backgroundColor": "var(--kpi-object)",
                             "classes": ""
                           },
                           "text": "Stretch",
@@ -394,7 +394,7 @@
               "position.display": {
                 "binding": {
                   "config": {
-                    "expression": "{../Grid/Grid/Grid.props.controlValue} \u003d 0"
+                    "expression": "{../Grid/Grid/Grid.props.controlValue} = 0"
                   },
                   "type": "expr"
                 }
@@ -681,7 +681,7 @@
               "component": {
                 "onActionPerformed": {
                   "config": {
-                    "script": "\t# When this dock is opened, the current \u0027edit dashboard\u0027 properties\n\t# are passed to this view in the \u0027currEdit\u0027 param. When this \u0027Cancel\u0027\n\t# button is pressed, the dashboard.objects.edit object (besides the widgets) \n\t# is set equal to the \u0027currEdit\u0027 param (reverting the \u0027edit dashboard\u0027 object,\n\t# effectively cancelling any changes that the user could have made).\n\t\n\tfor key, value in self.view.params.currEdit.iteritems():\n\t\tself.session.custom.launchpad.dashboard.objects.edit[key] \u003d value\n\n\tsystem.perspective.closeDock(\u0027editDashDetails\u0027)"
+                    "script": "\t# When this dock is opened, the current 'edit dashboard' properties\n\t# are passed to this view in the 'currEdit' param. When this 'Cancel'\n\t# button is pressed, the dashboard.objects.edit object (besides the widgets) \n\t# is set equal to the 'currEdit' param (reverting the 'edit dashboard' object,\n\t# effectively cancelling any changes that the user could have made).\n\t\n\tfor key, value in self.view.params.currEdit.iteritems():\n\t\tself.session.custom.launchpad.dashboard.objects.edit[key] = value\n\n\tsystem.perspective.closeDock('editDashDetails')"
                   },
                   "scope": "G",
                   "type": "script"
@@ -711,7 +711,7 @@
               "component": {
                 "onActionPerformed": {
                   "config": {
-                    "script": "\t# Due to the fact that the components on this view contain\n\t# bidirectional bindings to the \u0027edit dashboard\u0027 session\n\t# custom property object (the changes are applied right after\n\t# the user enters new info), this \u0027Done\u0027 button only needs\n\t# to close this dock.\n\t\n\tsystem.perspective.closeDock(\u0027editDashDetails\u0027)"
+                    "script": "\t# Due to the fact that the components on this view contain\n\t# bidirectional bindings to the 'edit dashboard' session\n\t# custom property object (the changes are applied right after\n\t# the user enters new info), this 'Done' button only needs\n\t# to close this dock.\n\t\n\tsystem.perspective.closeDock('editDashDetails')"
                   },
                   "scope": "G",
                   "type": "script"

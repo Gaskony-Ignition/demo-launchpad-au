@@ -9,7 +9,7 @@
       "borderTopLeftRadius": "8px",
       "borderTopRightRadius": "8px",
       "borderWidth": "2px",
-      "color": "#000000",
+      "color": "var(--oee-ink-inverse)",
       "fontFamily": "Noto Sans",
       "fontSize": "13.5px",
       "marginBottom": "8px",

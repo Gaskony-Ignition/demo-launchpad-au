@@ -1,7 +1,7 @@
 {
   "base": {
     "style": {
-      "fill": "#FFFFFF"
+      "fill": "var(--kpi-ink-strong)"
     }
   }
 }

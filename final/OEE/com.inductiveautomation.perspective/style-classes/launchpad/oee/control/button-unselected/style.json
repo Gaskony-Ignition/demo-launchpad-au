@@ -2,14 +2,14 @@
   "base": {
     "style": {
       "backgroundColor": "var(--oee-background)",
-      "borderColor": "#FFFFFF",
+      "borderColor": "var(--oee-line)",
       "borderStyle": "solid",
       "borderWidth": "1px",
       "borderTopLeftRadius": "10px",
       "borderTopRightRadius": "10px",
       "borderBottomLeftRadius": "10px",
       "borderBottomRightRadius": "10px",
-      "color": "#FFFFFF",
+      "color": "var(--oee-ink-strong)",
       "fontFamily": "Noto Sans",
       "fontSize": "16px",
       "marginBottom": "0px",
@@ -23,7 +23,7 @@
       "pseudo": "disabled",
       "style": {
         "backgroundColor": "var(--oee-object)",
-        "fontFamily": "var(oee-font)"
+        "color": "var(--oee-ink-muted)"
       }
     }
   ]

@@ -153,7 +153,7 @@
             "opacity": 1
           },
           "label": {
-            "color": "#FFFFFF",
+            "color": "var(--kpi-ink-strong)",
             "visible": false
           },
           "style": {

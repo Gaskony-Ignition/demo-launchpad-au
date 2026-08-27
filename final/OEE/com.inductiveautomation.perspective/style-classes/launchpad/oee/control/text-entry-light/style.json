@@ -1,12 +1,12 @@
 {
   "base": {
     "style": {
-      "backgroundColor": "var(--oee-lightback)",
+      "backgroundColor": "var(--oee-field)",
       "borderTopLeftRadius": "6px",
       "borderTopRightRadius": "6px",
       "borderBottomLeftRadius": "6px",
       "borderBottomRightRadius": "6px",
-      "color": "var(--oee-font)",
+      "color": "var(--oee-ink)",
       "fontSize": "14px"
     }
   }

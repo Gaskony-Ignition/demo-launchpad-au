@@ -965,7 +965,7 @@
                                 "infoBox": {
                                   "dateFormat": "DD/MM/YYYY",
                                   "font": {
-                                    "color": "var(--oee-font)"
+                                    "color": "var(--oee-ink-inverse)"
                                   },
                                   "timeFormat": "HH:mm:ss"
                                 }
@@ -1039,7 +1039,7 @@
                 "props": {
                   "path": "Launchpad/Oee/EmbeddedViews/LineSelection",
                   "style": {
-                    "classes": "\n",
+                    "classes": "",
                     "marginLeft": 10,
                     "marginRight": 10
                   }
@@ -1057,7 +1057,7 @@
                 "props": {
                   "path": "Launchpad/Oee/EmbeddedViews/LineDisplayOptions",
                   "style": {
-                    "classes": "\n",
+                    "classes": "",
                     "marginLeft": 10,
                     "marginRight": 10
                   }

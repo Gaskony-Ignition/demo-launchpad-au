@@ -38,7 +38,7 @@
         },
         "transforms": [
           {
-            "code": "\tif value \u003d\u003d \u0027\u0027:\n\t\treturn self.params.path.split(\u0027/\u0027)[-1]\n\telse:\n\t\treturn value",
+            "code": "\tif value == '':\n\t\treturn self.params.path.split('/')[-1]\n\telse:\n\t\treturn value",
             "type": "script"
           }
         ],
@@ -394,7 +394,7 @@
     },
     "props": {
       "style": {
-        "classes": "Launchpad/Oee/CardSmall",
+        "classes": "launchpad/oee/card-small",
         "overflow": "hidden"
       }
     },

@@ -77,7 +77,7 @@
         },
         "props": {
           "style": {
-            "classes": "Launchpad/Oee/Text/Label",
+            "classes": "launchpad/oee/text/label",
             "marginRight": "10px"
           }
         },

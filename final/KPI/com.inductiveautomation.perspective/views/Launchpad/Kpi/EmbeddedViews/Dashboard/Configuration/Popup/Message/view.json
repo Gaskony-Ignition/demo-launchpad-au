@@ -138,7 +138,7 @@
                 }
               },
               "style": {
-                "classes": "Button/Standard",
+                "classes": "",
                 "marginBottom": "6px",
                 "marginRight": "6px"
               },

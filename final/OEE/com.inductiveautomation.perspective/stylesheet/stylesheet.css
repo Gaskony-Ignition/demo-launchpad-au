@@ -1,92 +1,142 @@
 /* Direct stylesheet authoring is an advanced feature. Knowledge of CSS required.*/
 
 
+/* ===========================================================================
+   Theme mapping.
+
+   Every colour this project paints its chrome with resolves from the ACTIVE
+   PERSPECTIVE THEME, so changing the theme repaints the whole application --
+   Ignition's own six, and any custom theme installed on the gateway under
+   data/config/resources/core/com.inductiveautomation.perspective/themes/.
+   Pick one on the Settings page, or set session.props.theme.
+
+   Each var() carries the colour the AU port shipped with as its fallback. That
+   is what a theme which does not define the variable lands on, and it doubles
+   as the record of what the original looked like.
+
+   What is deliberately NOT themed: the CHART SERIES colours (the Availability /
+   Performance / Quality / OEE pens, the production pens, the KPI bar palettes).
+   Those are data encoding rather than chrome -- a series that changes hue with
+   the theme stops being recognisable between two screens -- and they are chosen
+   to read on a light and a dark ground alike. The Ignition Launchpad wordmark
+   keeps its orange tick for the same reason: it is a mark, not a surface.
+   =========================================================================== */
+
 :root {
-	/* Tell Chrome the page is already dark. Without this, "auto dark mode for
-	   web contents" (chrome://flags/#enable-force-dark) repaints SVG fills and
-	   turns the charts WHITE on an otherwise-correct dark page. It is a client
-	   setting, so every server-side probe reads clean and no headless screenshot
-	   can reproduce it. */
-	color-scheme: dark;
+	/* --- surfaces ------------------------------------------------------- */
+	--oee-background:  var(--containerRoot, #151518);   /* the page */
+	--oee-card:        var(--container, #212121);       /* a card on the page */
+	/* the alternate summary-table row: far enough from --oee-card to separate
+	   the rows, close enough that the table still reads as one surface */
+	--oee-row-alt:     var(--neutral-30, #2A2A2A);
+	--oee-field:       var(--input, #F2F2F2);           /* a text input */
+	--oee-object:      var(--neutral-50, #7A7A7A);      /* a muted/disabled control */
+	--oee-line:        var(--border, #767676);          /* hairlines and outlines */
 
-	
-	--oee-card: #212121;
-	/* the alternate summary-table row: far enough from --oee-card to separate the
-	   rows, close enough that the table still reads as one dark surface */
-	--oee-row-alt: #2A2A2A;
-	--oee-background: #151518;
-	--oee-object: #7A7A7A;
-	--oee-gray-a: #B4B4B4;
-	--oee-gray-p: #969696;
-	--oee-gray-q: #787878;
-	--oee-font: #161616;
-	--oee-bar: #B4B4B4;
-	--oee-orange: #FFB35E;
-	--oee-highlight: #51C49E;
-	--oee-scroll: #202020;
-	--oee-good: #6CDAF4;
-	--oee-bad: #E20505;
-	--oee-lightback: #F2F2F2
-	
+	/* --- ink ------------------------------------------------------------ */
+	--oee-ink:         var(--label, #D8D8D8);           /* body text on a card */
+	--oee-ink-strong:  var(--neutral-100, #FFFFFF);     /* headings, big numbers */
+	--oee-ink-muted:   var(--label--disabled, #969696); /* disabled text */
+	/* ink that sits ON a fill rather than on a surface -- an accent button, the
+	   A/P/Q chips, the summary table's header band. Ignition's own
+	   .ia_button--primary uses --neutral-10 for exactly this, and it inverts
+	   with the theme the way the fill under it does. */
+	--oee-ink-inverse: var(--neutral-10, #161616);
 
+	/* --- accents and status --------------------------------------------- */
+	--oee-highlight:   var(--callToAction, #51C49E);    /* selection, primary action */
+	--oee-good:        var(--success, #6CDAF4);         /* at or above target */
+	--oee-bad:         var(--error, #E20505);           /* below target */
+	--oee-orange:      var(--warning, #FFB35E);         /* line stopped */
+
+	/* --- the A / P / Q ramp --------------------------------------------- */
+	--oee-gray-a:      var(--neutral-70, #B4B4B4);      /* Availability */
+	--oee-gray-p:      var(--neutral-60, #969696);      /* Performance */
+	--oee-gray-q:      var(--neutral-50, #787878);      /* Quality, and bar tracks */
 }
 
-/* line chart x trace popup colors */
+/* The project's own colour-scheme declaration, and the one place it is
+   deliberately NOT written as `:root`.
+
+   Without a declared scheme, Chrome's "auto dark mode for web contents"
+   (chrome://flags/#enable-force-dark) repaints SVG fills and turns the charts
+   WHITE on an otherwise-correct dark page. It is a client setting, so every
+   server-side probe reads clean and no headless screenshot can reproduce it.
+
+   But this stylesheet loads AFTER the theme's, so a `:root` rule here would
+   also override a light theme's own `color-scheme: light` and leave its form
+   controls and scrollbars rendering dark. `html` is an element selector
+   (specificity 0,0,1) against a theme's `:root` (0,1,0), so any theme that
+   declares its own scheme wins regardless of order, and this only applies on
+   the themes that declare none -- which is Ignition's stock six, whose default
+   here is dark. */
+html {
+	color-scheme: dark;
+}
+
+/* line chart x trace popup colors -- ink on the info box's own light ground,
+   which inverts with the theme the same way --oee-ink-inverse does */
 .ia_timeSeriesChartComponent__labelText{
-	fill: black;
-	stroke: #e9e9e9;
+	fill: var(--oee-ink-inverse);
+	stroke: var(--neutral-90, #e9e9e9);
 	stroke-width: 6;
 	paint-order: stroke fill;
 }
 
 .ia_timeMarker > g > text{
-	fill: white;
+	fill: var(--oee-ink);
 }
 
-/* Custom scrollbars */
+/* Bound the form fields whatever the theme did.
+
+   Ignition's own .ia_inputField and .ia_dropdown draw their border with
+   `border: var(--containerBorder)`. In the six stock themes that variable is a
+   SHORTHAND -- `1px solid var(--border)` -- and the rule works. Every one of the
+   ten Gaskony custom themes redefines --containerBorder as a bare COLOUR
+   (`#d8dee9`), which makes the shorthand invalid, and the border disappears: on
+   a light custom theme the field is then white on a white card with nothing to
+   say where it is. Restating it here costs nothing on a stock theme -- same
+   width, same --border colour, later in the cascade -- and keeps every field
+   visible on the others. Remove once the theme pack emits a shorthand again. */
+.ia_inputField,
+.ia_dropdown {
+	border: 1px solid var(--oee-line);
+}
+
+/* Custom scrollbars. Stock Ignition themes leave scrollbars at the browser
+   default, so they never follow the theme on their own; these track it.
+   `scrollbar-color` is what Chrome 121+ and Firefox read, the ::-webkit-*
+   block carries width and radius for older Chromium (Perspective Workstation). */
+
+* {
+	scrollbar-color: var(--oee-line) transparent;
+	scrollbar-width: thin;
+}
 
 ::-webkit-scrollbar {
-	background: var(--oee-gray-q);
 	width: 10px;
 	height: 10px;
-	padding: 1px;
-	margin: 1px;
 }
 
-::-webkit-scrollbar-button {
-    background: var(--oee-gray-q);
-    height: 0px;
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+	background: transparent;
 }
-::-webkit-scrollbar-track {
-    background: var(--oee-gray-q);
-}
+
 ::-webkit-scrollbar-thumb {
-    background: var(--oee-scroll);
-    border: 2px solid var(--oee-gray-q);
-    border-radius:5px;
+	background: var(--oee-line);
+	border-radius: 6px;
+	border: 2px solid transparent;
+	background-clip: content-box;
 }
 
-/* dark mode dropdowns */
-
-.iaDropdownCommon_options {
-    background-color: var(--oee-card);
+::-webkit-scrollbar-thumb:hover {
+	background: var(--oee-highlight);
+	background-clip: content-box;
 }
 
-.iaDropdownCommon_option {
-	color: #FFFFFF;
-}
-
-.ia_dropdown {
-    background-color: var(--oee-card);
-    color: #FFFFFF;
-}
-
-.iaSelectCommon {
-    background-color: var(--oee-card);
-}
-
-.iaSelectCommon_select {
-    background-color: var(--oee-card);
-    color: #FFFFFF;
-}
-
+/* The dropdown and select overrides that used to live here forced white text on
+   a fixed dark surface, to make Ignition's then light-by-default controls read
+   on this project's dark pages. The theme paints those controls correctly on
+   its own, in both directions, so the overrides are gone rather than fighting
+   it -- a dropdown under a light theme would have been white-on-white. */

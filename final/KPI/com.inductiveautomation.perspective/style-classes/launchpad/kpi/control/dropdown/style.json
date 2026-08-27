@@ -1,12 +1,11 @@
 {
   "base": {
     "style": {
-      "backgroundColor": "var(--oee-good)",
       "borderTopLeftRadius": "6px",
       "borderTopRightRadius": "6px",
       "borderBottomLeftRadius": "6px",
       "borderBottomRightRadius": "6px",
-      "color": "var(--oee-ink-inverse)",
+      "color": "var(--kpi-ink)",
       "fontSize": "14px"
     }
   }
