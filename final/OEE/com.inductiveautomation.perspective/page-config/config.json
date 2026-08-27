@@ -2,19 +2,19 @@
   "pages": {
     "/": {
       "title": "",
-      "viewPath": "Exchange/Launchpad/Oee/Views/Overview"
+      "viewPath": "Launchpad/Oee/Views/Overview"
     },
     "/line-view": {
       "title": "",
-      "viewPath": "Exchange/Launchpad/Oee/Views/LineView"
+      "viewPath": "Launchpad/Oee/Views/LineView"
     },
     "/production-summary": {
       "title": "",
-      "viewPath": "Exchange/Launchpad/Oee/Views/ProductionSummary"
+      "viewPath": "Launchpad/Oee/Views/ProductionSummary"
     },
     "/settings": {
       "title": "",
-      "viewPath": "Exchange/Launchpad/Oee/Views/Settings"
+      "viewPath": "Launchpad/Oee/Views/Settings"
     }
   },
   "sharedDocks": {
@@ -32,7 +32,7 @@
         "show": "visible",
         "size": 52,
         "viewParams": {},
-        "viewPath": "Exchange/Launchpad/Oee/EmbeddedViews/Header"
+        "viewPath": "Launchpad/Oee/EmbeddedViews/Header"
       }
     ]
   }

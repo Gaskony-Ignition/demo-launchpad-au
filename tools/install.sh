@@ -154,7 +154,7 @@ EXEC_ROOT chown -R ignition:ignition "$RES"
 config_scan
 
 # ---------------------------------------------------------------- phase 2
-# Projects before tags: the UDT event scripts call exchange.launchpad.oee.*, which
+# Projects before tags: the UDT event scripts call launchpad.oee.*, which
 # only resolves once the gateway scripting project is set. Land that first and the
 # tags come alive against working scripts instead of logging errors for a minute.
 say "Phase 2/6  projects + gateway scripting project"

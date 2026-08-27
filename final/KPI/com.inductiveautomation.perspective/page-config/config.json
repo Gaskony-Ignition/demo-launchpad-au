@@ -2,11 +2,11 @@
   "pages": {
     "/": {
       "title": "",
-      "viewPath": "Exchange/Launchpad/Kpi/Views/Overview"
+      "viewPath": "Launchpad/Kpi/Views/Overview"
     },
     "/alarming": {
       "title": "",
-      "viewPath": "Exchange/Launchpad/Kpi/Views/Alarming"
+      "viewPath": "Launchpad/Kpi/Views/Alarming"
     },
     "/dashboard": {
       "docks": {
@@ -25,12 +25,12 @@
             "viewParams": {
               "currEdit": ""
             },
-            "viewPath": "Exchange/Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Details"
+            "viewPath": "Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Details"
           }
         ]
       },
       "title": "",
-      "viewPath": "Exchange/Launchpad/Kpi/Views/Dashboard"
+      "viewPath": "Launchpad/Kpi/Views/Dashboard"
     },
     "/dashboard/:dashboard": {
       "docks": {
@@ -49,20 +49,20 @@
             "viewParams": {
               "currEdit": ""
             },
-            "viewPath": "Exchange/Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Details"
+            "viewPath": "Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Details"
           }
         ]
       },
       "title": "",
-      "viewPath": "Exchange/Launchpad/Kpi/Views/Dashboard"
+      "viewPath": "Launchpad/Kpi/Views/Dashboard"
     },
     "/settings": {
       "title": "",
-      "viewPath": "Exchange/Launchpad/Kpi/Views/Settings"
+      "viewPath": "Launchpad/Kpi/Views/Settings"
     },
     "/trending": {
       "title": "",
-      "viewPath": "Exchange/Launchpad/Kpi/Views/Trending"
+      "viewPath": "Launchpad/Kpi/Views/Trending"
     }
   },
   "sharedDocks": {
@@ -80,7 +80,7 @@
         "show": "visible",
         "size": 52,
         "viewParams": {},
-        "viewPath": "Exchange/Launchpad/Kpi/EmbeddedViews/Header"
+        "viewPath": "Launchpad/Kpi/EmbeddedViews/Header"
       }
     ]
   }

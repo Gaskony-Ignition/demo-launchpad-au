@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Rewrite OEE/KPI project tag references from the old [Launchpad]Exchange/Launchpad/...
-(and stale [default]Exchange/Launchpad/...) layout to the new flat layout:
+"""Rewrite OEE/KPI project tag references from the old [Launchpad]Launchpad/...
+(and stale [default]Launchpad/...) layout to the new flat layout:
   Oee/...            -> [Launchpad]OEE/...
   everything else    -> [Launchpad]KPI/...
 Also fixes the two SafeGroup binding typos. Dry-run by default; --apply to write.
@@ -13,7 +13,7 @@ APPLY = "--apply" in sys.argv
 # provider-qualified refs
 REF = re.compile(r"\[(?:Launchpad|default)\]Exchange/Launchpad(/[A-Za-z0-9_ /.]*|(?=[\"'\s]))")
 # bare typeId refs (browse calls / typeIds inside project files)
-TYPEID = re.compile(r"(?<!\])Exchange/Launchpad/Oee/(LineConfig|OEE|Schedule|Shift)")
+TYPEID = re.compile(r"(?<!\])Launchpad/Oee/(LineConfig|OEE|Schedule|Shift)")
 
 def map_ref(m):
     rest = m.group(1) or ""

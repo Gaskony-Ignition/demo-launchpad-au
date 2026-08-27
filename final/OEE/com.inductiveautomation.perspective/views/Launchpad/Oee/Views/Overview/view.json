@@ -1,0 +1,801 @@
+{
+  "custom": {
+    "database": "Examples",
+    "downtimeBars": [],
+    "historicalData": [],
+    "oeeBars": [],
+    "tagFolder": "[Launchpad]OEE/Demo"
+  },
+  "params": {},
+  "propConfig": {
+    "custom.database": {
+      "binding": {
+        "config": {
+          "path": "/root.meta.name"
+        },
+        "transforms": [
+          {
+            "code": "\treturn launchpad.oee.db()\n\t",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.downtimeBars": {
+      "binding": {
+        "config": {
+          "path": "view.custom.historicalData"
+        },
+        "transforms": [
+          {
+            "code": "\tinstances = []\n\tfor row in value:\n\t\tinstance = {\n\t\t  \"format\": \"#0.0%\",\n\t\t  \"high\": 1,\n\t\t  \"low\": 0,\n\t\t  \"title\": row.line_name,\n\t\t  \"units\": \"\",\n\t\t  \"value\": row.down_minutes/row.minutes_elapsed\n\t\t \n\t\t}\n\t\tinstances.append(instance)\n\n\treturn instances",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.historicalData": {
+      "binding": {
+        "config": {
+          "parameters": {
+            "database": "{view.custom.database}",
+            "line_name": "\"\"",
+            "start_time": "{session.custom.launchpad.oee.display.startTime}",
+            "stop_time": "{session.custom.launchpad.oee.display.stopTime}",
+            "tag_folder": "{view.custom.tagFolder}"
+          },
+          "queryPath": "Launchpad/Oee/HourlyStatsAverage",
+          "returnFormat": "json"
+        },
+        "type": "query"
+      },
+      "persistent": true
+    },
+    "custom.oeeBars": {
+      "binding": {
+        "config": {
+          "path": "view.custom.historicalData"
+        },
+        "transforms": [
+          {
+            "code": "\tinstances = []\n\tfor row in value:\n\t\tinstance = {\n\t\t  \"format\": \"#0.0%\",\n\t\t  \"high\": 1,\n\t\t  \"low\": 0,\n\t\t  \"title\": row.line_name,\n\t\t  \"units\": \"\",\n\t\t  \"value\": row.oee\n\t\t}\n\t\tinstances.append(instance)\n\n\treturn instances",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.tagFolder": {
+      "binding": {
+        "config": {
+          "expression": "now(0)"
+        },
+        "transforms": [
+          {
+            "code": "\treturn launchpad.oee.BASE_TAG_FOLDER",
+            "type": "script"
+          }
+        ],
+        "type": "expr"
+      },
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 813,
+      "width": 1600
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Icon"
+                        },
+                        "position": {
+                          "basis": "30px"
+                        },
+                        "props": {
+                          "color": "#FFFFFF",
+                          "path": "material/location_on"
+                        },
+                        "type": "ia.display.icon"
+                      },
+                      {
+                        "meta": {
+                          "name": "Location"
+                        },
+                        "position": {
+                          "grow": 1
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "launchpad/oee/text/header",
+                            "color": "--oee-highlight",
+                            "margin-left": 16
+                          },
+                          "text": "Australia"
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "Location"
+                    },
+                    "position": {
+                      "basis": "40px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "justify": "space-around",
+                      "style": {
+                        "background": "none",
+                        "classes": "launchpad/oee/card",
+                        "padding": 0
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "meta": {
+                      "name": "Notepad"
+                    },
+                    "position": {
+                      "basis": "190px",
+                      "grow": 1,
+                      "shrink": 3
+                    },
+                    "propConfig": {
+                      "props.style": {
+                        "binding": {
+                          "config": {
+                            "path": "this.props.params.path"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "params": {
+                        "path": "[Launchpad]OEE/Notepad"
+                      },
+                      "path": "Launchpad/Oee/Components/Notepad",
+                      "style": {
+                        "minHeight": 0,
+                        "overflowY": "auto"
+                      }
+                    },
+                    "type": "ia.display.view"
+                  },
+                  {
+                    "meta": {
+                      "name": "PropertyBarsOee"
+                    },
+                    "position": {
+                      "basis": "268px",
+                      "grow": 0,
+                      "shrink": 1
+                    },
+                    "propConfig": {
+                      "props.params": {
+                        "binding": {
+                          "config": {
+                            "struct": {
+                              "folderPath": "{session.custom.launchpad.oee.lineTagFolder}",
+                              "instances": "{view.custom.oeeBars}",
+                              "interval": "{session.custom.launchpad.oee.display.interval}",
+                              "mode": "{session.custom.launchpad.oee.display.mode}"
+                            },
+                            "waitOnAll": true
+                          },
+                          "transforms": [
+                            {
+                              "code": "\tif value[\"mode\"] == \"Realtime\":\n\t\tparams ={\n\t  \t\"folderPath\": value[\"folderPath\"],\n\t  \t\"title\": \"OEE\",\n\t  \t\"property\": \"%sOee/O\" %(value[\"interval\"])\n\t\t}\n\telse:\n\t\tparams = {\"title\": \"OEE\", \"instances\":value[\"instances\"]}\n\treturn params\n\n",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "expr-struct"
+                        }
+                      },
+                      "props.path": {
+                        "binding": {
+                          "config": {
+                            "path": "session.custom.launchpad.oee.display.mode"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "Launchpad/Oee/Components/PropertyBars",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": "Realtime",
+                                  "output": "Launchpad/Oee/Components/PropertyBarsTag"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "minHeight": 0,
+                        "overflowY": "auto"
+                      }
+                    },
+                    "type": "ia.display.view"
+                  },
+                  {
+                    "meta": {
+                      "name": "PropertyBarsAvailability"
+                    },
+                    "position": {
+                      "basis": "268px",
+                      "grow": 0,
+                      "shrink": 1
+                    },
+                    "propConfig": {
+                      "props.params": {
+                        "binding": {
+                          "config": {
+                            "struct": {
+                              "folderPath": "{session.custom.launchpad.oee.lineTagFolder}",
+                              "instances": "{view.custom.downtimeBars}",
+                              "interval": "{session.custom.launchpad.oee.display.interval}",
+                              "mode": "{session.custom.launchpad.oee.display.mode}"
+                            },
+                            "waitOnAll": true
+                          },
+                          "transforms": [
+                            {
+                              "code": "\tif value[\"mode\"] == \"Realtime\":\n\t\tparams ={\n\t  \t\"folderPath\": value[\"folderPath\"],\n\t  \t\"title\": \"Downtime\",\n\t  \t\"property\": \"%sOee/D\" %(value[\"interval\"])\n\t\t}\n\telse:\n\t\tparams = {\"title\": \"Downtime\", \"instances\":value[\"instances\"] }\n\treturn params\n\n",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "expr-struct"
+                        }
+                      },
+                      "props.path": {
+                        "binding": {
+                          "config": {
+                            "path": "session.custom.launchpad.oee.display.mode"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "Launchpad/Oee/Components/PropertyBars",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": "Realtime",
+                                  "output": "Launchpad/Oee/Components/PropertyBarsTag"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "marginTop": -10,
+                        "minHeight": 0,
+                        "overflowY": "auto"
+                      }
+                    },
+                    "type": "ia.display.view"
+                  }
+                ],
+                "meta": {
+                  "name": "Left"
+                },
+                "position": {
+                  "basis": "400px",
+                  "grow": 1
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "minHeight": 0,
+                    "overflowY": "auto"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Options"
+                    },
+                    "position": {
+                      "basis": "68px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "path": "Launchpad/Oee/EmbeddedViews/LineDisplayOptions",
+                      "style": {
+                        "padding": 0
+                      }
+                    },
+                    "type": "ia.display.view"
+                  },
+                  {
+                    "meta": {
+                      "name": "Lines"
+                    },
+                    "position": {
+                      "grow": 1
+                    },
+                    "propConfig": {
+                      "props.instances": {
+                        "binding": {
+                          "config": {
+                            "struct": {
+                              "interval": "{session.custom.launchpad.oee.display.interval}",
+                              "mode": "{session.custom.launchpad.oee.display.mode}",
+                              "oeeConfig": "{session.custom.launchpad.oee}",
+                              "startTime": "{session.custom.launchpad.oee.display.startTime}",
+                              "stopTime": "{session.custom.launchpad.oee.display.stopTime}"
+                            },
+                            "waitOnAll": true
+                          },
+                          "transforms": [
+                            {
+                              "code": "\tinstances = []\n\t\n\tfor item in value.oeeConfig.lines:\n\t\tinstances.append({\n\t\t  \"instanceStyle\": {\n\t\t    \"classes\": \"\"\n\t\t  },\n\t\t  \"instancePosition\": {},\n\t\t  \"path\": value.oeeConfig.lineTagFolder + \"/\" + item,\n\t\t  \"interval\": value.interval,\n\t\t  \"mode\": value.mode,\n\t\t  \"startTime\": value.startTime,\n\t\t  \"stopTime\": value.stopTime\n\t\t})\n\t\t\n\treturn instances",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "expr-struct"
+                        }
+                      }
+                    },
+                    "props": {
+                      "alignContent": "flex-start",
+                      "elementPosition": {
+                        "basis": "280px",
+                        "grow": 0,
+                        "shrink": 0
+                      },
+                      "path": "Launchpad/Oee/Components/OeeCard",
+                      "style": {
+                        "marginTop": -10,
+                        "minHeight": 0,
+                        "overflowY": "auto"
+                      },
+                      "wrap": "wrap"
+                    },
+                    "type": "ia.display.flex-repeater"
+                  }
+                ],
+                "meta": {
+                  "name": "Right"
+                },
+                "position": {
+                  "basis": "1300px",
+                  "grow": 1
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "minHeight": 0
+                  }
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "Large"
+            },
+            "position": {
+              "size": "large"
+            },
+            "props": {
+              "justify": "space-between",
+              "style": {
+                "minHeight": 0
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Icon"
+                    },
+                    "position": {
+                      "basis": "20px"
+                    },
+                    "props": {
+                      "color": "#FFFFFF",
+                      "path": "material/location_on"
+                    },
+                    "type": "ia.display.icon"
+                  },
+                  {
+                    "meta": {
+                      "name": "Location"
+                    },
+                    "position": {
+                      "grow": 1
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "launchpad/oee/text/header",
+                        "color": "--oee-highlight",
+                        "fontSize": 20,
+                        "margin-left": 16
+                      },
+                      "text": "Australia"
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "meta": {
+                  "name": "Location"
+                },
+                "position": {
+                  "basis": "40px"
+                },
+                "props": {
+                  "justify": "space-around",
+                  "style": {
+                    "background": "none",
+                    "classes": "launchpad/oee/card",
+                    "marginBottom": -10,
+                    "marginTop": -5,
+                    "padding": 0
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "meta": {
+                  "name": "Options"
+                },
+                "position": {
+                  "shrink": 0
+                },
+                "props": {
+                  "path": "Launchpad/Oee/EmbeddedViews/LineDisplayOptions",
+                  "style": {
+                    "paddingBottom": 10,
+                    "paddingTop": 10
+                  }
+                },
+                "type": "ia.display.view"
+              },
+              {
+                "meta": {
+                  "name": "Notepad"
+                },
+                "position": {
+                  "basis": "100px",
+                  "display": false,
+                  "grow": 1,
+                  "shrink": 0
+                },
+                "props": {
+                  "params": {
+                    "path": "[Launchpad]OEE/Notepad"
+                  },
+                  "path": "Launchpad/Oee/Components/Notepad",
+                  "style": {
+                    "marginBottom": -10,
+                    "marginTop": -10
+                  }
+                },
+                "type": "ia.display.view"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "PropertyBarsOee"
+                    },
+                    "propConfig": {
+                      "props.params": {
+                        "binding": {
+                          "config": {
+                            "struct": {
+                              "folderPath": "{session.custom.launchpad.oee.lineTagFolder}",
+                              "instances": "{view.custom.oeeBars}",
+                              "interval": "{session.custom.launchpad.oee.display.interval}",
+                              "mode": "{session.custom.launchpad.oee.display.mode}"
+                            },
+                            "waitOnAll": true
+                          },
+                          "transforms": [
+                            {
+                              "code": "\tif value[\"mode\"] == \"Realtime\":\n\t\tparams ={\n\t  \t\"folderPath\": value[\"folderPath\"],\n\t  \t\"title\": \"\",\n\t  \t\"property\": \"%sOee/O\" %(value[\"interval\"])\n\t\t}\n\telse:\n\t\tparams = {\"title\": \"\", \"instances\":value[\"instances\"]}\n\treturn params\n\n",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "expr-struct"
+                        }
+                      },
+                      "props.path": {
+                        "binding": {
+                          "config": {
+                            "path": "session.custom.launchpad.oee.display.mode"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "Launchpad/Oee/Components/PropertyBars",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": "Realtime",
+                                  "output": "Launchpad/Oee/Components/PropertyBarsTag"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": -18,
+                        "marginLeft": -18,
+                        "marginRight": -18,
+                        "marginTop": 0
+                      }
+                    },
+                    "type": "ia.display.view"
+                  },
+                  {
+                    "meta": {
+                      "name": "PropertyBarsAvailability"
+                    },
+                    "position": {
+                      "tabIndex": 1
+                    },
+                    "propConfig": {
+                      "props.params": {
+                        "binding": {
+                          "config": {
+                            "struct": {
+                              "folderPath": "{session.custom.launchpad.oee.lineTagFolder}",
+                              "instances": "{view.custom.downtimeBars}",
+                              "interval": "{session.custom.launchpad.oee.display.interval}",
+                              "mode": "{session.custom.launchpad.oee.display.mode}"
+                            },
+                            "waitOnAll": true
+                          },
+                          "transforms": [
+                            {
+                              "code": "\tif value[\"mode\"] == \"Realtime\":\n\t\tparams ={\n\t  \t\"folderPath\": value[\"folderPath\"],\n\t  \t\"title\": \"\",\n\t  \t\"property\": \"%sOee/D\" %(value[\"interval\"])\n\t\t}\n\telse:\n\t\tparams = {\"title\": \"\", \"instances\":value[\"instances\"] }\n\treturn params\n\n",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "expr-struct"
+                        }
+                      },
+                      "props.path": {
+                        "binding": {
+                          "config": {
+                            "path": "session.custom.launchpad.oee.display.mode"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "Launchpad/Oee/Components/PropertyBars",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": "Realtime",
+                                  "output": "Launchpad/Oee/Components/PropertyBarsTag"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "marginBottom": -18,
+                        "marginLeft": -18,
+                        "marginRight": -18,
+                        "marginTop": 0
+                      }
+                    },
+                    "type": "ia.display.view"
+                  },
+                  {
+                    "meta": {
+                      "name": "Notepad"
+                    },
+                    "position": {
+                      "tabIndex": 2
+                    },
+                    "props": {
+                      "params": {
+                        "path": "[Launchpad]OEE/Notepad"
+                      },
+                      "path": "Launchpad/Oee/Components/Notepad",
+                      "style": {
+                        "marginBottom": -18,
+                        "marginLeft": -18,
+                        "marginRight": -18,
+                        "marginTop": 0
+                      }
+                    },
+                    "type": "ia.display.view"
+                  }
+                ],
+                "meta": {
+                  "name": "TabContainer"
+                },
+                "position": {
+                  "basis": "200px",
+                  "grow": 1
+                },
+                "props": {
+                  "contentStyle": {
+                    "classes": "launchpad/oee/header/root"
+                  },
+                  "menuStyle": {
+                    "backgroundColor": ""
+                  },
+                  "menuType": "modern",
+                  "style": {
+                    "borderStyle": "none",
+                    "marginLeft": 5,
+                    "marginRight": 5,
+                    "marginTop": -10
+                  },
+                  "tabStyle": {
+                    "active": {
+                      "backgroundColor": "var(--oee-card)",
+                      "classes": "launchpad/oee/text/label"
+                    },
+                    "inactive": {
+                      "classes": "launchpad/oee/header/root"
+                    }
+                  },
+                  "tabs": [
+                    "OEE",
+                    "Downtime",
+                    "Notepad"
+                  ]
+                },
+                "type": "ia.container.tab"
+              },
+              {
+                "meta": {
+                  "name": "Lines"
+                },
+                "position": {
+                  "basis": "300px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.instances": {
+                    "binding": {
+                      "config": {
+                        "struct": {
+                          "interval": "{session.custom.launchpad.oee.display.interval}",
+                          "mode": "{session.custom.launchpad.oee.display.mode}",
+                          "oeeConfig": "{session.custom.launchpad.oee}",
+                          "startTime": "{session.custom.launchpad.oee.display.startTime}",
+                          "stopTime": "{session.custom.launchpad.oee.display.stopTime}"
+                        },
+                        "waitOnAll": true
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tinstances = []\n\t\n\tfor item in value.oeeConfig.lines:\n\t\tinstances.append({\n\t\t  \"instanceStyle\": {\n\t\t    \"classes\": \"\"\n\t\t  },\n\t\t  \"instancePosition\": {},\n\t\t  \"path\": value.oeeConfig.lineTagFolder + \"/\" + item,\n\t\t  \"interval\": value.interval,\n\t\t  \"mode\": value.mode,\n\t\t  \"startTime\": value.startTime,\n\t\t  \"stopTime\": value.stopTime\n\t\t})\n\t\t\n\treturn instances",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr-struct"
+                    }
+                  }
+                },
+                "props": {
+                  "alignContent": "flex-start",
+                  "direction": "column",
+                  "elementPosition": {
+                    "basis": "250px",
+                    "shrink": 0
+                  },
+                  "path": "Launchpad/Oee/Components/OeeCard",
+                  "style": {
+                    "overflow": "scroll",
+                    "overflowX": "hidden"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
+                },
+                "type": "ia.display.flex-repeater"
+              }
+            ],
+            "meta": {
+              "name": "Small"
+            },
+            "props": {
+              "direction": "column",
+              "justify": "space-between",
+              "style": {
+                "overflowX": "hidden",
+                "padding": -20
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "BreakpointContainer"
+        },
+        "position": {
+          "grow": 1
+        },
+        "props": {
+          "breakpoint": 800,
+          "style": {
+            "minHeight": 0
+          }
+        },
+        "type": "ia.container.breakpt"
+      }
+    ],
+    "events": {
+      "system": {
+        "onStartup": {
+          "config": {
+            "script": "\tsystem.perspective.sendMessage(\"navigation\", \"Overview\")"
+          },
+          "scope": "G",
+          "type": "script"
+        }
+      }
+    },
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "style": {
+        "classes": "launchpad/oee/root",
+        "margin": 0,
+        "minHeight": 0,
+        "padding": 18
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

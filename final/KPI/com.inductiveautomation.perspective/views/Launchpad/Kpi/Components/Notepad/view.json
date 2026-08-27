@@ -1,0 +1,124 @@
+{
+  "custom": {},
+  "params": {
+    "path": "[Launchpad]KPI/Notepad"
+  },
+  "propConfig": {
+    "params.path": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 400,
+      "width": 400
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label"
+            },
+            "position": {
+              "grow": 1
+            },
+            "props": {
+              "text": "Notepad:"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\n\tif self.parent.parent.getChild(\"TextArea\").props.enabled:\n\t\tself.parent.parent.getChild(\"TextArea\").props.enabled \u003d False\n\telse:\n\t\tself.parent.parent.getChild(\"TextArea\").props.enabled \u003d True"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Icon",
+              "tooltip": {
+                "enabled": true,
+                "text": "Toggle editing of the note"
+              }
+            },
+            "position": {
+              "basis": "30px"
+            },
+            "props": {
+              "path": "material/edit",
+              "style": {
+                "classes": ""
+              }
+            },
+            "type": "ia.display.icon"
+          }
+        ],
+        "meta": {
+          "name": "Header"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "launchpad/kpi/text/header"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "TextArea"
+        },
+        "position": {
+          "grow": 1
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "bidirectional": true,
+                "fallbackDelay": 2.5,
+                "mode": "indirect",
+                "references": {
+                  "path": "{view.params.path}"
+                },
+                "tagPath": "{path}"
+              },
+              "type": "tag"
+            }
+          }
+        },
+        "props": {
+          "enable": false,
+          "rejectUpdatesWhileFocused": false,
+          "style": {
+            "backgroundColor": "transparent",
+            "borderStyle": "none",
+            "marginTop": 10
+          }
+        },
+        "type": "ia.input.text-area"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "launchpad/kpi/card"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

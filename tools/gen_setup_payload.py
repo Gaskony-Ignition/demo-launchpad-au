@@ -4,7 +4,7 @@
 The button has to be able to build a gateway from nothing: tag provider, historian,
 simulator device (including its programme), and the tags themselves. None of that is
 reachable from a running Perspective session unless it ships INSIDE the project, so
-this generates `exchange.launchpad.payload` for OEE and for KPI.
+this generates `launchpad.payload` for OEE and for KPI.
 
 Payloads are zlib+base64 rather than literal JSON: 150 KB of pretty-printed tag
 definitions inside a .py is unreadable either way, and the compressed form survives
@@ -146,7 +146,7 @@ def main():
         body = common
         for name, obj, accessor in blobs:
             body += emit(name, pack(obj), accessor)
-        dest = "%s/final/%s/ignition/script-python/exchange/launchpad/payload" % (ROOT, proj)
+        dest = "%s/final/%s/ignition/script-python/launchpad/payload" % (ROOT, proj)
         os.makedirs(dest, exist_ok=True)
         with open(dest + "/code.py", "w") as fh:
             fh.write(body.rstrip() + "\n")

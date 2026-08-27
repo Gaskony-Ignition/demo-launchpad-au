@@ -1,0 +1,775 @@
+{
+  "custom": {},
+  "params": {
+    "currEdit": ""
+  },
+  "propConfig": {
+    "params.currEdit": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 946,
+      "width": 402
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "fontWeight": "bold"
+                  },
+                  "text": "Name"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Name"
+                },
+                "position": {
+                  "basis": "32px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "bidirectional": true,
+                        "path": "session.custom.launchpad.dashboard.objects.edit.name"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "launchpad/kpi/dashboard/entry"
+                  }
+                },
+                "type": "ia.input.text-field"
+              }
+            ],
+            "meta": {
+              "name": "Name"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "direction": "column"
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "UrlLabel"
+                },
+                "position": {
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "fontWeight": "bold"
+                  },
+                  "text": "URL"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Url"
+                },
+                "position": {
+                  "basis": "32px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "bidirectional": true,
+                        "path": "session.custom.launchpad.dashboard.objects.edit.url"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "launchpad/kpi/dashboard/entry"
+                  }
+                },
+                "type": "ia.input.text-field"
+              }
+            ],
+            "meta": {
+              "name": "Url"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "direction": "column"
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "IconLabel"
+                },
+                "position": {
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "fontWeight": "bold"
+                  },
+                  "text": "Icon"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "EmbeddedView"
+                    },
+                    "position": {
+                      "grow": 1
+                    },
+                    "propConfig": {
+                      "props.params.value": {
+                        "binding": {
+                          "config": {
+                            "bidirectional": true,
+                            "path": "session.custom.launchpad.dashboard.objects.edit.icon"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "params": {
+                        "configuration": {}
+                      },
+                      "path": "Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Parameter Types/Icon"
+                    },
+                    "type": "ia.display.view"
+                  }
+                ],
+                "meta": {
+                  "name": "Icon"
+                },
+                "position": {
+                  "basis": "32px",
+                  "shrink": 0
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "Icon"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "direction": "column"
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "GridLabel"
+                },
+                "position": {
+                  "basis": "20px",
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "fontWeight": "bold"
+                  },
+                  "text": "Grid"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Grid"
+                    },
+                    "position": {
+                      "basis": "150px",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.controlValue": {
+                        "binding": {
+                          "config": {
+                            "path": "session.custom.launchpad.dashboard.objects.edit.grid"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": null,
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": "fixed",
+                                  "output": 0
+                                },
+                                {
+                                  "input": "stretch",
+                                  "output": 1
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        },
+                        "onChange": {
+                          "enabled": null,
+                          "script": "\tif origin \u003d\u003d \"Browser\":\n\t\tif currentValue.value:\n\t\t\tself.session.custom.launchpad.dashboard.objects.edit.grid \u003d \"stretch\"\n\t\telse:\n\t\t\tself.session.custom.launchpad.dashboard.objects.edit.grid \u003d \"fixed\""
+                        }
+                      },
+                      "props.indicatorValue": {
+                        "binding": {
+                          "config": {
+                            "path": "this.props.controlValue"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "orientation": "row",
+                      "states": [
+                        {
+                          "selectedStyle": {
+                            "backgroundColor": "#AAAAAA",
+                            "classes": ""
+                          },
+                          "text": "Fixed",
+                          "unselectedStyle": {
+                            "classes": ""
+                          },
+                          "value": 0
+                        },
+                        {
+                          "selectedStyle": {
+                            "backgroundColor": "#AAAAAA",
+                            "classes": ""
+                          },
+                          "text": "Stretch",
+                          "unselectedStyle": {
+                            "classes": ""
+                          },
+                          "value": 1
+                        }
+                      ]
+                    },
+                    "type": "ia.input.multi-state-button"
+                  }
+                ],
+                "meta": {
+                  "name": "Grid"
+                },
+                "position": {
+                  "basis": "32px",
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "paddingBottom": "2px"
+                  }
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "Grid"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "direction": "column"
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "CellSizeLabel"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "fontWeight": "bold"
+                      },
+                      "text": "Cell Size"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "CellSize"
+                    },
+                    "position": {
+                      "basis": "32px",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.value": {
+                        "binding": {
+                          "config": {
+                            "bidirectional": true,
+                            "path": "session.custom.launchpad.dashboard.objects.edit.cellSize"
+                          },
+                          "overlayOptOut": true,
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "format": "0,0",
+                      "style": {
+                        "classes": "launchpad/kpi/dashboard/entry"
+                      }
+                    },
+                    "type": "ia.input.numeric-entry-field"
+                  }
+                ],
+                "meta": {
+                  "name": "CellSize"
+                },
+                "position": {
+                  "basis": "75px",
+                  "shrink": 0
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "marginRight": "6px"
+                  }
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "CellSize"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.display": {
+                "binding": {
+                  "config": {
+                    "expression": "{../Grid/Grid/Grid.props.controlValue} \u003d 0"
+                  },
+                  "type": "expr"
+                }
+              }
+            },
+            "props": {
+              "wrap": "wrap"
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "NumberRowsLabel"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "fontWeight": "bold"
+                      },
+                      "text": "# of Grid Rows"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Rows"
+                    },
+                    "position": {
+                      "basis": "32px",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.value": {
+                        "binding": {
+                          "config": {
+                            "bidirectional": true,
+                            "path": "session.custom.launchpad.dashboard.objects.edit.gridRows"
+                          },
+                          "overlayOptOut": true,
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "format": "0,0",
+                      "style": {
+                        "classes": "launchpad/kpi/dashboard/entry"
+                      }
+                    },
+                    "type": "ia.input.numeric-entry-field"
+                  }
+                ],
+                "meta": {
+                  "name": "Rows"
+                },
+                "position": {
+                  "basis": "70px"
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "marginRight": "6px"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "RowGutterLabel"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "fontWeight": "bold"
+                      },
+                      "text": "Row Gutter"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "RowGutter"
+                    },
+                    "position": {
+                      "basis": "32px",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.value": {
+                        "binding": {
+                          "config": {
+                            "bidirectional": true,
+                            "path": "session.custom.launchpad.dashboard.objects.edit.gridRowGutterSize"
+                          },
+                          "overlayOptOut": true,
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "format": "0,0",
+                      "style": {
+                        "classes": "launchpad/kpi/dashboard/entry"
+                      }
+                    },
+                    "type": "ia.input.numeric-entry-field"
+                  }
+                ],
+                "meta": {
+                  "name": "RowGutter"
+                },
+                "position": {
+                  "basis": "70px"
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "marginRight": "6px"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "GridColumnsLabel"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "fontWeight": "bold"
+                      },
+                      "text": "# of Grid Columns"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Cols"
+                    },
+                    "position": {
+                      "basis": "32px",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.value": {
+                        "binding": {
+                          "config": {
+                            "bidirectional": true,
+                            "path": "session.custom.launchpad.dashboard.objects.edit.gridCols"
+                          },
+                          "overlayOptOut": true,
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "format": "0,0",
+                      "style": {
+                        "classes": "launchpad/kpi/dashboard/entry"
+                      }
+                    },
+                    "type": "ia.input.numeric-entry-field"
+                  }
+                ],
+                "meta": {
+                  "name": "Cols"
+                },
+                "position": {
+                  "basis": "70px"
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "marginRight": "6px"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "ColumnGutterLabel"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "fontWeight": "bold"
+                      },
+                      "text": "Column Gutter"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "ColGutter"
+                    },
+                    "position": {
+                      "basis": "32px",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.value": {
+                        "binding": {
+                          "config": {
+                            "bidirectional": true,
+                            "path": "session.custom.launchpad.dashboard.objects.edit.gridColGutterSize"
+                          },
+                          "overlayOptOut": true,
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "format": "0,0.########",
+                      "style": {
+                        "classes": "launchpad/kpi/dashboard/entry"
+                      }
+                    },
+                    "type": "ia.input.numeric-entry-field"
+                  }
+                ],
+                "meta": {
+                  "name": "ColGutter"
+                },
+                "position": {
+                  "basis": "70px"
+                },
+                "props": {
+                  "direction": "column"
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "GridConfig"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "gap": "15px"
+              },
+              "wrap": "wrap"
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "DashDetails"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "gap": "25px"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "events": {
+              "component": {
+                "onActionPerformed": {
+                  "config": {
+                    "script": "\t# When this dock is opened, the current \u0027edit dashboard\u0027 properties\n\t# are passed to this view in the \u0027currEdit\u0027 param. When this \u0027Cancel\u0027\n\t# button is pressed, the dashboard.objects.edit object (besides the widgets) \n\t# is set equal to the \u0027currEdit\u0027 param (reverting the \u0027edit dashboard\u0027 object,\n\t# effectively cancelling any changes that the user could have made).\n\t\n\tfor key, value in self.view.params.currEdit.iteritems():\n\t\tself.session.custom.launchpad.dashboard.objects.edit[key] \u003d value\n\n\tsystem.perspective.closeDock(\u0027editDashDetails\u0027)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Cancel"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "border-width": "1px",
+                "classes": "launchpad/kpi/header/button-unselected",
+                "margin": "0px",
+                "width": "100px"
+              },
+              "text": "Cancel"
+            },
+            "type": "ia.input.button"
+          },
+          {
+            "events": {
+              "component": {
+                "onActionPerformed": {
+                  "config": {
+                    "script": "\t# Due to the fact that the components on this view contain\n\t# bidirectional bindings to the \u0027edit dashboard\u0027 session\n\t# custom property object (the changes are applied right after\n\t# the user enters new info), this \u0027Done\u0027 button only needs\n\t# to close this dock.\n\t\n\tsystem.perspective.closeDock(\u0027editDashDetails\u0027)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Done"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "border-width": "1px",
+                "classes": "launchpad/kpi/header/button-selected",
+                "margin": "0px",
+                "width": "100px"
+              },
+              "text": "Done"
+            },
+            "type": "ia.input.button"
+          }
+        ],
+        "meta": {
+          "name": "DoneAndCancel"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "justify": "space-evenly"
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "propConfig": {
+      "custom.id": {
+        "binding": {
+          "config": {
+            "path": "session.custom.launchpad.dashboard.objects.edit.id"
+          },
+          "type": "property"
+        }
+      }
+    },
+    "props": {
+      "direction": "column",
+      "justify": "space-between",
+      "style": {
+        "backgroundColor": "var(--kpi-background)",
+        "padding": "15px"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

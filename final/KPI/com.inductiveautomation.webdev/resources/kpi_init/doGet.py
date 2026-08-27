@@ -4,7 +4,7 @@ def doGet(request, session):
 	GET /system/webdev/KPI/kpi_init?action=initDashboard
 
 	The dashboard tables live in the same database as the OEE ones, but the script
-	that creates them (exchange.launchpad.init) belongs to THIS project -- project
+	that creates them (launchpad.init) belongs to THIS project -- project
 	script packages are not visible across projects, so OEE's lp_init cannot call it.
 
 	Actions: initDashboard | backfill | repairBackfill | status
@@ -17,40 +17,40 @@ def doGet(request, session):
 			# against a populated database would fail half-way and leave it torn.
 			existing = system.db.runScalarQuery(
 				"SELECT COUNT(*) FROM sqlite_master WHERE type = \'table\' AND name = \'ex_lp_dashboards\'",
-				database=exchange.launchpad.init.db())
+				database=launchpad.init.db())
 			if existing:
 				out["skipped"] = "dashboard tables already present"
 			else:
-				exchange.launchpad.init.initDashboard()
+				launchpad.init.initDashboard()
 				out["created"] = True
 			out["dashboards"] = system.db.runScalarQuery(
-				"SELECT COUNT(*) FROM ex_lp_dashboards", database=exchange.launchpad.init.db())
+				"SELECT COUNT(*) FROM ex_lp_dashboards", database=launchpad.init.db())
 			out["widgets"] = system.db.runScalarQuery(
-				"SELECT COUNT(*) FROM ex_lp_dashboard_widgets", database=exchange.launchpad.init.db())
+				"SELECT COUNT(*) FROM ex_lp_dashboard_widgets", database=launchpad.init.db())
 			out["ok"] = True
 		elif action == "setup":
 			# the same call the Setup button makes -- one implementation, not two
-			out["setup"] = exchange.launchpad.setup.run(
+			out["setup"] = launchpad.setup.run(
 				force=request["params"].get("force", "") in ("1", "true", "yes"),
 				history=request["params"].get("history", "1") not in ("0", "false", "no"),
 				tags=request["params"].get("tags", "") in ("1", "true", "yes"))
 			out["ok"] = out["setup"].get("ok", False)
 		elif action == "check":
-			out["check"] = exchange.launchpad.setup.check()
+			out["check"] = launchpad.setup.check()
 			out["ok"] = True
 		elif action == "backfill":
 			hours = int(request["params"].get("hours", 48))
 			step = int(request["params"].get("step", 15))
 			force = request["params"].get("force") in ("1", "true", "yes")
-			out.update(exchange.launchpad.init.backfill(hours, step, force))
+			out.update(launchpad.init.backfill(hours, step, force))
 			out["ok"] = "error" not in out
 		elif action == "repairBackfill":
-			out["result"] = exchange.launchpad.init.repairBackfill()
+			out["result"] = launchpad.init.repairBackfill()
 			out["ok"] = True
 		else:
 			tables = system.db.runQuery(
 				"SELECT name FROM sqlite_master WHERE type = \'table\' AND name LIKE \'ex_lp_%\' ORDER BY name",
-				database=exchange.launchpad.init.db())
+				database=launchpad.init.db())
 			out["tables"] = [r["name"] for r in tables]
 			out["ok"] = True
 	except:

@@ -9,33 +9,33 @@ def doGet(request, session):
 	out = {"action": action}
 	try:
 		if action == "initDemoTags":
-			exchange.launchpad.oee.initDemoTags()
+			launchpad.oee.initDemoTags()
 			out["ok"] = True
 		elif action == "resetDemoTags":
-			exchange.launchpad.oee.resetDemoTags()
+			launchpad.oee.resetDemoTags()
 			out["ok"] = True
 		elif action == "intervals":
 			out["intervals"] = _allIntervals()
 			out["ok"] = True
 		elif action == "setupShifts":
-			out["result"] = exchange.launchpad.oee.setupShifts()
+			out["result"] = launchpad.oee.setupShifts()
 			out["ok"] = True
 		elif action == "seedHistory":
-			out["result"] = exchange.launchpad.oee.seedHistory()
+			out["result"] = launchpad.oee.seedHistory()
 			out["ok"] = True
 		elif action == "setup":
 			# the same call the Setup button makes -- one implementation, not two
-			out["setup"] = exchange.launchpad.setup.run(
+			out["setup"] = launchpad.setup.run(
 				force=request["params"].get("force", "") in ("1", "true", "yes"),
 				history=request["params"].get("history", "1") not in ("0", "false", "no"),
 				tags=request["params"].get("tags", "") in ("1", "true", "yes"))
 			out["ok"] = out["setup"].get("ok", False)
 		elif action == "heal":
 			# the same repair the scheduled self-heal runs, on demand
-			out["heal"] = exchange.launchpad.oee.healAnchors()
+			out["heal"] = launchpad.oee.healAnchors()
 			out["ok"] = True
 		elif action == "check":
-			out["check"] = exchange.launchpad.setup.check()
+			out["check"] = launchpad.setup.check()
 			out["ok"] = True
 		elif action == "diag":
 			out["diag"] = _diag()
@@ -46,16 +46,16 @@ def doGet(request, session):
 			# tableExists goes through the gateway's own metadata provider, so it
 			# works on any connection. A sqlite_master query does not: on Postgres
 			# it throws, and the install fails at the first seeding step.
-			done = exchange.launchpad.oee.tableExists(
-				exchange.launchpad.oee.db(), "ex_launchpad_oee_shift")
+			done = launchpad.oee.tableExists(
+				launchpad.oee.db(), "ex_launchpad_oee_shift")
 			if done:
 				out["skipped"] = "OEE tables already present"
 			else:
-				exchange.launchpad.oee.initTables()
+				launchpad.oee.initTables()
 				out["created"] = True
 			out["ok"] = True
 		else:
-			lines = exchange.launchpad.oee.getLineNames("[Launchpad]OEE/Demo")
+			lines = launchpad.oee.getLineNames("[Launchpad]OEE/Demo")
 			paths = []
 			for ln in lines:
 				for leaf in ["Display/OEE", "Display/Availability", "Plc/State", "ShiftOee/O", "Enabled"]:
@@ -72,7 +72,7 @@ def doGet(request, session):
 
 
 def _diag():
-	DB = exchange.launchpad.oee.db()
+	DB = launchpad.oee.db()
 	out = {}
 	# what does the OEE engine currently hold for line 1?
 	base = "[Launchpad]OEE/Demo/Line 1"
@@ -96,7 +96,7 @@ def _diag():
 	stop = system.date.now()
 	start = system.date.addHours(stop, -24)
 	try:
-		r = system.db.runNamedQuery("OEE", "Exchange/Launchpad/Oee/HourlyStats",
+		r = system.db.runNamedQuery("OEE", "Launchpad/Oee/HourlyStats",
 			{"line_name": "Line 1", "tag_folder": "[Launchpad]OEE/Demo",
 			 "start_time": start, "stop_time": stop})
 		out["hourlyStatsRows"] = r.rowCount
@@ -107,7 +107,7 @@ def _diag():
 
 
 def _allIntervals():
-	lines = exchange.launchpad.oee.getLineNames("[Launchpad]OEE/Demo")
+	lines = launchpad.oee.getLineNames("[Launchpad]OEE/Demo")
 	paths, keys = [], []
 	for ln in lines:
 		for iv in ("DayOee", "ShiftOee", "HourOee"):

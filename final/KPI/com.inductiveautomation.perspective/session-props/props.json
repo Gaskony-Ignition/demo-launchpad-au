@@ -1,40 +1,38 @@
 {
   "custom": {
-    "exchange": {
-      "historyProvider": "launchpad",
-      "launchpad": {
-        "dashboard": {
-          "mobileBreakpoint": 1100,
-          "objects": {
-            "edit": {}
-          },
-          "options": {
-            "overrideUsername": "admin",
-            "url": ""
-          }
+    "launchpad": {
+      "dashboard": {
+        "mobileBreakpoint": 1100,
+        "objects": {
+          "edit": {}
+        },
+        "options": {
+          "overrideUsername": "admin",
+          "url": ""
         }
-      }
+      },
+      "historyProvider": "launchpad"
     }
   },
   "propConfig": {
-    "custom.exchange.launchpad.dashboard.dashboards": {
+    "custom.launchpad.dashboard.dashboards": {
       "binding": {
         "config": {
-          "path": "this.custom.exchange.launchpad.dashboard.options.username"
+          "path": "this.custom.launchpad.dashboard.options.username"
         },
         "transforms": [
           {
-            "code": "\tvalue = system.db.runNamedQuery(path=\"Exchange/Launchpad/Dashboard/Get\", parameters={\"username\":value})\n\tvalue = system.dataset.toPyDataSet(value)\n\treturn exchange.launchpad.dashboard.getDashboards(value)",
+            "code": "\tvalue = system.db.runNamedQuery(path=\"Launchpad/Dashboard/Get\", parameters={\"username\":value})\n\tvalue = system.dataset.toPyDataSet(value)\n\treturn launchpad.dashboard.getDashboards(value)",
             "type": "script"
           }
         ],
         "type": "property"
       }
     },
-    "custom.exchange.launchpad.dashboard.dbValid": {
+    "custom.launchpad.dashboard.dbValid": {
       "binding": {
         "config": {
-          "queryPath": "Exchange/Launchpad/Dashboard/DB Check"
+          "queryPath": "Launchpad/Dashboard/DB Check"
         },
         "transforms": [
           {
@@ -45,40 +43,40 @@
         "type": "query"
       }
     },
-    "custom.exchange.launchpad.dashboard.objects.current": {
+    "custom.launchpad.dashboard.objects.current": {
       "binding": {
         "config": {
           "struct": {
-            "dashboards": "{this.custom.exchange.launchpad.dashboard.dashboards}",
-            "url": "{this.custom.exchange.launchpad.dashboard.options.url}"
+            "dashboards": "{this.custom.launchpad.dashboard.dashboards}",
+            "url": "{this.custom.launchpad.dashboard.options.url}"
           },
           "waitOnAll": true
         },
         "transforms": [
           {
-            "code": "\turl = value[\"url\"]\n\tdashboards = value[\"dashboards\"]\n\treturn exchange.launchpad.dashboard.getCurrentDashboard(dashboards, url)",
+            "code": "\turl = value[\"url\"]\n\tdashboards = value[\"dashboards\"]\n\treturn launchpad.dashboard.getCurrentDashboard(dashboards, url)",
             "type": "script"
           }
         ],
         "type": "expr-struct"
       }
     },
-    "custom.exchange.launchpad.dashboard.objects.currentLastModified": {
+    "custom.launchpad.dashboard.objects.currentLastModified": {
       "binding": {
         "config": {
           "parameters": {
-            "id": "{this.custom.exchange.launchpad.dashboard.objects.current.id}"
+            "id": "{this.custom.launchpad.dashboard.objects.current.id}"
           },
           "polling": {
             "enabled": true,
             "rate": "30"
           },
-          "queryPath": "Exchange/Launchpad/Dashboard/Last Modified"
+          "queryPath": "Launchpad/Dashboard/Last Modified"
         },
         "type": "query"
       }
     },
-    "custom.exchange.launchpad.dashboard.options.isDesigner": {
+    "custom.launchpad.dashboard.options.isDesigner": {
       "binding": {
         "config": {
           "expression": "{this.props.device.type} = 'designer'"
@@ -86,10 +84,10 @@
         "type": "expr"
       }
     },
-    "custom.exchange.launchpad.dashboard.options.username": {
+    "custom.launchpad.dashboard.options.username": {
       "binding": {
         "config": {
-          "expression": "if({this.custom.exchange.launchpad.dashboard.options.isDesigner}, \r\n{this.custom.exchange.launchpad.dashboard.options.overrideUsername},\r\n{this.props.auth.user.userName})"
+          "expression": "if({this.custom.launchpad.dashboard.options.isDesigner}, \r\n{this.custom.launchpad.dashboard.options.overrideUsername},\r\n{this.props.auth.user.userName})"
         },
         "transforms": [
           {

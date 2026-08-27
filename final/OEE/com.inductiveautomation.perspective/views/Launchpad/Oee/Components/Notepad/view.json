@@ -1,0 +1,152 @@
+{
+  "custom": {},
+  "params": {
+    "path": "[Launchpad]OEE/Notepad"
+  },
+  "propConfig": {
+    "params.path": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 400,
+      "width": 400
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label"
+            },
+            "position": {
+              "grow": 1
+            },
+            "props": {
+              "text": "Notepad:"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\n\tif self.parent.parent.getChild(\"TextArea\").props.enabled:\n\t\tself.parent.parent.getChild(\"TextArea\").props.enabled = False\n\telse:\n\t\tself.parent.parent.getChild(\"TextArea\").props.enabled = True"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Icon",
+              "tooltip": {
+                "enabled": true,
+                "text": "Toggle editing of the note"
+              }
+            },
+            "position": {
+              "basis": "30px"
+            },
+            "props": {
+              "path": "material/edit",
+              "style": {
+                "classes": ""
+              }
+            },
+            "type": "ia.display.icon"
+          }
+        ],
+        "meta": {
+          "name": "Header"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "launchpad/oee/text/header"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "TextArea"
+        },
+        "position": {
+          "grow": 1,
+          "shrink": 1
+        },
+        "propConfig": {
+          "props.style.backgroundColor": {
+            "binding": {
+              "config": {
+                "path": "this.props.enabled"
+              },
+              "transforms": [
+                {
+                  "fallback": "var(--oee-object)",
+                  "inputType": "scalar",
+                  "mappings": [
+                    {
+                      "input": true,
+                      "output": "var(--oee-card)"
+                    }
+                  ],
+                  "outputType": "scalar",
+                  "type": "map"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.text": {
+            "binding": {
+              "config": {
+                "bidirectional": true,
+                "fallbackDelay": 2.5,
+                "mode": "indirect",
+                "references": {
+                  "path": "{view.params.path}"
+                },
+                "tagPath": "{path}"
+              },
+              "type": "tag"
+            }
+          }
+        },
+        "props": {
+          "deferUpdates": false,
+          "rejectUpdatesWhileFocused": false,
+          "style": {
+            "borderBottomLeftRadius": 10,
+            "borderBottomRightRadius": 10,
+            "borderStyle": "none",
+            "borderTopLeftRadius": 10,
+            "borderTopRightRadius": 10,
+            "color": "#FFFFFF",
+            "marginTop": 6,
+            "minHeight": "40px"
+          }
+        },
+        "type": "ia.input.text-area"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "launchpad/oee/card"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

@@ -1,0 +1,371 @@
+{
+  "custom": {
+    "setupResult": "Press Check to see what is already in place.",
+    "maintResult": ""
+  },
+  "params": {},
+  "props": {
+    "defaultSize": {
+      "height": 600,
+      "width": 800
+    }
+  },
+  "root": {
+    "meta": {
+      "name": "root"
+    },
+    "type": "ia.container.flex",
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "launchpad/kpi/root",
+        "margin": 20
+      }
+    },
+    "children": [
+      {
+        "meta": {
+          "name": "GatewaySetup"
+        },
+        "position": {
+          "grow": 0,
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "classes": "launchpad/kpi/card",
+            "padding": 20
+          }
+        },
+        "type": "ia.container.flex",
+        "children": [
+          {
+            "meta": {
+              "name": "Header"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "text": "Gateway setup",
+              "style": {
+                "classes": "launchpad/kpi/text/label",
+                "fontSize": 20,
+                "marginBottom": 6,
+                "textAlign": "left"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Info"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "text": "Creates the Examples database, the launchpad tag provider and historian, the simulator device and its programme, the KPI tags, the dashboard tables and 48 hours of history. Safe to press twice: it only creates what is missing.",
+              "style": {
+                "classes": "launchpad/kpi/text/label",
+                "marginBottom": 14,
+                "textAlign": "left"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Buttons"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "direction": "row",
+              "alignItems": "center"
+            },
+            "type": "ia.container.flex",
+            "children": [
+              {
+                "meta": {
+                  "name": "SetUp"
+                },
+                "position": {
+                  "basis": "190px",
+                  "shrink": 0
+                },
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "script": "    # Run on a worker thread so the session can paint the transcript as it goes.\n    # A bare gateway takes up to a minute, and a synchronous click just freezes the\n    # button for that whole time with nothing to say it is doing anything.\n    view = self.view\n    view.custom.setupResult = \"starting...\"\n    def build():\n        def progress(message):\n            view.custom.setupResult = message\n        report = launchpad.setup.run(progress=progress)\n        # run() builds a transcript as it works -- one line per step with its\n        # result -- and that is what the person watching needs to keep. Fall back\n        # to the summary only if an older run() did not produce one.\n        view.custom.setupResult = report.get(\"detail\") or \\\n            launchpad.setup.detail(report)\n    system.util.invokeAsynchronous(build)"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Set up this gateway",
+                  "style": {
+                    "classes": "launchpad/kpi/header/button-selected",
+                    "marginRight": 10
+                  }
+                },
+                "type": "ia.input.button"
+              },
+              {
+                "meta": {
+                  "name": "Check"
+                },
+                "position": {
+                  "basis": "120px",
+                  "shrink": 0
+                },
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "script": "\t# read-only: reports what is and is not in place, changes nothing\n\tview = self.view\n\tview.custom.setupResult = \"checking...\"\n\tdef look():\n\t\tview.custom.setupResult = launchpad.setup.detail(\n\t\t\tlaunchpad.setup.check())\n\tsystem.util.invokeAsynchronous(look)"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Check",
+                  "style": {
+                    "classes": "launchpad/kpi/header/button-selected",
+                    "marginRight": 10
+                  }
+                },
+                "type": "ia.input.button"
+              },
+              {
+                "meta": {
+                  "name": "UpdateTags"
+                },
+                "position": {
+                  "basis": "150px",
+                  "shrink": 0
+                },
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "script": "    # Reinstalls the tag definitions, which no ordinary Setup press will do: writing\n    # them over a live subscription leaves the previous definition's script running\n    # too. That is why this is a separate button and why it says to restart -- the\n    # old subscription does not go away until the gateway does.\n    view = self.view\n    view.custom.setupResult = \"updating the tag definitions...\"\n    def build():\n        def progress(message):\n            view.custom.setupResult = message\n        report = launchpad.setup.run(progress=progress, force=True, tags=True)\n        view.custom.setupResult = launchpad.setup.detail(report) + (\n            \"\\n\\nRESTART THE GATEWAY to finish: until you do, the previous \"\n            \"definition's script is still subscribed as well and the demo counts \"\n            \"more than once per tick.\")\n    system.util.invokeAsynchronous(build)"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Update tags",
+                  "style": {
+                    "classes": "launchpad/kpi/header/button-selected",
+                    "marginRight": 10
+                  }
+                },
+                "type": "ia.input.button"
+              }
+            ]
+          },
+          {
+            "meta": {
+              "name": "Result"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.setupResult"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "launchpad/kpi/text/label",
+                "textAlign": "left",
+                "whiteSpace": "pre-line",
+                "marginTop": 14
+              }
+            },
+            "type": "ia.display.label"
+          }
+        ]
+      },
+      {
+        "meta": {
+          "name": "Maintenance"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "classes": "launchpad/kpi/card",
+            "padding": 20,
+            "marginTop": 20
+          }
+        },
+        "type": "ia.container.flex",
+        "children": [
+          {
+            "meta": {
+              "name": "Header"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "text": "History maintenance",
+              "style": {
+                "classes": "launchpad/kpi/text/label",
+                "fontSize": 20,
+                "marginBottom": 6,
+                "textAlign": "left"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Info"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "text": "Setup seeds history once and then leaves it alone. These two are for afterwards: re-seed discards the seeded samples and writes them again, which is what you want after rescaling a tag; repair moves mis-columned integer samples into the column an integer tag actually reads.",
+              "style": {
+                "classes": "launchpad/kpi/text/label",
+                "marginBottom": 14,
+                "textAlign": "left"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Buttons"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "direction": "row",
+              "alignItems": "center"
+            },
+            "type": "ia.container.flex",
+            "children": [
+              {
+                "meta": {
+                  "name": "Reseed"
+                },
+                "position": {
+                  "basis": "170px",
+                  "shrink": 0
+                },
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "script": "\t# force=1 drops the seeded samples and writes them again. Worth doing after\n\t# rescaling a tag, so one series does not end up holding two different units.\n\tview = self.view\n\tview.custom.maintResult = \"re-seeding history...\"\n\tdef work():\n\t\tr = launchpad.init.backfill(force=True)\n\t\tview.custom.maintResult = (\"re-seeded %s rows across %s tags\"\n\t\t\t% (r.get(\"rows\"), r.get(\"tagsSeeded\"))) if not r.get(\"error\") else r[\"error\"]\n\tsystem.util.invokeAsynchronous(work)"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Re-seed history",
+                  "style": {
+                    "classes": "launchpad/kpi/header/button-selected",
+                    "marginRight": 10
+                  }
+                },
+                "type": "ia.input.button"
+              },
+              {
+                "meta": {
+                  "name": "Repair"
+                },
+                "position": {
+                  "basis": "160px",
+                  "shrink": 0
+                },
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "script": "\t# moves mis-columned integer samples into intvalue, where an int tag reads them\n\tview = self.view\n\tview.custom.maintResult = \"repairing...\"\n\tdef work():\n\t\tview.custom.maintResult = \"repaired: %s\" % launchpad.init.repairBackfill()\n\tsystem.util.invokeAsynchronous(work)"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Repair columns",
+                  "style": {
+                    "classes": "launchpad/kpi/header/button-selected",
+                    "marginRight": 10
+                  }
+                },
+                "type": "ia.input.button"
+              }
+            ]
+          },
+          {
+            "meta": {
+              "name": "Result"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.maintResult"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "launchpad/kpi/text/label",
+                "textAlign": "left",
+                "whiteSpace": "pre-line",
+                "marginTop": 14
+              }
+            },
+            "type": "ia.display.label"
+          }
+        ]
+      }
+    ],
+    "events": {
+      "system": {
+        "onStartup": {
+          "config": {
+            "script": "\tsystem.perspective.sendMessage(\"navigation\", \"Settings\")"
+          },
+          "scope": "G",
+          "type": "script"
+        }
+      }
+    }
+  }
+}

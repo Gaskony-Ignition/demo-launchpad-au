@@ -1,0 +1,128 @@
+{
+  "custom": {
+    "instances": [
+      {
+        "label": "Line 1",
+        "path": "[Launchpad]KPI/Lines/Line1/ActivePower"
+      },
+      {
+        "label": "Line 2",
+        "path": "[Launchpad]KPI/Lines/Line2/ActivePower"
+      },
+      {
+        "label": "Line 3",
+        "path": "[Launchpad]KPI/Lines/Line3/ActivePower"
+      },
+      {
+        "label": "Line 4",
+        "path": "[Launchpad]KPI/Lines/Line4/ActivePower"
+      },
+      {
+        "label": "Line 5",
+        "path": "[Launchpad]KPI/Lines/Line5/ActivePower"
+      },
+      {
+        "label": "Line 6",
+        "path": "[Launchpad]KPI/Lines/Line6/ActivePower"
+      },
+      {
+        "label": "Line 7",
+        "path": "[Launchpad]KPI/Lines/Line7/ActivePower"
+      }
+    ]
+  },
+  "params": {
+    "folderPath": "[Launchpad]KPI/Lines"
+  },
+  "propConfig": {
+    "custom.instances": {
+      "binding": {
+        "config": {
+          "path": "view.params.folderPath"
+        },
+        "transforms": [
+          {
+            "code": "\ttags \u003d system.tag.browse(value, filter\u003d{\"tagType\":\"AtomicTag\", \"name\": \"ActivePower\", \"recursive\":True})\n\treturn [{\u0027path\u0027:t[\u0027fullPath\u0027], \u0027label\u0027:str(t[\u0027fullPath\u0027]).split(\u0027/\u0027)[-2].replace(\u0027Line\u0027,\u0027Line \u0027)} for t in tags]",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "params.folderPath": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 709,
+      "width": 564
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Label"
+        },
+        "position": {
+          "basis": "32px"
+        },
+        "props": {
+          "style": {
+            "classes": "launchpad/kpi/text/header",
+            "margin": 8
+          },
+          "text": "Active Power"
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "FlexRepeater"
+        },
+        "position": {
+          "basis": "320px",
+          "grow": 1
+        },
+        "propConfig": {
+          "props.instances": {
+            "binding": {
+              "config": {
+                "path": "view.custom.instances"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "direction": "column",
+          "elementPosition": {
+            "basis": "50px"
+          },
+          "elementStyle": {
+            "margin": 0,
+            "padding": 6
+          },
+          "justify": "space-between",
+          "path": "Launchpad/Kpi/Components/ProgressBar",
+          "useDefaultViewHeight": false,
+          "useDefaultViewWidth": false
+        },
+        "type": "ia.display.flex-repeater"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "launchpad/kpi/card"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

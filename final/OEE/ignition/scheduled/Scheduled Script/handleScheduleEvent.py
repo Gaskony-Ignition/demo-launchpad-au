@@ -1,2 +1,2 @@
 def handleScheduleEvent():
-	exchange.launchpad.oee.purgeHistory()
+	launchpad.oee.purgeHistory()

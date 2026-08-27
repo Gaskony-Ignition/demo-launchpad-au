@@ -1,85 +1,83 @@
 {
   "custom": {
-    "exchange": {
-      "launchpad": {
-        "oee": {
-          "display": {
-            "customTime": {
-              "start": {
-                "$": [
-                  "ts",
-                  192,
-                  1778208665073
-                ],
-                "$ts": 1778112000000
-              },
-              "stop": {
-                "$": [
-                  "ts",
-                  192,
-                  1778208665073
-                ],
-                "$ts": 1778198399000
-              }
+    "launchpad": {
+      "oee": {
+        "display": {
+          "customTime": {
+            "start": {
+              "$": [
+                "ts",
+                192,
+                1778208665073
+              ],
+              "$ts": 1778112000000
             },
-            "interval": "Hour",
-            "mode": "Realtime",
-            "rangeDays": {
-              "period": 0,
-              "start": -1,
-              "stop": 0
+            "stop": {
+              "$": [
+                "ts",
+                192,
+                1778208665073
+              ],
+              "$ts": 1778198399000
             }
           },
-          "lines": [],
-          "report": {
-            "customTime": {
-              "start": {
-                "$": [
-                  "ts",
-                  192,
-                  1752787578813
-                ],
-                "$ts": 1752649200000
-              },
-              "stop": {
-                "$": [
-                  "ts",
-                  192,
-                  1752787578813
-                ],
-                "$ts": 1752735599000
-              }
+          "interval": "Hour",
+          "mode": "Realtime",
+          "rangeDays": {
+            "period": 0,
+            "start": -1,
+            "stop": 0
+          }
+        },
+        "lines": [],
+        "report": {
+          "customTime": {
+            "start": {
+              "$": [
+                "ts",
+                192,
+                1752787578813
+              ],
+              "$ts": 1752649200000
             },
-            "mode": "Summary",
-            "rangeDays": {
-              "period": 0,
-              "start": -1,
-              "stop": 0
+            "stop": {
+              "$": [
+                "ts",
+                192,
+                1752787578813
+              ],
+              "$ts": 1752735599000
             }
           },
-          "selectedLine": "Line 1",
-          "target": 0.45
-        }
+          "mode": "Summary",
+          "rangeDays": {
+            "period": 0,
+            "start": -1,
+            "stop": 0
+          }
+        },
+        "selectedLine": "Line 1",
+        "target": 0.45
       }
     }
   },
   "propConfig": {
-    "custom.exchange.launchpad.oee.display.rangeDays": {
+    "custom.launchpad.oee.display.rangeDays": {
       "onChange": {
         "enabled": null,
-        "script": "\n\tif currentValue.value[\"period\"].value != \"\":\n\t\t# if value in dropdown changes (but not empties, set start/end time to the bound start and end time)\n\t\tself.custom.exchange.launchpad.oee.display.customTime.start = system.date.addDays(system.date.midnight(system.date.now()),currentValue.value[\"start\"].value)\n\t\tself.custom.exchange.launchpad.oee.display.customTime.stop = system.date.addSeconds(system.date.addDays(system.date.midnight(system.date.now()),currentValue.value[\"stop\"].value),-1)"
+        "script": "\n\tif currentValue.value[\"period\"].value != \"\":\n\t\t# if value in dropdown changes (but not empties, set start/end time to the bound start and end time)\n\t\tself.custom.launchpad.oee.display.customTime.start = system.date.addDays(system.date.midnight(system.date.now()),currentValue.value[\"start\"].value)\n\t\tself.custom.launchpad.oee.display.customTime.stop = system.date.addSeconds(system.date.addDays(system.date.midnight(system.date.now()),currentValue.value[\"stop\"].value),-1)"
       }
     },
-    "custom.exchange.launchpad.oee.display.startTime": {
+    "custom.launchpad.oee.display.startTime": {
       "binding": {
         "config": {
           "struct": {
-            "customTime": "{this.custom.exchange.launchpad.oee.display.customTime}",
-            "interval": "{this.custom.exchange.launchpad.oee.display.interval}",
-            "mode": "{this.custom.exchange.launchpad.oee.display.mode}",
+            "customTime": "{this.custom.launchpad.oee.display.customTime}",
+            "interval": "{this.custom.launchpad.oee.display.interval}",
+            "mode": "{this.custom.launchpad.oee.display.mode}",
             "now": "now(60000)",
-            "rangeDays": "{this.custom.exchange.launchpad.oee.display.rangeDays}",
-            "shiftStart": "{this.custom.exchange.launchpad.oee.selectedLineShiftStart}"
+            "rangeDays": "{this.custom.launchpad.oee.display.rangeDays}",
+            "shiftStart": "{this.custom.launchpad.oee.selectedLineShiftStart}"
           },
           "waitOnAll": true
         },
@@ -92,48 +90,48 @@
         "type": "expr-struct"
       }
     },
-    "custom.exchange.launchpad.oee.display.stopTime": {
+    "custom.launchpad.oee.display.stopTime": {
       "binding": {
         "config": {
           "struct": {
-            "customTime": "{this.custom.exchange.launchpad.oee.display.customTime}",
-            "mode": "{this.custom.exchange.launchpad.oee.display.mode}",
+            "customTime": "{this.custom.launchpad.oee.display.customTime}",
+            "mode": "{this.custom.launchpad.oee.display.mode}",
             "now": "now(60000)",
-            "rangeDays": "{this.custom.exchange.launchpad.oee.display.rangeDays}"
+            "rangeDays": "{this.custom.launchpad.oee.display.rangeDays}"
           },
           "waitOnAll": true
         },
         "transforms": [
           {
-            "code": "\t#//in realtime mode we want to poll the stop time to keep up with the current time \n\t#if({this.custom.exchange.launchpad.oee.display.mode} = \"Realtime\",now(60000), addSeconds(addDays(midnight(now(0)),{this.custom.exchange.launchpad.oee.display.rangeDays.stop}),-1))\n\t\n\tif value.mode == \"Realtime\":\n\t\t# if realtime, return now every 60 seconds\n\t\treturn value.now\n\t\n\tif value.mode == \"Historical\":\n\t\tif value.rangeDays.period != \"\":\n\t\t\t# if historical and not custom time selected, return 11:59:59 PM of whatever day is today + rangeDays.stop\n\t\t\treturn system.date.addSeconds(system.date.addDays(system.date.midnight(system.date.now()),value.rangeDays.stop),-1)\n\t\telse:\n\t\t\t# if historical and custom time selected\n\t\t\treturn value.customTime.stop",
+            "code": "\t#//in realtime mode we want to poll the stop time to keep up with the current time \n\t#if({this.custom.launchpad.oee.display.mode} = \"Realtime\",now(60000), addSeconds(addDays(midnight(now(0)),{this.custom.launchpad.oee.display.rangeDays.stop}),-1))\n\t\n\tif value.mode == \"Realtime\":\n\t\t# if realtime, return now every 60 seconds\n\t\treturn value.now\n\t\n\tif value.mode == \"Historical\":\n\t\tif value.rangeDays.period != \"\":\n\t\t\t# if historical and not custom time selected, return 11:59:59 PM of whatever day is today + rangeDays.stop\n\t\t\treturn system.date.addSeconds(system.date.addDays(system.date.midnight(system.date.now()),value.rangeDays.stop),-1)\n\t\telse:\n\t\t\t# if historical and custom time selected\n\t\t\treturn value.customTime.stop",
             "type": "script"
           }
         ],
         "type": "expr-struct"
       }
     },
-    "custom.exchange.launchpad.oee.lineTagFolder": {
+    "custom.launchpad.oee.lineTagFolder": {
       "binding": {
         "config": {
           "expression": "now(0)"
         },
         "transforms": [
           {
-            "code": "\treturn exchange.launchpad.oee.BASE_TAG_FOLDER\n\t",
+            "code": "\treturn launchpad.oee.BASE_TAG_FOLDER\n\t",
             "type": "script"
           }
         ],
         "type": "expr"
       }
     },
-    "custom.exchange.launchpad.oee.lines": {
+    "custom.launchpad.oee.lines": {
       "binding": {
         "config": {
           "expression": "now(30000)"
         },
         "transforms": [
           {
-            "code": "\t# Re-browsed on a timer, not once at session start. A session opened before\n\t# the tags exist -- which is exactly what happens between importing the\n\t# project and pressing Set up -- used to hold an empty list for its whole\n\t# life, and an empty list leaves the line dropdown with nothing to select,\n\t# every live value null and a quality overlay over the card.\n\treturn exchange.launchpad.oee.getLineNames(exchange.launchpad.oee.BASE_TAG_FOLDER)\n\t",
+            "code": "\t# Re-browsed on a timer, not once at session start. A session opened before\n\t# the tags exist -- which is exactly what happens between importing the\n\t# project and pressing Set up -- used to hold an empty list for its whole\n\t# life, and an empty list leaves the line dropdown with nothing to select,\n\t# every live value null and a quality overlay over the card.\n\treturn launchpad.oee.getLineNames(launchpad.oee.BASE_TAG_FOLDER)\n\t",
             "type": "script"
           }
         ],
@@ -141,21 +139,21 @@
       },
       "onChange": {
         "enabled": null,
-        "script": "\t# Only on the empty -> populated transition. That is the recovery case:\n\t# the session started before the tags existed, so nothing could be\n\t# selected, and without this the page stays null after the tags arrive.\n\t# Restricting it to the transition is what keeps <All Lines> working on\n\t# the Production Summary -- that deliberately selects \"\", and this must\n\t# not undo it.\n\tdef names(qv):\n\t\treturn [str(getattr(v, \"value\", v)) for v in (qv.value or [])] if qv else []\n\tnow = names(currentValue)\n\tif now and not names(previousValue):\n\t\tif self.custom.exchange.launchpad.oee.selectedLine not in now:\n\t\t\tself.custom.exchange.launchpad.oee.selectedLine = now[0]\n\t"
+        "script": "\t# Only on the empty -> populated transition. That is the recovery case:\n\t# the session started before the tags existed, so nothing could be\n\t# selected, and without this the page stays null after the tags arrive.\n\t# Restricting it to the transition is what keeps <All Lines> working on\n\t# the Production Summary -- that deliberately selects \"\", and this must\n\t# not undo it.\n\tdef names(qv):\n\t\treturn [str(getattr(v, \"value\", v)) for v in (qv.value or [])] if qv else []\n\tnow = names(currentValue)\n\tif now and not names(previousValue):\n\t\tif self.custom.launchpad.oee.selectedLine not in now:\n\t\t\tself.custom.launchpad.oee.selectedLine = now[0]\n\t"
       }
     },
-    "custom.exchange.launchpad.oee.report.rangeDays": {
+    "custom.launchpad.oee.report.rangeDays": {
       "onChange": {
         "enabled": null,
-        "script": "\t\n\tif currentValue.value[\"period\"].value != \"\":\n\t\t# if value in dropdown changes (but not empties, set start/end time to the bound start and end time)\n\t\tself.custom.exchange.launchpad.oee.report.customTime.start = system.date.addDays(system.date.midnight(system.date.now()),currentValue.value[\"start\"].value)\n\t\tself.custom.exchange.launchpad.oee.report.customTime.stop = system.date.addSeconds(system.date.addDays(system.date.midnight(system.date.now()),currentValue.value[\"stop\"].value),-1)"
+        "script": "\t\n\tif currentValue.value[\"period\"].value != \"\":\n\t\t# if value in dropdown changes (but not empties, set start/end time to the bound start and end time)\n\t\tself.custom.launchpad.oee.report.customTime.start = system.date.addDays(system.date.midnight(system.date.now()),currentValue.value[\"start\"].value)\n\t\tself.custom.launchpad.oee.report.customTime.stop = system.date.addSeconds(system.date.addDays(system.date.midnight(system.date.now()),currentValue.value[\"stop\"].value),-1)"
       }
     },
-    "custom.exchange.launchpad.oee.report.startTime": {
+    "custom.launchpad.oee.report.startTime": {
       "binding": {
         "config": {
           "struct": {
-            "customTime": "{this.custom.exchange.launchpad.oee.report.customTime}",
-            "rangeDays": "{this.custom.exchange.launchpad.oee.report.rangeDays}"
+            "customTime": "{this.custom.launchpad.oee.report.customTime}",
+            "rangeDays": "{this.custom.launchpad.oee.report.rangeDays}"
           },
           "waitOnAll": true
         },
@@ -168,12 +166,12 @@
         "type": "expr-struct"
       }
     },
-    "custom.exchange.launchpad.oee.report.stopTime": {
+    "custom.launchpad.oee.report.stopTime": {
       "binding": {
         "config": {
           "struct": {
-            "customTime": "{this.custom.exchange.launchpad.oee.report.customTime}",
-            "rangeDays": "{this.custom.exchange.launchpad.oee.report.rangeDays}"
+            "customTime": "{this.custom.launchpad.oee.report.customTime}",
+            "rangeDays": "{this.custom.launchpad.oee.report.rangeDays}"
           },
           "waitOnAll": true
         },
@@ -186,20 +184,20 @@
         "type": "expr-struct"
       }
     },
-    "custom.exchange.launchpad.oee.selectedLine": {
+    "custom.launchpad.oee.selectedLine": {
       "onChange": {
         "enabled": null,
         "script": "\tsystem.perspective.sendMessage(\"selectedLine\", {\"line\": currentValue.value, \"timestamp\": system.date.now()}, \"session\")"
       }
     },
-    "custom.exchange.launchpad.oee.selectedLineShiftStart": {
+    "custom.launchpad.oee.selectedLineShiftStart": {
       "binding": {
         "config": {
           "fallbackDelay": 2.5,
           "mode": "indirect",
           "references": {
-            "1": "{this.custom.exchange.launchpad.oee.lineTagFolder}",
-            "2": "{this.custom.exchange.launchpad.oee.selectedLine}"
+            "1": "{this.custom.launchpad.oee.lineTagFolder}",
+            "2": "{this.custom.launchpad.oee.selectedLine}"
           },
           "tagPath": "{1}/{2}/Schedule/CurrentShiftStartTime"
         },

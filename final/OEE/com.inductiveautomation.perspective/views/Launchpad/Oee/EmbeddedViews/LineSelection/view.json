@@ -1,0 +1,133 @@
+{
+  "custom": {},
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\t# Guarded, and it has to be: on a session opened before the tags exist the\n\t# line list is empty, lines[0] raises IndexError, and this action -- which\n\t# only ever runs at startup -- dies without selecting anything. The session\n\t# then holds no selected line for its whole life. The recovery now lives on\n\t# the session's `lines` property, which re-browses on a timer.\n\tlines = self.session.custom.launchpad.oee.lines\n\tif lines and not self.session.custom.launchpad.oee.selectedLine:\n\t\tself.session.custom.launchpad.oee.selectedLine = lines[0]\n\t"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
+  },
+  "params": {
+    "showAllOption": false
+  },
+  "propConfig": {
+    "params.showAllOption": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 48,
+      "width": 400
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Label"
+        },
+        "position": {
+          "basis": "43px"
+        },
+        "props": {
+          "style": {
+            "classes": "launchpad/oee/text/label"
+          },
+          "text": "Line"
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Dropdown"
+        },
+        "position": {
+          "basis": "350px"
+        },
+        "propConfig": {
+          "props.options": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.oee.lines"
+              },
+              "transforms": [
+                {
+                  "code": "\tif self.view.params.showAllOption:\n\t\tlines = [{\"value\":\"\",\"label\":\"<All Lines>\"}]\n\t\tlines.extend( [{\"value\":lineName,\"label\":lineName} for lineName in value])\n\t\treturn lines\n\telse:\n\t\treturn [{\"value\":lineName,\"label\":lineName} for lineName in value]\n\t",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.value": {
+            "binding": {
+              "config": {
+                "bidirectional": true,
+                "path": "session.custom.launchpad.oee.selectedLine"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "classes": "Launchpad/Oee/Text/Label",
+            "marginRight": "10px"
+          }
+        },
+        "type": "ia.input.dropdown"
+      },
+      {
+        "events": {
+          "component": {
+            "onActionPerformed": {
+              "config": {
+                "script": "\tlineFolderPath = launchpad.oee.BASE_TAG_FOLDER\n\tlines = launchpad.oee.getLineNames(lineFolderPath) \n\tself.session.custom.launchpad.oee.lineTagFolder = lineFolderPath\n\tself.session.custom.launchpad.oee.lines = lines\n\tself.session.custom.launchpad.oee.selectedLine = \"\"\n\tif len(lines)>0:\n\t\tself.session.custom.launchpad.oee.selectedLine = lines[0]"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "RefreshLines",
+          "tooltip": {
+            "enabled": true,
+            "text": "Refresh Lines"
+          }
+        },
+        "position": {
+          "basis": "50px"
+        },
+        "props": {
+          "image": {
+            "icon": {
+              "path": "material/refresh"
+            }
+          },
+          "style": {
+            "classes": "launchpad/oee/control/button-selected"
+          },
+          "text": ""
+        },
+        "type": "ia.input.button"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "alignItems": "center",
+      "style": {
+        "classes": "launchpad/oee/card-small"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}
