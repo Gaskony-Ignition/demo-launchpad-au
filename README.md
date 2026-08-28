@@ -62,6 +62,11 @@ the tag provider, historian, simulator and its programme, tags, UDT types, table
 roster and demo history. Nothing has to exist on the gateway first. It only creates what
 is missing, so pressing it twice is safe.
 
+Pressing it again is also how you take a fix. Import a newer release over the top with
+**Allow Overwrite**, press **Set up this gateway**, and anything the new version knows
+how to repair — a database connection made by an older release, say — is brought up to
+date in place. Your data is not touched.
+
 Two things it will not do. It won't repoint a gateway scripting project already set to
 something else. And if a connection called `Examples` is already there and is *not*
 SQLite, it stops on that step having created nothing — the schema is SQLite DDL, so
