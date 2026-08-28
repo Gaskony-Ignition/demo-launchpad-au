@@ -210,7 +210,7 @@
           ],
           "plots": [
             {
-              "color": "var(--kpi-root)",
+              "color": "transparent",
               "markers": [],
               "relativeWeight": 1,
               "style": {
