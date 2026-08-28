@@ -611,10 +611,27 @@ def ensureDatabase(force=False):
         # it reads as fine -- but it carries the parameterless URL and the file is
         # still on the rollback journal. Returning "already connected" there would
         # leave the stall in place on exactly the gateways that have been running
-        # longest. Rewrite it instead; everything else about the connection is
-        # unchanged, and re-pressing Set up is how a user gets fixes.
+        # longest.
         if existingConnectURL() == CONNECT_URL:
             return "already connected"
+        # Repair the URL and NOTHING else. This connection is almost certainly the
+        # one this project created, but "almost certainly" is not a licence to
+        # rewrite a resource wholesale: a config.json written from the dict below
+        # would also reset every pool and eviction setting, so anyone who had tuned
+        # poolMaxActive on a busy gateway would lose it silently to an upgrade they
+        # asked for on other grounds. The create path already refuses to overwrite
+        # a connection it does not recognise; a repair path has no business being
+        # more invasive than the create path it is repairing. Patch the one key
+        # that is wrong and leave the rest of the file exactly as found.
+        existing = _readConfig(CORE, "database-connection", DATABASE)
+        if existing is not None:
+            existing["connectURL"] = CONNECT_URL
+            _configResource(CORE, "database-connection", DATABASE, existing,
+                            "SQLite database for the Launchpad OEE + KPI example "
+                            "resources")
+            return "updated"
+        # Unreadable config.json: fall through and write a known-good one rather
+        # than leaving a connection nobody can repair.
     _configResource(CORE, "database-connection", DATABASE, {
         "connectURL": CONNECT_URL,
         "connectionProps": "", "connectionResetParams": "",
@@ -629,6 +646,20 @@ def ensureDatabase(force=False):
         "validationQuery": "SELECT 1", "validationSleepTime": 10000,
     }, "SQLite database for the Launchpad OEE + KPI example resources")
     return "created" if kind == "absent" else "updated"
+
+
+def _readConfig(module, kind, name):
+    """A config resource's config.json as a dict, or None if absent/unreadable.
+
+    Used to change one key of an existing resource without rewriting the others.
+    """
+    p = os.path.join(_abs(RESOURCES), module, kind, name, "config.json")
+    if not os.path.exists(p):
+        return None
+    try:
+        return system.util.jsonDecode(_read(p))
+    except:
+        return None
 
 
 def existingConnectURL():
