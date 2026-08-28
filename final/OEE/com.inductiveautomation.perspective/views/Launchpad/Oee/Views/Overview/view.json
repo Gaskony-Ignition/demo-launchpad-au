@@ -1,6 +1,6 @@
 {
   "custom": {
-    "database": "Examples",
+    "database": "OEE",
     "downtimeBars": [],
     "historicalData": [],
     "oeeBars": [],

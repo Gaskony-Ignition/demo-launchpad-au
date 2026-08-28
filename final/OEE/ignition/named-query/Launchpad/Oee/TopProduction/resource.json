@@ -16,7 +16,7 @@
     "enabled": true,
     "cacheAmount": 1,
     "cacheEnabled": false,
-    "database": "Examples",
+    "database": "OEE",
     "fallbackEnabled": false,
     "permissions": [
       {

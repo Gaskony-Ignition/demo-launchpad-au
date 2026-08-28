@@ -1,7 +1,7 @@
 {
   "custom": {
     "avgData": [],
-    "database": "Examples",
+    "database": "OEE",
     "oeeData": {
       "$": [
         "ds",

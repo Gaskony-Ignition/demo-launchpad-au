@@ -57,7 +57,8 @@ by hand.
 3. Open the project's Settings screen and press **Set up this gateway**.
 
 That's the install, and it starts from nothing. The button creates its own **database
-connection** — SQLite at `${data}/Examples.db`, so no server and no credentials — then
+connection** — SQLite, named after the project, at `${data}/OEE.db` or `${data}/KPI.db`,
+so no server and no credentials — then
 the tag provider, historian, simulator and its programme, tags, UDT types, tables, shift
 roster and demo history. Nothing has to exist on the gateway first. It only creates what
 is missing, so pressing it twice is safe.
@@ -68,7 +69,7 @@ how to repair — a database connection made by an older release, say — is bro
 date in place. Your data is not touched.
 
 Two things it will not do. It won't repoint a gateway scripting project already set to
-something else. And if a connection called `Examples` is already there and is *not*
+something else. And if a connection under the project's own name is already there and is *not*
 SQLite, it stops on that step having created nothing — the schema is SQLite DDL, so
 building on someone else's Postgres would half-create a schema rather than fail. Rename
 or remove that connection and press **Set up this gateway** again.

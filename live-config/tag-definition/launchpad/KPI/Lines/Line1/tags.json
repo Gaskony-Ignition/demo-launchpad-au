@@ -20,7 +20,7 @@
     "alarms": [
       {
         "mode": "BelowValue",
-        "setpointA": 20.0,
+        "setpointA": 25.0,
         "name": "Battery Low",
         "label": "Line 1",
         "displayPath": "",
@@ -45,7 +45,7 @@
     "alarms": [
       {
         "mode": "AboveValue",
-        "setpointA": 145.0,
+        "setpointA": 58.0,
         "name": "Coil Temperature High",
         "label": "Line 1",
         "priority": "Critical"

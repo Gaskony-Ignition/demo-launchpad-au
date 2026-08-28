@@ -66,7 +66,7 @@
               "shrink": 0
             },
             "props": {
-              "text": "Creates the Examples database, the launchpad tag provider and historian, the simulator device and its programme, the KPI tags, the dashboard tables and 48 hours of history. Safe to press twice: it only creates what is missing.",
+              "text": "Creates the KPI database, the launchpad tag provider and historian, the simulator device and its programme, the KPI tags, the dashboard tables and 48 hours of history. Safe to press twice: it only creates what is missing.",
               "style": {
                 "classes": "launchpad/kpi/text/label",
                 "marginBottom": 14,

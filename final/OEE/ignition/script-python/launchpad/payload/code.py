@@ -16,9 +16,9 @@ def _json(b64):
     return json.loads(_blob(b64))
 
 _PROVIDER = (
-    "eNqdj7FuwzAMRP+Fc74gmwt3K5IiyVZ0YOxTIJSWDJFKagT+91IZsqcbceS7O95pLjlEAW3vxCL59sbDjwtC28Ci2BASnwUn"
-    "vhwQUJAGHC0XB6xUX9sy+0zHU7fru0NP64YUZjFdtHmOCFzFejbWXMuAHU/t/v2Xp1mg5AFjtE+UKarGnB6UYqgl2vKBK8SV"
-    "r+9nUCeyDy2lgMd9kuVZtAn/8LmyVDinUa1957vW9swKL3dzHC+7rusfAkZ6sw=="
+    "eNqdj7GOAjEMRP/FNV9At2ibEydAQIcozO4ERWcSFDugFdp/P+cK+qOzxn4z4xfdSw5RQMsXsUh+rnj4cUFoGVgUC0Lii+DI"
+    "1z0CCtKAg+XigJXqa5vuPtPh2G36bt/TvCCFWUxXbZ4jAlexno011zJgw7d2v959kXuP0XYot6gac/oDFEMt0aZvPCCunM7v"
+    "jE5kG1pAAY/bJNO7YxM+8HmwVDinUa095rtW9MIKL/d0HP92nedfIt94WA=="
 )
 
 
@@ -27,9 +27,9 @@ def tagProvider():
 
 
 _HISTORIAN = (
-    "eNpNjrsOwjAMRf/FcwZgYOjGUKlLQaIgxOi2LrJIk5C44lH130moQEzXujryPSM4bzvWBNkI8nQxobrpgoNYz2hgUhBIhM0l"
-    "JKRFwRpDwvIH9k5TAAUOvbCwNQkhg7WmFjLxAymwTrjnVyo61OG/ObFp7b2ixpo2fl8v4lbsIVvOx9GwxB7K3fZQJBPnBxNN"
-    "0gpeZi7mFzvnm32U+e1/5pK/oKZy0MJOM3nIVgrEY3OtGpotp+kNs9VbNw=="
+    "eNpNjsEKwjAMht8l5x7Ug4fdPAgTmYpTxGO2ZRKsbW0zRMfe3daheEr48pP/68F527ImyHqQp4sTyrvOOYj1jAYGBYFE2FxC"
+    "ijQoWGFIsfVuBQocemFha9KVDFaaGsjEd6TAOuEbvxJoUYd/cmLT2EdJtTVNfDyfxJrIIZuOy9GwRA7FdnPIk4TznYkSqQUv"
+    "Yy7Ob+y8XOyjzK//U5fUBTUVnRZ2mslDNlMgHutrWdNoOQxvb+NY3A=="
 )
 
 

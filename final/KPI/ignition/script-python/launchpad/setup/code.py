@@ -14,7 +14,8 @@ Both are idempotent. `run` creates only what is absent unless `force` is set; `c
 writes nothing at all. The WebDev endpoint and the Setup button both call these, so
 there is one implementation and not two that drift.
 
-A note on the database. These projects ship SQLite at ${data}/Examples.db on purpose:
+A note on the database. Each project ships its own SQLite file -- ${data}/OEE.db and
+${data}/KPI.db -- on purpose:
 the schema is SQLite DDL, and a self-contained demo should not need a database server.
 A SQLite connection needs no credentials, which is why setup can create it outright
 rather than asking. If you want the demo on Postgres or MSSQL you need portable DDL
@@ -32,7 +33,19 @@ CORE = "core/ignition"
 HISTORIAN_MODULE = "core/com.inductiveautomation.historian"
 OPCUA_MODULE = "core/com.inductiveautomation.opcua"
 
-DATABASE = "Examples"
+# Each project gets its OWN SQLite database, named after the project, so a
+# glance at the gateway's connection list says which project a database belongs
+# to (Nigel, 28/08/2026). They used to share one called "Examples", which told
+# a user nothing and tied the two projects together for no reason -- OEE keeps
+# its own SQL tables and KPI keeps tag history, and neither reads the other's.
+#
+# HISTORY_DATABASE is KPI's, always. The tag historian is ONE gateway provider
+# called "launchpad" and can point at only one database, all 61 historised tags
+# are KPI's, and OEE has none at all -- so the historian belongs to KPI and OEE
+# does not create or touch it. Having each project point the shared provider at
+# its own database would mean whichever installed last silently broke the
+# other's history.
+HISTORY_DATABASE = "KPI"
 
 # The SQLite URL, and both parameters are load-bearing rather than tuning.
 #
@@ -43,7 +56,7 @@ DATABASE = "Examples"
 # for the length of the write, so the symptom is a chart that stalls in front of
 # whoever you are demonstrating to. WAL lets readers carry on against the last
 # committed state. It is a property of the FILE, not the connection, so setting
-# it here converts an existing Examples.db the first time it connects.
+# it here converts an existing database file the first time it connects.
 #
 # busy_timeout=30000: the one case WAL does not cover is two writers, and this
 # has two (the OEE timer and the historian). Without it the loser of that race
@@ -51,7 +64,15 @@ DATABASE = "Examples"
 #
 # Verified on a blank gateway 28/08/2026: without these, PRAGMA journal_mode on
 # the created file reads `delete`.
-CONNECT_URL = "jdbc:sqlite:${data}/%s.db?journal_mode=WAL&busy_timeout=30000" % DATABASE
+def _dbName():
+    """This project's own database: "OEE" or "KPI"."""
+    return "OEE" if _isOee() else "KPI"
+
+
+def _connectURL(name=None):
+    """The SQLite URL for a database of this name."""
+    return ("jdbc:sqlite:${data}/%s.db?journal_mode=WAL&busy_timeout=30000"
+            % (name or _dbName()))
 PROVIDER = "launchpad"
 HISTORIAN = "launchpad"
 DEVICE = "Launchpad"
@@ -564,7 +585,7 @@ def shiftsEnabled():
 # --------------------------------------------------------------- build steps
 
 def existingDatabase():
-    """What a connection already called `Examples` actually is.
+    """What a connection already under this project's name actually is.
 
     Returns "absent", "ours" for the SQLite one these projects are written against,
     or the translator name of whatever else is sitting under that name.
@@ -573,7 +594,7 @@ def existingDatabase():
     message telling them exactly what to look at; guessing wrong costs them a
     half-created schema in a database they chose.
     """
-    p = os.path.join(_abs(RESOURCES), CORE, "database-connection", DATABASE,
+    p = os.path.join(_abs(RESOURCES), CORE, "database-connection", _dbName(),
                      "config.json")
     if not os.path.exists(p):
         return "absent"
@@ -596,7 +617,7 @@ def ensureDatabase(force=False):
     kind = existingDatabase()
     if kind not in ("absent", "ours"):
         # databaseReady only asks whether the name answers SELECT 1, so a gateway
-        # that already has a connection called Examples pointing at Postgres reads as
+        # that already has a connection under this name pointing at Postgres reads as
         # ready and every later step would run SQLite DDL against it -- half-building
         # a schema in somebody else's database instead of stopping. The README has
         # always said this does not happen; this is what makes that true.
@@ -605,14 +626,14 @@ def ensureDatabase(force=False):
         raise Exception(
             "a connection called '%s' already exists here and is %s, not SQLite. "
             "This schema is SQLite DDL. Rename or remove it, then press Set up again"
-            % (DATABASE, kind))
-    if kind == "ours" and databaseReady(DATABASE) and not force:
+            % (_dbName(), kind))
+    if kind == "ours" and databaseReady(_dbName()) and not force:
         # A connection made by an older release is SQLite and answers SELECT 1, so
         # it reads as fine -- but it carries the parameterless URL and the file is
         # still on the rollback journal. Returning "already connected" there would
         # leave the stall in place on exactly the gateways that have been running
         # longest.
-        if existingConnectURL() == CONNECT_URL:
+        if existingConnectURL() == _connectURL():
             return "already connected"
         # Repair the URL and NOTHING else. This connection is almost certainly the
         # one this project created, but "almost certainly" is not a licence to
@@ -623,17 +644,17 @@ def ensureDatabase(force=False):
         # a connection it does not recognise; a repair path has no business being
         # more invasive than the create path it is repairing. Patch the one key
         # that is wrong and leave the rest of the file exactly as found.
-        existing = _readConfig(CORE, "database-connection", DATABASE)
+        existing = _readConfig(CORE, "database-connection", _dbName())
         if existing is not None:
-            existing["connectURL"] = CONNECT_URL
-            _configResource(CORE, "database-connection", DATABASE, existing,
+            existing["connectURL"] = _connectURL()
+            _configResource(CORE, "database-connection", _dbName(), existing,
                             "SQLite database for the Launchpad OEE + KPI example "
                             "resources")
             return "updated"
         # Unreadable config.json: fall through and write a known-good one rather
         # than leaving a connection nobody can repair.
-    _configResource(CORE, "database-connection", DATABASE, {
-        "connectURL": CONNECT_URL,
+    _configResource(CORE, "database-connection", _dbName(), {
+        "connectURL": _connectURL(),
         "connectionProps": "", "connectionResetParams": "",
         "defaultTransactionLevel": "DEFAULT", "driver": "SQLite",
         "evictionRate": -1, "evictionTests": 3, "evictionTime": 1800000,
@@ -663,11 +684,11 @@ def _readConfig(module, kind, name):
 
 
 def existingConnectURL():
-    """The connectURL of the Examples connection as it stands, or "" if there is
+    """The connectURL of this project's connection as it stands, or "" if there is
     no readable one. Used to tell an up-to-date connection from an older
     release's, which are otherwise indistinguishable -- both are SQLite and both
     answer SELECT 1."""
-    p = os.path.join(_abs(RESOURCES), CORE, "database-connection", DATABASE,
+    p = os.path.join(_abs(RESOURCES), CORE, "database-connection", _dbName(),
                      "config.json")
     if not os.path.exists(p):
         return ""
@@ -681,7 +702,7 @@ def ensureTagProvider(force=False):
     if providerReady() and not force:
         return "already present"
     config = launchpad.payload.tagProvider()
-    config["settings"]["defaultDatasourceName"] = DATABASE
+    config["settings"]["defaultDatasourceName"] = _dbName()
     _configResource(CORE, "tag-provider", PROVIDER, config,
                     "Tag provider for the Launchpad OEE + KPI example resources")
     return "created"
@@ -691,7 +712,7 @@ def ensureHistorian(force=False):
     if historianReady() and not force:
         return "already present"
     config = launchpad.payload.historian()
-    config["settings"]["database"] = DATABASE
+    config["settings"]["database"] = HISTORY_DATABASE
     _configResource(HISTORIAN_MODULE, "historian-provider", HISTORIAN, config,
                     "Tag historian for the Launchpad OEE + KPI example resources")
     return "created"
@@ -857,7 +878,12 @@ def run(progress=None, force=False, history=True, tags=False):
         return report
 
     step("tagProvider", lambda: ensureTagProvider(force), "creating the tag provider")
-    step("historian", lambda: ensureHistorian(force), "creating the tag historian")
+    # KPI only: the historian is one shared gateway provider pointing at ONE
+    # database, every historised tag is KPI's, and OEE has none -- so OEE
+    # creating it would either point it at a database with no history in it or,
+    # worse, repoint KPI's away from its own. See HISTORY_DATABASE above.
+    if not _isOee():
+        step("historian", lambda: ensureHistorian(force), "creating the tag historian")
     step("device", lambda: ensureDevice(force), "creating the simulator device")
     step("scriptingProject", lambda: ensureScriptingProject(force),
          "setting the gateway scripting project")
@@ -891,7 +917,7 @@ def run(progress=None, force=False, history=True, tags=False):
     else:
         report["configScan"] = "skipped - nothing new to register"
     reporter.start("waiting for the database connection and tag provider")
-    if not _waitFor(lambda: databaseReady(DATABASE) and providerReady(), 90,
+    if not _waitFor(lambda: databaseReady(_dbName()) and providerReady(), 90,
                     report=reporter, what="waiting for the database connection "
                                           "and tag provider"):
         reporter.failed("still not available after 90s")
@@ -1132,7 +1158,7 @@ def check():
         except:
             report[name] = "FAILED: %s" % traceback.format_exc().strip().split("\n")[-1]
 
-    probe("database", lambda: {"name": DATABASE, "ok": databaseReady(DATABASE)})
+    probe("database", lambda: {"name": DATABASE, "ok": databaseReady(_dbName())})
     probe("tagProvider", lambda: {"name": PROVIDER, "ok": providerReady()})
     probe("historian", lambda: {"name": HISTORIAN, "ok": historianReady()})
     probe("device", lambda: {"name": DEVICE, "state": deviceState(),

@@ -3,7 +3,7 @@
     "type": "SqlHistorian"
   },
   "settings": {
-    "database": "Examples",
+    "database": "KPI",
     "partition": {
       "enabled": true,
       "optimized": false,

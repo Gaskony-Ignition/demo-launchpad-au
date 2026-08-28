@@ -1,11 +1,12 @@
-DATABASE_NAME = "Examples"
+DATABASE_NAME = "KPI"
 
 def db():
 	"""The database connection to use.
 
-	The Setup button records its choice in gateway globals so a change takes
-	effect in the same click, and rewrites this constant on disk so it survives a
-	restart -- this reads whichever is authoritative right now.
+	This project owns a SQLite database named after itself, so the connection
+	list on a gateway says which project each database belongs to. The globals
+	lookup stays as an override hook for anyone pointing the project at a
+	differently named connection; nothing in this project writes it.
 	"""
 	return system.util.getGlobals().get("launchpad.database") or DATABASE_NAME
 

@@ -5,7 +5,7 @@
     "type": "STANDARD"
   },
   "settings": {
-    "defaultDatasourceName": "Examples",
+    "defaultDatasourceName": "KPI",
     "editPermissions": {
       "securityLevels": [],
       "type": "AllOf"
