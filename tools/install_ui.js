@@ -5,15 +5,15 @@
 //        --zip OEE=dist/OEE-3.0.0.zip \
 //        --zip KPI=dist/KPI-3.0.0.zip [--overwrite] [--no-setup]
 //
-// This exists because `tools/install.sh` untars the projects straight into
-// data/projects, and untarring tolerates things the importer rejects. A resource
-// folder containing a file its resource.json does not declare -- a stray
-// __pycache__, say -- loads fine when copied and is silently DROPPED by the
+// This exists because copying project files straight into data/projects tolerates
+// things the importer rejects, so a test that installs that way proves less than it
+// looks. A resource folder containing a file its resource.json does not declare -- a
+// stray __pycache__, say -- loads fine when copied and is silently DROPPED by the
 // importer, taking its whole resource with it. That shipped once. Every test we
 // had passed, because every test took the shortcut past the real entry point.
 //
-// So: install.sh is for installing, this is for proving. The zips it takes are
-// the release artefacts, not the working tree.
+// So this drives the real entry point rather than a shortcut past it, and the zips
+// it takes are the release artefacts, not the working tree.
 //
 // Exits non-zero if an import fails or a Setup run does not reach SETUP COMPLETE.
 const path = require('path');

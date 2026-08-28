@@ -48,7 +48,7 @@ fi
 
 # The installer endpoints must be reachable unauthenticated to be driven from a
 # script, but they can truncate the example tables -- so the published copy
-# always requires auth. install.sh re-opens them for the duration of an install.
+# always requires auth.
 harden() {
   python3 -c '
 import json, sys

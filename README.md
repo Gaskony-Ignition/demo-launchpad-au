@@ -73,8 +73,6 @@ SQLite, it stops on that step having created nothing — the schema is SQLite DD
 building on someone else's Postgres would half-create a schema rather than fail. Rename
 or remove that connection and press **Set up this gateway** again.
 
-For many gateways at once, `tools/install.sh` does the same over SSH.
-
 ### Themes
 
 Settings → **Appearance** picks the theme for your session. The dropdown lists

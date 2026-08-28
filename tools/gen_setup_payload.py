@@ -75,8 +75,8 @@ def config_tree(*roots):
     The runtime API looks tidier and cost a day: configuring a subtree at the
     provider root takes the provider's other subtrees with it, so importing KPI's
     tags silently removed OEE's. Writing the resource files and running a config
-    scan is what tools/install.sh has always done, and it composes -- two projects
-    can each install their own tags without touching the other's.
+    scan is what the Setup button does, and it composes -- two projects can each
+    install their own tags without touching the other's.
     """
     out = {}
     for root in roots:
