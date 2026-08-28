@@ -2,10 +2,19 @@
 # Deliberately its own container, port and volume so it cannot touch the
 # module-test gateway or any of the other local projects.
 #
-# The Postgres service is here to reproduce a REAL target: a gateway whose only
-# database connection is a Postgres one that is NOT called Examples. That is the
-# case the Setup button has to handle, and it is the case a SQLite-only testbed
-# silently passes.
+# By DEFAULT this is a blank Ignition and nothing else, because that is the case
+# that matters most: a salesperson installs a fresh gateway, imports the two
+# projects and presses Set up this gateway, with no third-party database anywhere.
+# The projects create their own SQLite connection (jdbc:sqlite:${data}/Examples.db),
+# so a Postgres container sitting alongside the gateway would quietly weaken the
+# very claim this testbed exists to prove.
+#
+# The Postgres service is therefore behind the `foreign-db` profile, off unless
+# asked for. It reproduces the other REAL target: a gateway whose only database
+# connection is a Postgres one NOT called Examples, which is what the Setup
+# button's guard has to refuse rather than overwrite. Run that case with:
+#
+#     docker compose --profile foreign-db up -d
 services:
   launchpad-install-test:
     # 8.3.8 by default: that is what real targets are running, and the install has
@@ -24,8 +33,6 @@ services:
       - IGNITION_EDITION=standard
       - GATEWAY_MAX_MEMORY=2048m
       - GATEWAY_INIT_MEMORY=1024m
-    depends_on:
-      - launchpad-test-db
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8088/StatusPing"]
       interval: 10s
@@ -33,6 +40,7 @@ services:
       retries: 30
 
   launchpad-test-db:
+    profiles: ["foreign-db"]
     image: postgres:18.4
     container_name: launchpad-test-db
     ports:

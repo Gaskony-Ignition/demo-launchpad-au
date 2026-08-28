@@ -107,37 +107,6 @@ html {
 	fill: var(--oee-ink);
 }
 
-/* Repair --containerBorder, which Ignition consumes as a SHORTHAND.
-
-   Its own CSS says `border: var(--containerBorder)` in 85 separate rules -- every
-   input, dropdown, button, alarm table, accordion and dashboard tile. In the six
-   stock themes that variable holds `1px solid var(--border)` and they all work.
-   Every one of the ten Gaskony custom themes redefines it as a bare COLOUR
-   (`#d8dee9`), which makes all 85 declarations invalid at once, and the borders
-   simply vanish -- on a light custom theme a text field is then white on a white
-   card with nothing to say where it is.
-
-   Fixing the VARIABLE rather than the selectors is what covers all 85: an earlier
-   version of this restated the border on .ia_inputField and .ia_dropdown alone and
-   left the other 83 broken. This is a no-op on a stock theme (identical value) and
-   restores the contract on the others, using the theme's own --border colour
-   either way. It has to be `:root` and not `html` -- unlike color-scheme above,
-   here we WANT to outrank the theme, and this stylesheet loads after it.
-
-   Verify this one by computed style, never by screenshot: on several of the packs
-   the border colour sits close enough to the card that a crop cannot settle it.
-
-   FIXED UPSTREAM in ignition-themes v1.5.1 (28/08/2026): mapping.py now emits
-   the shorthand, so this is a no-op against a v1.5.1 pack exactly as it is
-   against a stock theme. It STAYS anyway, and the condition for removing it is
-   not "the pack is fixed" but "every gateway that runs this project has
-   reinstalled the pack" -- a gateway still carrying v1.4.0 or v1.5.0 themes
-   loses every border the moment this block goes. Drop it when that is true of
-   the estate, not when the upstream commit lands. */
-:root {
-	--containerBorder: 1px solid var(--border);
-}
-
 /* Custom scrollbars. Stock Ignition themes leave scrollbars at the browser
    default, so they never follow the theme on their own; these track it.
    `scrollbar-color` is what Chrome 121+ and Firefox read, the ::-webkit-*

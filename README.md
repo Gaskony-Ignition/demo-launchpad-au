@@ -83,6 +83,11 @@ Chart **series** colours stay put across themes on purpose: a pen that changes h
 between two screens stops being recognisable, and these read on a light and a dark
 ground alike.
 
+If you use the Gaskony custom theme packs, these projects need **v1.5.1 or newer** of
+them. Earlier packs declared `--containerBorder` as a colour where Ignition needs a
+shorthand, which leaves inputs and dropdowns with no border at all. Ignition's own six
+themes are unaffected and need nothing.
+
 ## What "AU" changes
 
 The OEE engine, UDT structure and screen designs are the original's. What changed:
