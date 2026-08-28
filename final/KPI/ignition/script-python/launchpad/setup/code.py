@@ -33,6 +33,25 @@ HISTORIAN_MODULE = "core/com.inductiveautomation.historian"
 OPCUA_MODULE = "core/com.inductiveautomation.opcua"
 
 DATABASE = "Examples"
+
+# The SQLite URL, and both parameters are load-bearing rather than tuning.
+#
+# journal_mode=WAL: this application writes CONTINUOUSLY while sessions read --
+# the simulator's gateway timer writes the OEE tables and the historian writes
+# its partition, both while Perspective pages query them for every chart on
+# screen. Under SQLite's default rollback journal a writer blocks every reader
+# for the length of the write, so the symptom is a chart that stalls in front of
+# whoever you are demonstrating to. WAL lets readers carry on against the last
+# committed state. It is a property of the FILE, not the connection, so setting
+# it here converts an existing Examples.db the first time it connects.
+#
+# busy_timeout=30000: the one case WAL does not cover is two writers, and this
+# has two (the OEE timer and the historian). Without it the loser of that race
+# fails immediately with SQLITE_BUSY rather than waiting its turn.
+#
+# Verified on a blank gateway 28/08/2026: without these, PRAGMA journal_mode on
+# the created file reads `delete`.
+CONNECT_URL = "jdbc:sqlite:${data}/%s.db?journal_mode=WAL&busy_timeout=30000" % DATABASE
 PROVIDER = "launchpad"
 HISTORIAN = "launchpad"
 DEVICE = "Launchpad"
@@ -588,9 +607,16 @@ def ensureDatabase(force=False):
             "This schema is SQLite DDL. Rename or remove it, then press Set up again"
             % (DATABASE, kind))
     if kind == "ours" and databaseReady(DATABASE) and not force:
-        return "already connected"
+        # A connection made by an older release is SQLite and answers SELECT 1, so
+        # it reads as fine -- but it carries the parameterless URL and the file is
+        # still on the rollback journal. Returning "already connected" there would
+        # leave the stall in place on exactly the gateways that have been running
+        # longest. Rewrite it instead; everything else about the connection is
+        # unchanged, and re-pressing Set up is how a user gets fixes.
+        if existingConnectURL() == CONNECT_URL:
+            return "already connected"
     _configResource(CORE, "database-connection", DATABASE, {
-        "connectURL": "jdbc:sqlite:${data}/%s.db" % DATABASE,
+        "connectURL": CONNECT_URL,
         "connectionProps": "", "connectionResetParams": "",
         "defaultTransactionLevel": "DEFAULT", "driver": "SQLite",
         "evictionRate": -1, "evictionTests": 3, "evictionTime": 1800000,
@@ -602,7 +628,22 @@ def ensureDatabase(force=False):
         "translator": "SQLITE", "username": "",
         "validationQuery": "SELECT 1", "validationSleepTime": 10000,
     }, "SQLite database for the Launchpad OEE + KPI example resources")
-    return "created"
+    return "created" if kind == "absent" else "updated"
+
+
+def existingConnectURL():
+    """The connectURL of the Examples connection as it stands, or "" if there is
+    no readable one. Used to tell an up-to-date connection from an older
+    release's, which are otherwise indistinguishable -- both are SQLite and both
+    answer SELECT 1."""
+    p = os.path.join(_abs(RESOURCES), CORE, "database-connection", DATABASE,
+                     "config.json")
+    if not os.path.exists(p):
+        return ""
+    try:
+        return str(system.util.jsonDecode(_read(p)).get("connectURL") or "")
+    except:
+        return ""
 
 
 def ensureTagProvider(force=False):
