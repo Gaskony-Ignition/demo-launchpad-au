@@ -74,6 +74,10 @@ SQLite, it stops on that step having created nothing — the schema is SQLite DD
 building on someone else's Postgres would half-create a schema rather than fail. Rename
 or remove that connection and press **Set up this gateway** again.
 
+Every gateway object the button creates, reads and refuses to touch is listed in
+[docs/WHAT-SETUP-DOES.md](docs/WHAT-SETUP-DOES.md), along with how to remove all
+of it. Worth reading before pressing it on a gateway that matters.
+
 ### Themes
 
 Settings → **Appearance** picks the theme for your session. The dropdown lists
