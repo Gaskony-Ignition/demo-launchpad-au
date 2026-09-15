@@ -1,0 +1,171 @@
+{
+  "custom": {},
+  "params": {
+    "lineName": "Line1"
+  },
+  "propConfig": {
+    "params.lineName": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 221,
+      "width": 750
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Label"
+        },
+        "position": {
+          "basis": "32px"
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "{session.custom.launchpad.oee.selectedLine} + \" Shifts\""
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "classes": "launchpad/oee/text/header",
+            "marginBottom": "10px"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Shift1"
+        },
+        "position": {
+          "basis": "40px",
+          "grow": 1,
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.params.lineName": {
+            "binding": {
+              "config": {
+                "path": "view.params.lineName"
+              },
+              "type": "property"
+            }
+          },
+          "props.params.linePath": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.oee.lineTagFolder"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "params": {
+            "shift": 1
+          },
+          "path": "Launchpad/Oee/EmbeddedViews/Shift",
+          "style": {
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.display.view"
+      },
+      {
+        "meta": {
+          "name": "Shift2"
+        },
+        "position": {
+          "basis": "40px",
+          "grow": 1,
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.params.lineName": {
+            "binding": {
+              "config": {
+                "path": "view.params.lineName"
+              },
+              "type": "property"
+            }
+          },
+          "props.params.linePath": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.oee.lineTagFolder"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "params": {
+            "shift": 2
+          },
+          "path": "Launchpad/Oee/EmbeddedViews/Shift",
+          "style": {
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.display.view"
+      },
+      {
+        "meta": {
+          "name": "Shift3"
+        },
+        "position": {
+          "basis": "40px",
+          "grow": 1,
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.params.lineName": {
+            "binding": {
+              "config": {
+                "path": "view.params.lineName"
+              },
+              "type": "property"
+            }
+          },
+          "props.params.linePath": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.oee.lineTagFolder"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "params": {
+            "shift": 3
+          },
+          "path": "Launchpad/Oee/EmbeddedViews/Shift",
+          "style": {
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.display.view"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "launchpad/oee/card"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

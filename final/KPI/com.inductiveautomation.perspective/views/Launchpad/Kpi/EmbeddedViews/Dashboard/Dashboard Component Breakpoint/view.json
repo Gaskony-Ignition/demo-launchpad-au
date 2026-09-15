@@ -1,0 +1,50 @@
+{
+  "custom": {},
+  "params": {},
+  "props": {},
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Large"
+        },
+        "position": {
+          "size": "large"
+        },
+        "props": {
+          "params": {
+            "mobile": false
+          },
+          "path": "Launchpad/Kpi/EmbeddedViews/Dashboard/Dashboard Component"
+        },
+        "type": "ia.display.view"
+      },
+      {
+        "meta": {
+          "name": "Small"
+        },
+        "props": {
+          "params": {
+            "mobile": true
+          },
+          "path": "Launchpad/Kpi/EmbeddedViews/Dashboard/Dashboard Component"
+        },
+        "type": "ia.display.view"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "propConfig": {
+      "props.breakpoint": {
+        "binding": {
+          "config": {
+            "path": "session.custom.launchpad.dashboard.mobileBreakpoint"
+          },
+          "type": "property"
+        }
+      }
+    },
+    "type": "ia.container.breakpt"
+  }
+}

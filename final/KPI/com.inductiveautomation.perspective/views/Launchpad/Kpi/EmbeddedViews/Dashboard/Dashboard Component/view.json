@@ -1,0 +1,211 @@
+{
+  "custom": {},
+  "params": {
+    "mobile": false
+  },
+  "propConfig": {
+    "params.mobile": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {},
+  "root": {
+    "children": [
+      {
+        "custom": {
+          "basisMult": 24
+        },
+        "meta": {
+          "domId": "launchpadDashboard",
+          "name": "Dashboard"
+        },
+        "propConfig": {
+          "custom.padding": {
+            "binding": {
+              "config": {
+                "expression": "if({view.params.mobile}, \u002715px\u0027, \u00270px\u0027)"
+              },
+              "type": "expr"
+            }
+          },
+          "position.basis": {
+            "binding": {
+              "config": {
+                "expression": "if({view.params.mobile}, toString({this.props.stretch.rowCount} * {this.custom.basisMult}) + \"px\", \"auto\")"
+              },
+              "type": "expr"
+            }
+          },
+          "position.grow": {
+            "binding": {
+              "config": {
+                "expression": "if({view.params.mobile}, 0, 1)"
+              },
+              "type": "expr"
+            }
+          },
+          "position.shrink": {
+            "binding": {
+              "config": {
+                "expression": "if({view.params.mobile}, 0, 1)"
+              },
+              "type": "expr"
+            }
+          },
+          "props.fixed.cellSize": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.dashboard.objects.current.cellSize"
+              },
+              "type": "property"
+            }
+          },
+          "props.fixed.columnCount": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.dashboard.objects.current.gridCols"
+              },
+              "type": "property"
+            }
+          },
+          "props.fixed.columnGutterSize": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.dashboard.objects.current.gridColGutterSize"
+              },
+              "type": "property"
+            }
+          },
+          "props.fixed.rowCount": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.dashboard.objects.current.gridRows"
+              },
+              "type": "property"
+            }
+          },
+          "props.fixed.rowGutterSize": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.dashboard.objects.current.gridRowGutterSize"
+              },
+              "type": "property"
+            }
+          },
+          "props.grid": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.dashboard.objects.current.grid"
+              },
+              "type": "property"
+            }
+          },
+          "props.stretch.columnCount": {
+            "binding": {
+              "config": {
+                "expression": "if({view.params.mobile}, 1, {session.custom.launchpad.dashboard.objects.current.gridCols})"
+              },
+              "type": "expr"
+            }
+          },
+          "props.stretch.columnGutterSize": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.dashboard.objects.current.gridColGutterSize"
+              },
+              "type": "property"
+            }
+          },
+          "props.stretch.rowCount": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "gridRows": "{session.custom.launchpad.dashboard.objects.current.gridRows}",
+                  "mobile": "{view.params.mobile}",
+                  "widgets": "{session.custom.launchpad.dashboard.objects.current.widgets}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\t# If on a mobile device, call the getWidgetsRows function to get the total\n\t# number of rows that the dashboard\\u0027s widgets span (because the widgets are\n\t# laid out in a single column on mobile, and the dashboard needs to know the\n\t# total number of rows needed to display the widgets).\n\t\n\tmobile \u003d value[\"mobile\"]\n\tgridRows \u003d value[\"gridRows\"]\n\twidgets \u003d value[\"widgets\"]\n\t\n\tif mobile:\n\t\treturn launchpad.dashboard.getWidgetsRows(widgets, gridRows)\n\telse:\n\t\treturn gridRows",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          },
+          "props.stretch.rowGutterSize": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.dashboard.objects.current.gridRowGutterSize"
+              },
+              "type": "property"
+            }
+          },
+          "props.style.paddingLeft": {
+            "binding": {
+              "config": {
+                "path": "this.custom.padding"
+              },
+              "type": "property"
+            }
+          },
+          "props.style.paddingRight": {
+            "binding": {
+              "config": {
+                "path": "this.custom.padding"
+              },
+              "type": "property"
+            }
+          },
+          "props.style.paddingTop": {
+            "binding": {
+              "config": {
+                "path": "this.custom.padding"
+              },
+              "type": "property"
+            }
+          },
+          "props.widgets": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "columnCount": "{this.props.stretch.columnCount}",
+                  "mobile": "{view.params.mobile}",
+                  "rowCount": "{session.custom.launchpad.dashboard.objects.current.gridRows}",
+                  "widgets": "{session.custom.launchpad.dashboard.objects.current.widgets}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\tmobile \u003d value[\"mobile\"]\n\twidgets \u003d value[\"widgets\"]\n\t\n\twidgets \u003d launchpad.dashboard.getWidgets(widgets, mobile, value[\u0027rowCount\u0027], value[\u0027columnCount\u0027], True)\n\treturn [] if value \u003d\u003d None else widgets",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          }
+        },
+        "props": {
+          "editingToggle": false,
+          "fixed": {},
+          "stretch": {},
+          "style": {
+            "borderStyle": "none"
+          }
+        },
+        "type": "ia.display.dashboard"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column"
+    },
+    "type": "ia.container.flex"
+  }
+}

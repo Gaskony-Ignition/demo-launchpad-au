@@ -1,0 +1,117 @@
+{
+  "custom": {},
+  "params": {
+    "configuration": {},
+    "value": ""
+  },
+  "propConfig": {
+    "params.configuration": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.value": {
+      "paramDirection": "inout",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 40,
+      "width": 297
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Field"
+        },
+        "position": {
+          "basis": "40px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.allowCustomOptions": {
+            "binding": {
+              "config": {
+                "path": "view.params.configuration"
+              },
+              "transforms": [
+                {
+                  "code": "\treturn launchpad.dashboard.getConfiguration(value, \"allowCustomOptions\", False)",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.options": {
+            "binding": {
+              "config": {
+                "path": "view.params.configuration"
+              },
+              "transforms": [
+                {
+                  "code": "\treturn launchpad.dashboard.getConfiguration(value, \"options\", [])",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.placeholder.text": {
+            "binding": {
+              "config": {
+                "path": "view.params.configuration"
+              },
+              "transforms": [
+                {
+                  "code": "\treturn launchpad.dashboard.getConfiguration(value, \"placeholder\", \"Select...\")",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.showClearIcon": {
+            "binding": {
+              "config": {
+                "path": "view.params.configuration"
+              },
+              "transforms": [
+                {
+                  "code": "\treturn launchpad.dashboard.getConfiguration(value, \"showClearIcon\", False)",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.value": {
+            "binding": {
+              "config": {
+                "bidirectional": true,
+                "path": "view.params.value"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "placeholder": {},
+          "style": {
+            "classes": "launchpad/kpi/dashboard/entry"
+          }
+        },
+        "type": "ia.input.dropdown"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column"
+    },
+    "type": "ia.container.flex"
+  }
+}

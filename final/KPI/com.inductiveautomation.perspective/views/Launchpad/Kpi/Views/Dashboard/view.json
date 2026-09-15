@@ -1,0 +1,109 @@
+{
+  "custom": {
+    "dashboard": ""
+  },
+  "params": {
+    "dashboard": ""
+  },
+  "propConfig": {
+    "custom.dashboard": {
+      "binding": {
+        "config": {
+          "path": "page.props.path"
+        },
+        "transforms": [
+          {
+            "code": "\tdashboard = self.params.dashboard\n\t\n\ttry:\n\t\tpaths = value.split(\"/\")\n\t\tdashboard = paths[-1]\n\texcept:\n\t\tpass\n\t\n\tself.session.custom.launchpad.dashboard.options.url = dashboard \n\treturn dashboard",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "params.dashboard": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.feature": {
+      "paramDirection": "input"
+    },
+    "params.tier1": {
+      "paramDirection": "input"
+    },
+    "params.tier2": {
+      "paramDirection": "input"
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "width": 860
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Header"
+        },
+        "position": {
+          "basis": "64px",
+          "shrink": 0
+        },
+        "props": {
+          "path": "Launchpad/Kpi/EmbeddedViews/Dashboard/Header"
+        },
+        "type": "ia.display.view"
+      },
+      {
+        "meta": {
+          "name": "Dashboard"
+        },
+        "position": {
+          "grow": 1
+        },
+        "propConfig": {
+          "position.display": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.dashboard.objects.current.widgets"
+              },
+              "transforms": [
+                {
+                  "code": "\treturn len(value) > 0",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "path": "Launchpad/Kpi/EmbeddedViews/Dashboard/Dashboard Component Breakpoint"
+        },
+        "type": "ia.display.view"
+      }
+    ],
+    "events": {
+      "system": {
+        "onStartup": {
+          "config": {
+            "script": "\tsystem.perspective.sendMessage(\"navigation\", \"Dashboard\")"
+          },
+          "scope": "G",
+          "type": "script"
+        }
+      }
+    },
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": ""
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

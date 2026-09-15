@@ -1,0 +1,1 @@
+SELECT id FROM ex_lp_dashboards WHERE url = :url

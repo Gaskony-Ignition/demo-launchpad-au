@@ -1,0 +1,92 @@
+{
+  "custom": {},
+  "params": {},
+  "props": {
+    "defaultSize": {
+      "width": 1200
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "AlarmStatusTable"
+        },
+        "position": {
+          "basis": "400px",
+          "grow": 1
+        },
+        "props": {
+          "columns": {
+            "active": {
+              "activeTime": {
+                "width": 100
+              },
+              "displayPath": {
+                "order": 5,
+                "width": 300
+              },
+              "label": {
+                "enabled": true,
+                "order": 4,
+                "width": 150
+              },
+              "name": {
+                "order": 3
+              },
+              "priority": {
+                "order": 1,
+                "width": 100
+              },
+              "source": {
+                "enabled": false,
+                "order": 5
+              },
+              "state": {
+                "order": 2,
+                "width": 100
+              }
+            }
+          },
+          "filters": {
+            "active": {
+              "conditions": {
+                "provider": "launchpad"
+              }
+            }
+          },
+          "pager": {
+            "enabled": false
+          },
+          "responsive": {
+            "breakpoint": 800,
+            "enabled": true
+          }
+        },
+        "type": "ia.display.alarmstatustable"
+      }
+    ],
+    "events": {
+      "system": {
+        "onStartup": {
+          "config": {
+            "script": "\tsystem.perspective.sendMessage(\"navigation\", \"Alarming\")"
+          },
+          "scope": "G",
+          "type": "script"
+        }
+      }
+    },
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "launchpad/kpi/root",
+        "margin": 20
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

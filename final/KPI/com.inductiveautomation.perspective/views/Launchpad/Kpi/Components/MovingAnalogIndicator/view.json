@@ -1,0 +1,237 @@
+{
+  "custom": {
+    "engHigh": 100,
+    "engLow": 0,
+    "label": "Placeholder",
+    "limits": {
+      "desiredHigh": 60,
+      "desiredLow": 40,
+      "highAlarm": 90,
+      "lowAlarm": 10,
+      "maxValue": 100,
+      "minValue": 0
+    },
+    "value": 50
+  },
+  "params": {
+    "path": "[Launchpad]KPI/Placeholder"
+  },
+  "propConfig": {
+    "custom.engHigh": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "path": "{view.params.path}"
+          },
+          "tagPath": "{path}.EngHigh"
+        },
+        "type": "tag"
+      },
+      "persistent": true
+    },
+    "custom.engLow": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "path": "{view.params.path}"
+          },
+          "tagPath": "{path}.EngLow"
+        },
+        "type": "tag"
+      },
+      "persistent": true
+    },
+    "custom.label": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "path": "{view.params.path}"
+          },
+          "tagPath": "{path}.Documentation"
+        },
+        "transforms": [
+          {
+            "code": "\tif value == '':\n\t\treturn self.params.path.split('/')[-1]\n\telse:\n\t\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "tag"
+      },
+      "persistent": true
+    },
+    "custom.limits": {
+      "binding": {
+        "config": {
+          "struct": {
+            "engHigh": "{view.custom.engHigh}",
+            "engLow": "{view.custom.engLow}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tfullRange = value.engHigh - value.engLow\n\trangeOffset = 0.1 * fullRange\n\tmidPoint = (value.engHigh + value.engLow)/2.0\n\treturn {\n\t\t 'minValue': value.engLow\n\t\t,'maxValue': value.engHigh\n\t\t,'desiredHigh': midPoint + rangeOffset\n\t\t,'desiredLow': midPoint - rangeOffset\n\t\t,'highAlarm': value.engHigh - rangeOffset\n\t\t,'lowAlarm': value.engLow + rangeOffset\n\t}",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.value": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "path": "{view.params.path}"
+          },
+          "tagPath": "{path}"
+        },
+        "type": "tag"
+      },
+      "persistent": true
+    },
+    "params.path": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 693,
+      "width": 376
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Label"
+        },
+        "position": {
+          "basis": "32px"
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "path": "view.custom.label"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "classes": "launchpad/kpi/text/label"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "MovingAnalogIndicator"
+        },
+        "position": {
+          "basis": "223px",
+          "grow": 1
+        },
+        "propConfig": {
+          "props.desiredHigh": {
+            "binding": {
+              "config": {
+                "path": "view.custom.limits.desiredHigh"
+              },
+              "type": "property"
+            }
+          },
+          "props.desiredLow": {
+            "binding": {
+              "config": {
+                "path": "view.custom.limits.desiredLow"
+              },
+              "type": "property"
+            }
+          },
+          "props.highAlarm": {
+            "binding": {
+              "config": {
+                "path": "view.custom.limits.highAlarm"
+              },
+              "type": "property"
+            }
+          },
+          "props.lowAlarm": {
+            "binding": {
+              "config": {
+                "path": "view.custom.limits.lowAlarm"
+              },
+              "type": "property"
+            }
+          },
+          "props.maxValue": {
+            "binding": {
+              "config": {
+                "path": "view.custom.limits.maxValue"
+              },
+              "type": "property"
+            }
+          },
+          "props.minValue": {
+            "binding": {
+              "config": {
+                "path": "view.custom.limits.minValue"
+              },
+              "type": "property"
+            }
+          },
+          "props.processValue": {
+            "binding": {
+              "config": {
+                "path": "view.custom.value"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "desiredRangeColor": "--kpi-highlight",
+          "highHighAlarm": null,
+          "highInterlock": null,
+          "lowInterlock": null,
+          "lowLowAlarm": null
+        },
+        "type": "ia.display.moving-analog-indicator"
+      }
+    ],
+    "events": {
+      "dom": {
+        "onClick": {
+          "config": {
+            "script": "\tviewPath = 'Launchpad/Kpi/EmbeddedViews/Popup'\n\tviewParams = {'path': self.view.params.path, 'historyProvider': self.session.custom.launchpad.historyProvider}\n\tpopupTitle = self.view.custom.label\n\tlaunchpad.util.popup(self, viewPath, viewParams, popupTitle)"
+          },
+          "scope": "G",
+          "type": "script"
+        }
+      }
+    },
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "launchpad/kpi/card",
+        "cursor": "pointer"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

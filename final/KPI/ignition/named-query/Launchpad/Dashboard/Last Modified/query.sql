@@ -1,0 +1,1 @@
+SELECT last_modified FROM ex_lp_dashboards WHERE id = :id

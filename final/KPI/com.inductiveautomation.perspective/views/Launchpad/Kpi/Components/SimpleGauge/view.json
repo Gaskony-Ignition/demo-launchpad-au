@@ -1,0 +1,264 @@
+{
+  "custom": {
+    "format": "#,##0.#",
+    "label": "Placeholder",
+    "max": 100,
+    "min": 0,
+    "units": "TBD",
+    "value": 50
+  },
+  "params": {
+    "path": "[Launchpad]KPI/Placeholder"
+  },
+  "propConfig": {
+    "custom.format": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "path": "{view.params.path}"
+          },
+          "tagPath": "{path}.FormatString"
+        },
+        "type": "tag"
+      },
+      "persistent": true
+    },
+    "custom.label": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "path": "{view.params.path}"
+          },
+          "tagPath": "{path}.Documentation"
+        },
+        "type": "tag"
+      },
+      "persistent": true
+    },
+    "custom.max": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "path": "{view.params.path}"
+          },
+          "tagPath": "{path}.EngHigh"
+        },
+        "type": "tag"
+      },
+      "persistent": true
+    },
+    "custom.min": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "path": "{view.params.path}"
+          },
+          "tagPath": "{path}.EngLow"
+        },
+        "type": "tag"
+      },
+      "persistent": true
+    },
+    "custom.units": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "path": "{view.params.path}"
+          },
+          "tagPath": "{path}.EngUnit"
+        },
+        "type": "tag"
+      },
+      "persistent": true
+    },
+    "custom.value": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "path": "{view.params.path}"
+          },
+          "tagPath": "{path}"
+        },
+        "type": "tag"
+      },
+      "persistent": true
+    },
+    "params.path": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 200,
+      "width": 300
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "SimpleGauge"
+        },
+        "position": {
+          "basis": "200px",
+          "grow": 1
+        },
+        "propConfig": {
+          "props.maxValue": {
+            "persistent": true
+          },
+          "props.minValue": {
+            "persistent": true
+          },
+          "props.value": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "max": "{view.custom.max}",
+                  "min": "{view.custom.min}",
+                  "value": "{view.custom.value}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\treturn (float(value.value) - float(value.min))/(float(value.max) - float(value.min))*100",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          }
+        },
+        "props": {
+          "animate": true,
+          "arc": {
+            "color": "#51C49E"
+          },
+          "arcBackground": {
+            "color": "#7A7A7A",
+            "opacity": 1
+          },
+          "label": {
+            "color": "var(--kpi-ink-strong)",
+            "visible": false
+          },
+          "style": {
+            "marginBottom": -30,
+            "marginTop": -30
+          }
+        },
+        "type": "ia.chart.simple-gauge"
+      },
+      {
+        "meta": {
+          "name": "Value"
+        },
+        "position": {
+          "grow": 1
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "numberFormat({view.custom.value}, {view.custom.format})"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "classes": "launchpad/kpi/text/number"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Units"
+        },
+        "position": {
+          "grow": 1
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "path": "view.custom.units"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "classes": "launchpad/kpi/text/units"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Label"
+        },
+        "position": {
+          "grow": 1
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "path": "view.custom.label"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "classes": "launchpad/kpi/text/label",
+            "marginBottom": -5
+          }
+        },
+        "type": "ia.display.label"
+      }
+    ],
+    "events": {
+      "dom": {
+        "onClick": {
+          "config": {
+            "script": "\tviewPath = 'Launchpad/Kpi/EmbeddedViews/Popup'\n\tviewParams = {'path': self.view.params.path, 'historyProvider': self.session.custom.launchpad.historyProvider}\n\tpopupTitle = self.view.custom.label\n\tlaunchpad.util.popup(self, viewPath, viewParams, popupTitle)"
+          },
+          "scope": "G",
+          "type": "script"
+        }
+      }
+    },
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "launchpad/kpi/card",
+        "cursor": "pointer",
+        "overflow": "hidden"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

@@ -1,0 +1,369 @@
+{
+  "custom": {},
+  "params": {
+    "interval": "hour",
+    "linePath": "[Launchpad]OEE/Demo/Line 1"
+  },
+  "propConfig": {
+    "params.interval": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.linePath": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "width": 1113
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "SecondsElapsed"
+        },
+        "position": {
+          "height": 32,
+          "rotate": {
+            "anchor": "258% -500%"
+          },
+          "width": 272,
+          "x": 29,
+          "y": 9
+        },
+        "propConfig": {
+          "custom.label": {
+            "binding": {
+              "config": {
+                "fallbackDelay": 2.5,
+                "mode": "indirect",
+                "references": {
+                  "1": "{this.custom.path}"
+                },
+                "tagPath": "{1}.Name"
+              },
+              "type": "tag"
+            }
+          },
+          "custom.path": {
+            "binding": {
+              "config": {
+                "expression": "{view.params.linePath} + \"/\" + {view.params.interval} + \"Oee/\"  + {this.meta.name}"
+              },
+              "type": "expr"
+            }
+          },
+          "custom.value": {
+            "binding": {
+              "config": {
+                "fallbackDelay": 2.5,
+                "mode": "indirect",
+                "references": {
+                  "1": "{this.custom.path}"
+                },
+                "tagPath": "{1}"
+              },
+              "type": "tag"
+            }
+          },
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "{this.custom.label} + \": \" + {this.custom.value}"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Table"
+        },
+        "position": {
+          "height": 434,
+          "width": 1038,
+          "x": 29.000003814697266,
+          "y": 217
+        },
+        "propConfig": {
+          "props.data": {
+            "binding": {
+              "config": {
+                "fallbackDelay": 2.5,
+                "mode": "indirect",
+                "references": {
+                  "1": "{view.params.linePath}",
+                  "2": "{view.params.interval}"
+                },
+                "tagPath": "{1}/{2}Oee/TargetRateHistory"
+              },
+              "transforms": [
+                {
+                  "code": "\t\n\n\tpt = []\n\tfor row in range(value.rowCount):\n\t\trunTime = value.getValueAt(row,\"SecondsRunning\") /60.0\n\t\tpt.append(runTime*value.getValueAt(row,\"RateValue\"))\n\t\n\n\tvalue= system.dataset.addColumn(value,   pt, \"TargetProd\", float)\n\treturn value\n",
+                  "type": "script"
+                }
+              ],
+              "type": "tag"
+            }
+          }
+        },
+        "type": "ia.display.table",
+        "props": {
+          "pager": {
+            "options": [
+              1000
+            ],
+            "activeOption": 1000,
+            "top": false,
+            "bottom": false
+          }
+        }
+      },
+      {
+        "meta": {
+          "name": "RunSeconds"
+        },
+        "position": {
+          "height": 32,
+          "rotate": {
+            "anchor": "258% -500%"
+          },
+          "width": 272,
+          "x": 29,
+          "y": 41
+        },
+        "propConfig": {
+          "custom.label": {
+            "binding": {
+              "config": {
+                "fallbackDelay": 2.5,
+                "mode": "indirect",
+                "references": {
+                  "1": "{this.custom.path}"
+                },
+                "tagPath": "{1}.Name"
+              },
+              "type": "tag"
+            }
+          },
+          "custom.path": {
+            "binding": {
+              "config": {
+                "expression": "{view.params.linePath} + \"/\" + {view.params.interval} + \"Oee/\" +  {this.meta.name}"
+              },
+              "type": "expr"
+            }
+          },
+          "custom.value": {
+            "binding": {
+              "config": {
+                "fallbackDelay": 2.5,
+                "mode": "indirect",
+                "references": {
+                  "1": "{this.custom.path}"
+                },
+                "tagPath": "{1}"
+              },
+              "type": "tag"
+            }
+          },
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "{this.custom.label} + \": \" + {this.custom.value}"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "DownSeconds"
+        },
+        "position": {
+          "height": 32,
+          "rotate": {
+            "anchor": "258% -500%"
+          },
+          "width": 272,
+          "x": 29,
+          "y": 73
+        },
+        "propConfig": {
+          "custom.label": {
+            "binding": {
+              "config": {
+                "fallbackDelay": 2.5,
+                "mode": "indirect",
+                "references": {
+                  "1": "{this.custom.path}"
+                },
+                "tagPath": "{1}.Name"
+              },
+              "type": "tag"
+            }
+          },
+          "custom.path": {
+            "binding": {
+              "config": {
+                "expression": "{view.params.linePath} + \"/\" + {view.params.interval} + \"Oee/\" + {this.meta.name}"
+              },
+              "type": "expr"
+            }
+          },
+          "custom.value": {
+            "binding": {
+              "config": {
+                "fallbackDelay": 2.5,
+                "mode": "indirect",
+                "references": {
+                  "1": "{this.custom.path}"
+                },
+                "tagPath": "{1}"
+              },
+              "type": "tag"
+            }
+          },
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "{this.custom.label} + \": \" + {this.custom.value}"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "IdleSeconds"
+        },
+        "position": {
+          "height": 32,
+          "rotate": {
+            "anchor": "258% -500%"
+          },
+          "width": 272,
+          "x": 29,
+          "y": 105
+        },
+        "propConfig": {
+          "custom.label": {
+            "binding": {
+              "config": {
+                "fallbackDelay": 2.5,
+                "mode": "indirect",
+                "references": {
+                  "1": "{this.custom.path}"
+                },
+                "tagPath": "{1}.Name"
+              },
+              "type": "tag"
+            }
+          },
+          "custom.path": {
+            "binding": {
+              "config": {
+                "expression": "{view.params.linePath} + \"/\" + {view.params.interval} + \"Oee/\" +  {this.meta.name}"
+              },
+              "type": "expr"
+            }
+          },
+          "custom.value": {
+            "binding": {
+              "config": {
+                "fallbackDelay": 2.5,
+                "mode": "indirect",
+                "references": {
+                  "1": "{this.custom.path}"
+                },
+                "tagPath": "{1}"
+              },
+              "type": "tag"
+            }
+          },
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "{this.custom.label} + \": \" + {this.custom.value}"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "TargetProductionCount"
+        },
+        "position": {
+          "height": 32,
+          "rotate": {
+            "anchor": "258% -500%"
+          },
+          "width": 361,
+          "x": 29,
+          "y": 146
+        },
+        "propConfig": {
+          "custom.label": {
+            "binding": {
+              "config": {
+                "fallbackDelay": 2.5,
+                "mode": "indirect",
+                "references": {
+                  "1": "{this.custom.path}"
+                },
+                "tagPath": "{1}.Name"
+              },
+              "type": "tag"
+            }
+          },
+          "custom.path": {
+            "binding": {
+              "config": {
+                "expression": "{view.params.linePath} + \"/\" + {view.params.interval} + \"Oee/\" +  {this.meta.name}"
+              },
+              "type": "expr"
+            }
+          },
+          "custom.value": {
+            "binding": {
+              "config": {
+                "fallbackDelay": 2.5,
+                "mode": "indirect",
+                "references": {
+                  "1": "{this.custom.path}"
+                },
+                "tagPath": "{1}"
+              },
+              "type": "tag"
+            }
+          },
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "{this.custom.label} + \": \" + {this.custom.value}"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "type": "ia.display.label"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "type": "ia.container.coord"
+  }
+}

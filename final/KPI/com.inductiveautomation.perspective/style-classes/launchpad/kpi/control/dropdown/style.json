@@ -1,0 +1,12 @@
+{
+  "base": {
+    "style": {
+      "borderTopLeftRadius": "6px",
+      "borderTopRightRadius": "6px",
+      "borderBottomLeftRadius": "6px",
+      "borderBottomRightRadius": "6px",
+      "color": "var(--kpi-ink)",
+      "fontSize": "14px"
+    }
+  }
+}

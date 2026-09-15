@@ -1,0 +1,11 @@
+{
+  "base": {
+    "style": {
+      "color": "var(--kpi-ink-strong)",
+      "fontSize": "28px",
+      "fontWeight": "bolder",
+      "lineHeight": 1.35,
+      "textAlign": "center"
+    }
+  }
+}

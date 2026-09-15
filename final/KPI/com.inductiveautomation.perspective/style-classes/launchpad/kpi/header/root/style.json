@@ -1,0 +1,13 @@
+{
+  "base": {
+    "style": {
+      "backgroundColor": "var(--kpi-background)",
+      "borderBottomColor": "var(--kpi-line)",
+      "borderBottomStyle": "solid",
+      "borderBottomWidth": "1px",
+      "borderLeftStyle": "none",
+      "borderRightStyle": "none",
+      "borderTopStyle": "none"
+    }
+  }
+}

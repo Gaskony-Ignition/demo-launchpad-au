@@ -1,0 +1,631 @@
+[
+  {
+    "name": "Shift",
+    "typeId": "",
+    "tagType": "UdtType",
+    "tags": [
+      {
+        "valueSource": "memory",
+        "dataType": "Boolean",
+        "name": "ShiftEnabled",
+        "value": true,
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "expr",
+        "expression": "if({[.]StopTime}>{[.]StartTime}\r\n,secondsBetween(setTime(now(0),floor({[.]StartTime}/100),{[.]StartTime}%100,0)\r\n,setTime(now(0),floor({[.]StopTime}/100),{[.]StopTime}%100,0))\r\n,secondsBetween(setTime(now(0),floor({[.]StartTime}/100),{[.]StartTime}%100,0)\r\n,setTime(addDays(now(0),1),floor({[.]StopTime}/100),{[.]StopTime}%100,0))\r\n)\r\n",
+        "name": "ShiftSeconds",
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "memory",
+        "documentation": "Enter an integer value as hours and minutes in 24 hour time format.\nExample:\n8:00 AM = 800\n10:15PM = 2215\n",
+        "name": "StartTime",
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "memory",
+        "documentation": "Enter an integer value as hours and minutes in 24 hour time format.\nExample:\n8:00 AM = 800\n10:15PM = 2215\n",
+        "name": "StopTime",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "OEE",
+    "tagType": "UdtType",
+    "tags": [
+      {
+        "valueSource": "expr",
+        "expression": "//  Availability = Run Time / Planned Production Time\n// Capped at 1: a counter reset or an interval that has only just started can\n// otherwise report run seconds ahead of elapsed seconds for a few samples.\nmin(if({[.]SecondsElapsed} = 0, 1,\n{[.]RunSeconds} /{[.]SecondsElapsed}), 1)",
+        "dataType": "Float8",
+        "engHigh": 1.0,
+        "name": "A",
+        "formatString": "#0.0%",
+        "tagType": "AtomicTag"
+      },
+      {
+        "eventScripts": [
+          {
+            "eventid": "valueChanged",
+            "script": "\t#on change, reset counters and record  records in database\n\tnow =system.date.now()\n\tlogger = system.util.getLogger(\"launchpad.oee.tagChange\")\n\t\n\ttagReadPaths = [\"[.]../Plc/ProductionCounter\",\"[.]../Plc/RejectCounter\",\"[.]../LineName\",\"[.]../LinePath\", \"[.]../Config/RateName\", \"[.]../Config/TargetRate\",\"[.]StartTime\",\"[.]IntervalType\", \"[.]Enabled\",\"[.]PreviousInterval\"]\n\ttagValues = system.tag.readBlocking(tagReadPaths)\n\tstartCounter = tagValues[0].value\n\tstartReject = tagValues[1].value\n\tlineName = tagValues[2].value\n\tprevIntervalStart = tagValues[6].value\t\n\tintervalType = tagValues[7].value\n\tenabled = tagValues[8].value\t\n\tprevInterval = tagValues[9].value\n\ttargetRate = tagValues[5].value\n\ttargetRateName = tagValues[4].value\t\n\tcurrentInterval = currentValue.value\n\t\n\t#execute on  change, or when new instance is created and no start time has been recorded\n\tif (not initialChange or prevIntervalStart==None) and enabled:\n\t\t#logger.info(\"Current Interval %s Change %s %s %s\" %(intervalType, currentValue, currentValue.value, currentInterval))\n\t\t#read values from line UDT instance\n\t\tlineValue = system.tag.readBlocking([tagValues[3].value])[0].value\n\t\t# initialize variables\n\t\tif startCounter == None: startCounter = 0\n\t\tif startReject == None: startReject = 0\n\t\t#set zero milliseconds on the new interval start\n\t\tintervalStart = system.date.addSeconds(system.date.addMillis(now, 0-system.date.getMillis(now)), 0-system.date.getSecond(now))\n\t\t\t\n\t\tif prevIntervalStart and intervalType == \"Hour\":\n\t\t\t#record end of hour\n\t\t\tlaunchpad.oee.recordHourEnd( lineName, lineValue,prevIntervalStart )\n\t\t\n\t\t#reset running time\n\t\ttagWritePaths = [\"[.]RunSeconds\"] \n\t\ttagWritePaths.append(\"[.]DownSeconds\")\n\t\ttagWriteValues = [0,0]\n\t\t#set starting production counter and reject counter\n\t\ttagWritePaths.append(\"[.]StartCounter\")\n\t\ttagWriteValues.append(startCounter)\n\t\ttagWritePaths.append(\"[.]StartReject\")\n\t\ttagWriteValues.append(startReject)\n\t\t#set  start time\n\t\ttagWritePaths.append(\"[.]StartTime\")\n\t\ttagWriteValues.append(intervalStart)\n\n\t\t#reset target production\n\t\ttargetRateHistory = launchpad.oee.getTargetRateDataset(targetRateName, targetRate)\n\t\ttagWritePaths.append(\"[.]TargetRateHistory\")\n\t\ttagWriteValues.append(targetRateHistory)\n\n\t\t#set tag values\n\t\tsystem.tag.writeAsync(tagWritePaths, tagWriteValues)\n\t\t\n\t\tif enabled and intervalType == \"Hour\":\n\t\t\t#start new database record for the current hour\n\t\t\t#logger.info(\"Recording start of hour %s starting %s\" %(currentInterval,intervalStart))\n\t\t\tlaunchpad.oee.recordHourStart(currentInterval ,intervalStart, lineName, lineValue)\n\t\tif currentInterval > 0 and intervalType == \"Shift\":\n\t\t\t#start new database record for the current shift\n\t\t\tlaunchpad.oee.recordShiftStart(currentInterval, lineName, lineValue)\n\t\t\t\n\t\t"
+          }
+        ],
+        "valueSource": "expr",
+        "expression": "getHour24(now(500))",
+        "name": "CurrentInterval",
+        "value": 0,
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "expr",
+        "expression": "//  Downtime = \u2028 1 -  Availability (Run Time /Planned Production Time)\r\n1-{[.]A}",
+        "dataType": "Float8",
+        "engHigh": 1.0,
+        "name": "D",
+        "formatString": "#0.0%",
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "memory",
+        "name": "DownSeconds",
+        "value": 0,
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "memory",
+        "name": "Duration",
+        "value": 0,
+        "tagType": "AtomicTag"
+      },
+      {
+        "eventScripts": [
+          {
+            "eventid": "valueChanged",
+            "script": "\t#set counters and second timers for the new interval start\n\tlogger = system.util.getLogger(\"launchpad.oee.tagChange\")\n\tnow =system.date.now()\n\tintervalStart = system.date.addSeconds(system.date.addMillis(now, 0-system.date.getMillis(now)), 0-system.date.getSecond(now))\n\t\n\tif currentValue.value == 0:\n\t\tsystem.tag.writeBlocking([\"[.]StartTime\"],None)\n\telse:\n\t\tsystem.tag.writeBlocking([\"[.]StartTime\"], intervalStart)\n\t\n\ttagReadPaths = [\"[.]../Plc/ProductionCounter\",\"[.]../Plc/RejectCounter\",\"[.]../LineName\",\"[.]../LinePath\", \"[.]../Config/RateName\", \"[.]../Config/TargetRate\",\"[.]StartTime\",\"[.]IntervalType\", \"[.]Enabled\",\"[.]PreviousInterval\"]\n\ttagValues = system.tag.readBlocking(tagReadPaths)\n\tstartCounter = tagValues[0].value\n\tstartReject = tagValues[1].value\n\tlineName = tagValues[2].value\n\ttargetRateName = tagValues[4].value\t\n\ttargetRate = tagValues[5].value\n\tprevIntervalStart = tagValues[6].value\t\n\tintervalType = tagValues[7].value\n\tenabled = tagValues[8].value\t\n\tprevInterval = tagValues[9].value\n\t\n\tlogger.info(\"Enabled lineName %s %s, intervalStart %s, startCounter %d, starting reject %d\" %(lineName, intervalType, intervalStart, startCounter, startReject))\n\t\n\t#set run seconds and down seconds to zero\n\ttagWritePaths = [\"[.]RunSeconds\"] \n\ttagWritePaths.append(\"[.]DownSeconds\")\n\ttagWriteValues = [0,0]\n\t#set starting production counter and reject counter\n\ttagWritePaths.append(\"[.]StartCounter\")\n\ttagWriteValues.append(startCounter)\n\ttagWritePaths.append(\"[.]StartReject\")\n\ttagWriteValues.append(startReject)\n\t#set  start time\n\ttagWritePaths.append(\"[.]StartTime\")\n\ttagWriteValues.append(intervalStart)\n\t\n\t#reset target production\n\ttargetRateHistory = launchpad.oee.getTargetRateDataset(targetRateName, targetRate)\n\ttagWritePaths.append(\"[.]TargetRateHistory\")\n\ttagWriteValues.append(targetRateHistory)\n\t\n\t#set tag values\n\tsystem.tag.writeAsync(tagWritePaths, tagWriteValues)\n"
+          }
+        ],
+        "valueSource": "memory",
+        "dataType": "Boolean",
+        "name": "Enabled",
+        "value": false,
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "expr",
+        "expression": "max({[.]SecondsElapsed}-({[.]DownSeconds} + {[.]RunSeconds}),0)",
+        "name": "IdleSeconds",
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "memory",
+        "dataType": "String",
+        "name": "IntervalType",
+        "value": "Hour",
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "expr",
+        "expression": "//  OEE = \u2028 Availability * Performance * Quality\r\n{[.]A} * {[.]P} * {[.]Q}",
+        "dataType": "Float8",
+        "engHigh": 1.0,
+        "name": "O",
+        "formatString": "#0.0%",
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "expr",
+        "expression": "//Performance = Production Count / Target Production Count\n// Capped at 1: running above the target rate, or a partially-elapsed interval\n// straight after a rollover, would otherwise show Performance over 100%.\nmin(if({[.]TargetProductionCount}=0,1,{[.]ProductionCount}/{[.]TargetProductionCount}), 1)",
+        "dataType": "Float8",
+        "engHigh": 1.0,
+        "name": "P",
+        "formatString": "#0.0%",
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "memory",
+        "name": "PreviousInterval",
+        "value": 0,
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "expr",
+        "expression": "//production count since start\r\nif({[.]Enabled},\r\n{[.]../Plc/Outfeed} - \r\n{[.]StartCounter}*{[.]../Config/OutfeedFactor}\r\n,0)",
+        "name": "ProductionCount",
+        "value": 0,
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "expr",
+        "expression": "//Quality\u2028\u00a0 = Good Count / Total Count\r\nif({[.]ProductionCount}=0,1\r\n,max({[.]ProductionCount} - {[.]RejectCount},0)/{[.]ProductionCount})",
+        "dataType": "Float8",
+        "engHigh": 1.0,
+        "name": "Q",
+        "formatString": "#0.0%",
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "expr",
+        "expression": "//reject count since start \r\nif({[.]Enabled},\r\n{[.]../Plc/Reject}- \r\n{[.]StartReject}*{[.]../Config/RejectFactor}\r\n,0)",
+        "name": "RejectCount",
+        "value": 0,
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "memory",
+        "name": "RunSeconds",
+        "value": 0,
+        "tagType": "AtomicTag"
+      },
+      {
+        "eventScripts": [
+          {
+            "eventid": "valueChanged",
+            "script": "\tif not initialChange and currentValue.value > previousValue.value:\n\t\t#update OEE seconds in each state\n\t\tlogger = system.util.getLogger(\"launchpad.oee.tagScripts\")\n\t\ttimeIncrement = currentValue.value - previousValue.value \t \n\t\t#get current tags values\n\t\ttagReadPaths = [\"[.]CurrentInterval\", \"[.]../Plc/State\",\"[.]RunSeconds\",\"[.]DownSeconds\",\"[.]TargetRateHistory\" ]\n\t\ttagValues = system.tag.readBlocking(tagReadPaths)\n\t\tsecondsElapsed = currentValue.value\n\t\tlineState = tagValues[1].value\n\t\trunningSeconds = tagValues[2].value\n\t\tdownSeconds = tagValues[3].value\n\t\ttargetRateHistory = tagValues[4].value\n\t\trowIndex = targetRateHistory.rowCount-1\n\t\t#logger.info(\"Seconds Elapsed Timer (%d) : lineState %d, runningSeconds %d, downSeconds %d\" %(timeIncrement, lineState,runningSeconds,downSeconds)  )\n\t\tif rowIndex >=0:\n\t\t\trateRunningSeconds = targetRateHistory.getValueAt(rowIndex,\"SecondsRunning\")\n\t\t\trateDownSeconds = targetRateHistory.getValueAt(rowIndex,\"SecondsFaulted\")\n\t\t\trateIdleSeconds = targetRateHistory.getValueAt(rowIndex,\"SecondsIdle\")\n\t\t\trateSeconds = targetRateHistory.getValueAt(rowIndex,\"SecondsElapsed\")\n\t\t\t\n\t\tif runningSeconds == None: hourRunningSeconds = 0\n\t\tif downSeconds == None: hourDownSeconds = 0\n\t\t#update timers\n\t\tif  lineState == 1 and timeIncrement > 0:\n\t\t\t#update the number of seconds the line has been up during the hour\n\t\t\ttagWritePaths = [\"[.]RunSeconds\",  \"[.]TargetRateHistory\"]\n\t\t\tif rowIndex >=0:\n\t\t\t\ttargetRateHistory = system.dataset.setValue(targetRateHistory, rowIndex, \"SecondsRunning\", min(rateRunningSeconds + timeIncrement,secondsElapsed))\n\t\t\t\ttargetRateHistory = system.dataset.setValue(targetRateHistory, rowIndex, \"SecondsElapsed\", min(rateSeconds + timeIncrement,secondsElapsed))\n\t\t\tsystem.tag.writeAsync(tagWritePaths, [min(runningSeconds + timeIncrement, secondsElapsed), targetRateHistory])\n\t\tif  lineState == 2 and timeIncrement>0:\n\t\t\t#update the number of seconds the line has been faulted during the hour\n\t\t\ttagWritePaths = [\"[.]DownSeconds\", \"[.]TargetRateHistory\"]\n\t\t\tif rowIndex >=0:\n\t\t\t\ttargetRateHistory = system.dataset.setValue(targetRateHistory, rowIndex, \"SecondsFaulted\", min(rateDownSeconds + timeIncrement,secondsElapsed))\n\t\t\t\ttargetRateHistory = system.dataset.setValue(targetRateHistory, rowIndex, \"SecondsElapsed\", min(rateSeconds + timeIncrement,secondsElapsed))\n\t\t\tsystem.tag.writeAsync(tagWritePaths, [min(downSeconds + timeIncrement, secondsElapsed) ,targetRateHistory])\n\t\tif  lineState == 0 and timeIncrement>0:\n\t\t\ttagWritePaths = [\"[.]TargetRateHistory\"]\n\t\t\tif rowIndex >=0:\n\t\t\t\ttargetRateHistory = system.dataset.setValue(targetRateHistory, rowIndex, \"SecondsIdle\", min(rateIdleSeconds + timeIncrement,secondsElapsed))\n\t\t\t\ttargetRateHistory = system.dataset.setValue(targetRateHistory, rowIndex, \"SecondsElapsed\", min(rateSeconds + timeIncrement,secondsElapsed))\n\t\t\tsystem.tag.writeAsync(tagWritePaths, targetRateHistory)\n"
+          }
+        ],
+        "valueSource": "expr",
+        "expression": "//seconds between interval starting time and now\r\n//zero if the start time is now, or this instance is disabled\r\nif({[.]StartTime} = None || {[.]Enabled}  = 0 ,0,\r\nmin(secondsBetween({[.]StartTime},now(250)),{[.]Duration})\r\n)",
+        "name": "SecondsElapsed",
+        "value": 0,
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "memory",
+        "name": "StartCounter",
+        "value": 0,
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "memory",
+        "name": "StartReject",
+        "value": 0,
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "memory",
+        "expression": "setTime(now(500),getHour24(now(500)),0,0)",
+        "dataType": "DateTime",
+        "name": "StartTime",
+        "formatString": "yyyy-MM-dd h:mm:ss aa",
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "expr",
+        "expression": "// target production count =  running time * target rate\r\nrunScript(\"launchpad.oee.getTargetProductionCount\", 0,{[.]TargetRateHistory})",
+        "dataType": "Float8",
+        "name": "TargetProductionCount",
+        "value": 0.0,
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "memory",
+        "dataType": "DataSet",
+        "name": "TargetRateHistory",
+        "value": "{\"columns\":[{\"name\":\"RateName\",\"type\":\"java.lang.String\"},{\"name\":\"RateValue\",\"type\":\"java.lang.Double\"},{\"name\":\"SecondsElapsed\",\"type\":\"java.lang.Integer\"},{\"name\":\"SecondsRunning\",\"type\":\"java.lang.Long\"},{\"name\":\"SecondsFaulted\",\"type\":\"java.lang.Long\"},{\"name\":\"SecondsIdle\",\"type\":\"java.lang.Long\"}],\"rows\":[[\"default\",15.0,0,0,0,0]]}",
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "expr",
+        "expression": "//  Utilization = Planned Production Time / All Time\nmin(if({[.]SecondsElapsed} = 0, 1,\n({[.]SecondsElapsed}  - {[.]IdleSeconds}) /{[.]SecondsElapsed}), 1)",
+        "dataType": "Float8",
+        "engHigh": 1.0,
+        "name": "U",
+        "formatString": "#0.0%",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "Schedule",
+    "tagType": "UdtType",
+    "tags": [
+      {
+        "name": "1",
+        "typeId": "OEE/Shift",
+        "tagType": "UdtInstance",
+        "tags": [
+          {
+            "value": 1400,
+            "name": "StopTime",
+            "tagType": "AtomicTag"
+          },
+          {
+            "value": 600,
+            "name": "StartTime",
+            "tagType": "AtomicTag"
+          },
+          {
+            "value": false,
+            "name": "ShiftEnabled",
+            "tagType": "AtomicTag"
+          }
+        ]
+      },
+      {
+        "name": "2",
+        "typeId": "OEE/Shift",
+        "tagType": "UdtInstance",
+        "tags": [
+          {
+            "value": 1400,
+            "name": "StartTime",
+            "tagType": "AtomicTag"
+          },
+          {
+            "value": false,
+            "name": "ShiftEnabled",
+            "tagType": "AtomicTag"
+          },
+          {
+            "value": 2200,
+            "name": "StopTime",
+            "tagType": "AtomicTag"
+          }
+        ]
+      },
+      {
+        "name": "3",
+        "typeId": "OEE/Shift",
+        "tagType": "UdtInstance",
+        "tags": [
+          {
+            "value": 600,
+            "name": "StopTime",
+            "tagType": "AtomicTag"
+          },
+          {
+            "value": false,
+            "name": "ShiftEnabled",
+            "tagType": "AtomicTag"
+          },
+          {
+            "value": 2200,
+            "name": "StartTime",
+            "tagType": "AtomicTag"
+          }
+        ]
+      },
+      {
+        "valueSource": "expr",
+        "expression": "// get the current hour and minute in four digit format to compare with shift setups\r\n100*getHour24(now(5000))  + getMinute(now(5000))\r\n",
+        "name": "CurrentHourMinute",
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "expr",
+        "expression": "\r\nif({[.]1/ShiftEnabled} &&  {[.]1/StartTime} < {[.]1/StopTime} && {[.]CurrentHourMinute} >= {[.]1/StartTime} && {[.]CurrentHourMinute} < {[.]1/StopTime},1\r\n,if({[.]2/ShiftEnabled} && {[.]2/StartTime} < {[.]2/StopTime} && {[.]CurrentHourMinute} >= {[.]2/StartTime} && {[.]CurrentHourMinute} < {[.]2/StopTime},2\r\n,if({[.]3/ShiftEnabled} && {[.]3/StartTime} < {[.]3/StopTime} && {[.]CurrentHourMinute} >= {[.]3/StartTime} && {[.]CurrentHourMinute} < {[.]3/StopTime},3\r\n,if({[.]1/ShiftEnabled} && {[.]1/StartTime} > {[.]1/StopTime} && ({[.]CurrentHourMinute} >= {[.]1/StartTime} || {[.]CurrentHourMinute} < {[.]1/StopTime}),1\r\n,if({[.]2/ShiftEnabled} && {[.]2/StartTime} > {[.]2/StopTime} && ({[.]CurrentHourMinute} >= {[.]2/StartTime} || {[.]CurrentHourMinute} < {[.]3/StopTime}),2\r\n,if({[.]3/ShiftEnabled} && {[.]3/StartTime} > {[.]3/StopTime} && ({[.]CurrentHourMinute} >= {[.]3/StartTime} || {[.]CurrentHourMinute} < {[.]3/StopTime}),3\r\n\r\n, 0))))))",
+        "deriveExpressionGetter": "//find current shift\r\nif({source} >= {[.]1/StartTime} && {source} < {[.]1/StopTime}, 1\r\n,if({source} >= {[.]2/StartTime} && {source} < {[.]2/StopTime}, 2\r\n,if({source} >= {[.]3/StartTime} && {source} < {[.]3/StopTime}, 3\r\n,0)))",
+        "sourceTagPath": "[.]CurrentHourMinute",
+        "name": "CurrentShift",
+        "executionMode": "TagGroupRate",
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "expr",
+        "expression": "// Shift start time. A shift that does not cross midnight started today.\n// One that does (StartTime > StopTime) started today while the clock is still\n// past its start, and yesterday once we are past midnight. The stock expression\n// always subtracted a day, dating the shift a day early for its whole pre-midnight\n// half -- which left ShiftOee elapsed/target inconsistent and Performance > 100%.\nif({[.]CurrentShift}=1 && {[.]1/StartTime} < {[.]1/StopTime},setTime(now(0), floor({[.]1/StartTime} /100) , {[.]1/StartTime} %100,0)\n,if({[.]CurrentShift}=2 && {[.]2/StartTime} < {[.]2/StopTime},setTime(now(0), floor({[.]2/StartTime} /100) , {[.]2/StartTime} %100,0)\n,if({[.]CurrentShift}=3 && {[.]3/StartTime} < {[.]3/StopTime},setTime(now(0), floor({[.]3/StartTime} /100) , {[.]3/StartTime} %100,0)\n,if({[.]CurrentShift}=1 && {[.]1/StartTime} > {[.]1/StopTime},setTime(if({[.]CurrentHourMinute} >= {[.]1/StartTime}, now(0), addDays(now(0),-1)), floor({[.]1/StartTime} /100) , {[.]1/StartTime} %100,0)\n,if({[.]CurrentShift}=2 && {[.]2/StartTime} > {[.]2/StopTime},setTime(if({[.]CurrentHourMinute} >= {[.]2/StartTime}, now(0), addDays(now(0),-1)), floor({[.]2/StartTime} /100) , {[.]2/StartTime} %100,0)\n,if({[.]CurrentShift}=3 && {[.]3/StartTime} > {[.]3/StopTime},setTime(if({[.]CurrentHourMinute} >= {[.]3/StartTime}, now(0), addDays(now(0),-1)), floor({[.]3/StartTime} /100) , {[.]3/StartTime} %100,0)\n,setTime(now(0),0,0,0)))))))",
+        "dataType": "DateTime",
+        "name": "CurrentShiftStartTime",
+        "formatString": "yyyy-MM-dd h:mm:ss aa",
+        "tagType": "AtomicTag"
+      }
+    ]
+  },
+  {
+    "name": "LineConfig",
+    "tagType": "UdtType",
+    "tags": [
+      {
+        "name": "Config",
+        "tagType": "Folder",
+        "tags": [
+          {
+            "valueSource": "memory",
+            "dataType": "Float8",
+            "documentation": "Multiply production counter by this value to get output.  ",
+            "name": "OutfeedFactor",
+            "tooltip": "Multiply production counter by this value to get output",
+            "value": 1.0,
+            "tagType": "AtomicTag"
+          },
+          {
+            "valueSource": "memory",
+            "dataType": "String",
+            "name": "RateName",
+            "tooltip": "",
+            "value": "default",
+            "tagType": "AtomicTag"
+          },
+          {
+            "valueSource": "memory",
+            "dataType": "Float8",
+            "documentation": "Multiply reject counter by this value to get output. ",
+            "name": "RejectFactor",
+            "tooltip": "Multiply production counter by this value to get output",
+            "value": 1.0,
+            "tagType": "AtomicTag"
+          },
+          {
+            "valueSource": "memory",
+            "dataType": "String",
+            "name": "RateTime",
+            "value": "minute",
+            "tagType": "AtomicTag"
+          },
+          {
+            "valueSource": "memory",
+            "dataType": "Float8",
+            "documentation": "This value represents the ideal units produced per minute.  UOM stored in engineering units field.",
+            "name": "TargetRate",
+            "tooltip": "default",
+            "value": 15.0,
+            "engUnit": "units",
+            "tagType": "AtomicTag"
+          }
+        ]
+      },
+      {
+        "name": "DayOee",
+        "typeId": "OEE/OEE",
+        "tagType": "UdtInstance",
+        "tags": [
+          {
+            "value": "Day",
+            "name": "IntervalType",
+            "tagType": "AtomicTag"
+          },
+          {
+            "valueSource": "reference",
+            "sourceTagPath": "[.]../Enabled",
+            "name": "Enabled",
+            "tagType": "AtomicTag"
+          },
+          {
+            "expression": "setTime(now(500),0,0,0)",
+            "dataType": "DateTime",
+            "formatString": "yyyy-MM-dd h:mm:ss aa",
+            "name": "CurrentInterval",
+            "tagType": "AtomicTag"
+          },
+          {
+            "valueSource": "derived",
+            "expression": "secondsBetween({[.]StartTime}, addDays({source},1))",
+            "deriveExpressionGetter": "secondsBetween({[.]StartTime}, addDays({source},1))",
+            "sourceTagPath": "[.]CurrentInterval",
+            "name": "Duration",
+            "tagType": "AtomicTag"
+          }
+        ]
+      },
+      {
+        "name": "Display",
+        "tagType": "Folder",
+        "tags": [
+          {
+            "valueSource": "memory",
+            "dataType": "Boolean",
+            "name": "Availability",
+            "value": true,
+            "tagType": "AtomicTag"
+          },
+          {
+            "valueSource": "memory",
+            "dataType": "Boolean",
+            "name": "OEE",
+            "value": true,
+            "tagType": "AtomicTag"
+          },
+          {
+            "valueSource": "memory",
+            "dataType": "Boolean",
+            "name": "Performance",
+            "value": true,
+            "tagType": "AtomicTag"
+          },
+          {
+            "valueSource": "memory",
+            "dataType": "Boolean",
+            "name": "Quality",
+            "value": true,
+            "tagType": "AtomicTag"
+          }
+        ]
+      },
+      {
+        "valueSource": "memory",
+        "dataType": "Boolean",
+        "name": "Enabled",
+        "value": false,
+        "tagType": "AtomicTag"
+      },
+      {
+        "name": "HourOee",
+        "typeId": "OEE/OEE",
+        "tagType": "UdtInstance",
+        "tags": [
+          {
+            "valueSource": "derived",
+            "deriveExpressionGetter": "abs(secondsBetween(setTime({[.]StartTime},{source}+1,0,0), {[.]StartTime}))\r\n",
+            "sourceTagPath": "[.]../HourOee/CurrentInterval",
+            "name": "Duration",
+            "tagType": "AtomicTag"
+          },
+          {
+            "valueSource": "reference",
+            "sourceTagPath": "[.]../Enabled",
+            "name": "Enabled",
+            "tagType": "AtomicTag"
+          }
+        ]
+      },
+      {
+        "valueSource": "expr",
+        "expression": "{InstanceName}",
+        "dataType": "String",
+        "name": "LineName",
+        "tagType": "AtomicTag"
+      },
+      {
+        "valueSource": "expr",
+        "expression": "{PathToParentFolder}",
+        "dataType": "String",
+        "name": "LinePath",
+        "tagType": "AtomicTag"
+      },
+      {
+        "name": "Plc",
+        "tagType": "Folder",
+        "tags": [
+          {
+            "eventScripts": [
+              {
+                "eventid": "valueChanged",
+                "script": "\tif not initialChange:\n\t\t\n\t\tlogger = system.util.getLogger(\"launchpad.oee.tagChange\")\n\t\t#adjust after counter has reset to zero\n\t\tif currentValue.value == 0 and previousValue.value > 0:\n\t\t\t#first get starting counts\n\t\t\tlogger.info(\"Reject counter reset\")\n\t\t\ttagReadPaths = [\"[.]../HourOee/StartReject\" , \"[.]../ShiftOee/StartReject\", \"[.]../DayOee/StartReject\"]\n\t\t\ttagWritePaths = [\"[.]../HourOee/StartReject\" , \"[.]../ShiftOee/StartReject\", \"[.]../DayOee/StartReject\"]\n\t\t\ttagValues = system.tag.readBlocking(tagReadPaths)\n\t\t\t#OEE Reject Count = previous PLC Reject Count - Starting Count\n\t\t\t#new starting count = zero - OEE Reject Count\n\t\t\t\n\t\t\ttagWriteValues = [0- (previousValue.value - tagValues[0].value)]\t#Hour OEE\n\t\t\ttagWriteValues.append(0- (previousValue.value - tagValues[1].value))\t#Shift OEE\n\t\t\ttagWriteValues.append(0- (previousValue.value - tagValues[2].value))\t#Day OEE\n\t\t\t\n\t\t\tsystem.tag.writeBlocking(tagWritePaths, tagWriteValues)\n\t\t\t\n"
+              }
+            ],
+            "valueSource": "opc",
+            "opcItemPath": "",
+            "name": "RejectCounter",
+            "enabled": true,
+            "tagType": "AtomicTag",
+            "opcServer": "Ignition OPC UA Server"
+          },
+          {
+            "valueSource": "opc",
+            "opcItemPath": "",
+            "historyProvider": "launchpad-oee-historian",
+            "historyEnabled": false,
+            "name": "State",
+            "tagType": "AtomicTag",
+            "opcServer": "Ignition OPC UA Server"
+          },
+          {
+            "valueSource": "expr",
+            "expression": "{[.]../Plc/RejectCounter}*{[.]../Config/RejectFactor}",
+            "dataType": "Float8",
+            "name": "Reject",
+            "tagType": "AtomicTag"
+          },
+          {
+            "valueSource": "expr",
+            "expression": "{[.]../Plc/ProductionCounter}*{[.]../Config/OutfeedFactor}",
+            "dataType": "Float8",
+            "name": "Outfeed",
+            "tagType": "AtomicTag"
+          },
+          {
+            "eventScripts": [
+              {
+                "eventid": "valueChanged",
+                "script": "\tif not initialChange:\n\t\t\n\t\tlogger = system.util.getLogger(\"launchpad.oee.tagChange\")\n\t\t#adjust after counter has reset to zero\n\t\tif currentValue.value == 0 and previousValue.value > 0:\n\t\t\t#first get starting counts\n\t\t\tlogger.info(\"Reject counter reset\")\n\t\t\ttagReadPaths = [\"[.]../HourOee/StartCounter\" , \"[.]../ShiftOee/StartCounter\", \"[.]../DayOee/StartCounter\"]\n\t\t\ttagWritePaths = [\"[.]../HourOee/StartCounter\" , \"[.]../ShiftOee/StartCounter\", \"[.]../DayOee/StartCounter\"]\n\t\t\ttagValues = system.tag.readBlocking(tagReadPaths)\n\t\t\t#OEE Production Count = previous PLC Production Count - Starting Count\n\t\t\t#new starting count = zero - OEE Production Count\n\t\t\t\n\t\t\ttagWriteValues = [0- (previousValue.value - tagValues[0].value)]\t#Hour OEE\n\t\t\ttagWriteValues.append(0- (previousValue.value - tagValues[1].value))\t#Shift OEE\n\t\t\ttagWriteValues.append(0- (previousValue.value - tagValues[2].value))\t#Day OEE\n\t\t\t\n\t\t\tsystem.tag.writeBlocking(tagWritePaths, tagWriteValues)\n\t\t\t\n\t\t\t\n\t\t\t#logger.info(\"PLC Outfeed tag change.  Hour Start Counter %d ShiftPC %d, Day PC %d\" %(tagValues[1].value,tagValues[2].value,tagValues[3].value))\n\t\t\t"
+              }
+            ],
+            "valueSource": "opc",
+            "opcItemPath": "",
+            "name": "ProductionCounter",
+            "tagType": "AtomicTag",
+            "opcServer": "Ignition OPC UA Server"
+          }
+        ]
+      },
+      {
+        "name": "Schedule",
+        "typeId": "OEE/Schedule",
+        "tagType": "UdtInstance",
+        "tags": [
+          {
+            "name": "1",
+            "tagType": "UdtInstance",
+            "tags": [
+              {
+                "value": 1400,
+                "name": "StopTime",
+                "tagType": "AtomicTag"
+              },
+              {
+                "value": 600,
+                "name": "StartTime",
+                "tagType": "AtomicTag"
+              },
+              {
+                "value": false,
+                "name": "ShiftEnabled",
+                "tagType": "AtomicTag"
+              }
+            ]
+          },
+          {
+            "name": "2",
+            "tagType": "UdtInstance",
+            "tags": [
+              {
+                "value": false,
+                "name": "ShiftEnabled",
+                "tagType": "AtomicTag"
+              }
+            ]
+          },
+          {
+            "name": "3",
+            "tagType": "UdtInstance",
+            "tags": [
+              {
+                "value": 600,
+                "name": "StopTime",
+                "tagType": "AtomicTag"
+              },
+              {
+                "value": 2200,
+                "name": "StartTime",
+                "tagType": "AtomicTag"
+              },
+              {
+                "value": false,
+                "name": "ShiftEnabled",
+                "tagType": "AtomicTag"
+              }
+            ]
+          },
+          {
+            "eventScripts": [
+              {
+                "eventid": "valueChanged",
+                "script": "\tif not initialChange:\n\t\tlogger = system.util.getLogger(\"launchpad.oee.tagChange\")\n\t\tprevShift = previousValue.value\n\t\ttagReadPaths = [\"[.]../ShiftOee/StartTime\", \"[.]../LineName\", \"[.]../LinePath\"]\n\t\ttagValues = system.tag.readBlocking(tagReadPaths)\n\t\tprevShiftStart = tagValues[0].value\n\t\tlineName = tagValues[1].value\n\t\tlinePath = tagValues[2].value\n\t\tlineValue = system.tag.readBlocking(linePath)[0].value\n\t\t#record shift end\n\t\tif prevShift > 0:\n\t\t\tlaunchpad.oee.recordShiftEnd(prevShift, lineName, lineValue, prevShiftStart )\n\t\t#start next shift\n\t\tshiftDuration = system.tag.readBlocking([\"[.]%s/ShiftSeconds\" %(currentValue.value)])[0].value\n\t\ttagWritePaths = [\"[.]../ShiftOee/CurrentInterval\", \"[.]../ShiftOee/PreviousInterval\", \"[.]../ShiftOee/Duration\"]\n\t\ttagWriteValues = [currentValue.value, previousValue.value,shiftDuration]\n\t\tsystem.tag.writeBlocking(tagWritePaths, tagWriteValues)\n\t\t\n\t\n\t\t\n\n\t\t"
+              }
+            ],
+            "name": "CurrentShift",
+            "tagType": "AtomicTag"
+          },
+          {
+            "expression": "// get the current hour and minute in four digit format to compare with shift setups\r\n100*getHour24(now(500))  + getMinute(now(500))\r\n",
+            "name": "CurrentHourMinute",
+            "tagType": "AtomicTag"
+          }
+        ]
+      },
+      {
+        "name": "ShiftOee",
+        "typeId": "OEE/OEE",
+        "tagType": "UdtInstance",
+        "tags": [
+          {
+            "value": "Shift",
+            "name": "IntervalType",
+            "tagType": "AtomicTag"
+          },
+          {
+            "valueSource": "memory",
+            "name": "CurrentInterval",
+            "tagType": "AtomicTag"
+          },
+          {
+            "valueSource": "reference",
+            "sourceTagPath": "[.]../Enabled",
+            "name": "Enabled",
+            "tagType": "AtomicTag"
+          }
+        ]
+      }
+    ]
+  }
+]

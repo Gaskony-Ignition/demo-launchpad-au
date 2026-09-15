@@ -1,0 +1,10 @@
+{
+  "base": {
+    "style": {
+      "color": "var(--kpi-ink-strong)",
+      "marginBottom": "15px",
+      "marginRight": "15px",
+      "marginTop": "15px"
+    }
+  }
+}

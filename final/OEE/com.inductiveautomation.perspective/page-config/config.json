@@ -1,0 +1,39 @@
+{
+  "pages": {
+    "/": {
+      "title": "",
+      "viewPath": "Launchpad/Oee/Views/Overview"
+    },
+    "/line-view": {
+      "title": "",
+      "viewPath": "Launchpad/Oee/Views/LineView"
+    },
+    "/production-summary": {
+      "title": "",
+      "viewPath": "Launchpad/Oee/Views/ProductionSummary"
+    },
+    "/settings": {
+      "title": "",
+      "viewPath": "Launchpad/Oee/Views/Settings"
+    }
+  },
+  "sharedDocks": {
+    "cornerPriority": "top-bottom",
+    "top": [
+      {
+        "anchor": "fixed",
+        "autoBreakpoint": 480,
+        "content": "push",
+        "handle": "hide",
+        "iconUrl": "",
+        "id": "",
+        "modal": false,
+        "resizable": false,
+        "show": "visible",
+        "size": 52,
+        "viewParams": {},
+        "viewPath": "Launchpad/Oee/EmbeddedViews/Header"
+      }
+    ]
+  }
+}

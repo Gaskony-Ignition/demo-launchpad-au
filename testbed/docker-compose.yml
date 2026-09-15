@@ -1,0 +1,66 @@
+# Throwaway gateway used only to prove the install works from empty.
+# Deliberately its own container, port and volume so it cannot touch the
+# module-test gateway or any of the other local projects.
+#
+# By DEFAULT this is a blank Ignition and nothing else, because that is the case
+# that matters most: a salesperson installs a fresh gateway, imports the two
+# projects and presses Set up this gateway, with no third-party database anywhere.
+# The projects create their own SQLite connection (jdbc:sqlite:${data}/Examples.db),
+# so a Postgres container sitting alongside the gateway would quietly weaken the
+# very claim this testbed exists to prove.
+#
+# The Postgres service is therefore behind the `foreign-db` profile, off unless
+# asked for. It reproduces the other REAL target: a gateway whose only database
+# connection is a Postgres one NOT called Examples, which is what the Setup
+# button's guard has to refuse rather than overwrite. Run that case with:
+#
+#     docker compose --profile foreign-db up -d
+services:
+  launchpad-install-test:
+    # 8.3.8 by default: that is what real targets are running, and the install has
+    # to be proven against it rather than against the oldest supported version.
+    # Override with IGNITION_VERSION to test the 8.3.6 floor.
+    image: inductiveautomation/ignition:${IGNITION_VERSION:-8.3.8}
+    container_name: launchpad-install-test
+    ports:
+      - "8091:8088"
+    volumes:
+      - launchpad-test-data:/usr/local/bin/ignition/data
+    environment:
+      - ACCEPT_IGNITION_EULA=Y
+      - GATEWAY_ADMIN_USERNAME=admin
+      - GATEWAY_ADMIN_PASSWORD=password
+      - IGNITION_EDITION=standard
+      - GATEWAY_MAX_MEMORY=2048m
+      - GATEWAY_INIT_MEMORY=1024m
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8088/StatusPing"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  launchpad-test-db:
+    profiles: ["foreign-db"]
+    image: postgres:18.4
+    container_name: launchpad-test-db
+    ports:
+      - "55433:5432"
+    environment:
+      - POSTGRES_DB=ignition
+      - POSTGRES_USER=ignition
+      - POSTGRES_PASSWORD=throwaway
+    # /var/lib/postgresql, NOT .../data: from 18 the image stores its cluster under a
+    # major-version directory, and mounting the old path leaves the volume unused --
+    # the server either refuses to start on an existing one or starts with its data
+    # outside the volume, which looks fine until the container is recreated.
+    volumes:
+      - launchpad-test-db-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ignition"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  launchpad-test-data:
+  launchpad-test-db-data:

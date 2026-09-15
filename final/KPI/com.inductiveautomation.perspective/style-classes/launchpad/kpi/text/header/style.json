@@ -1,0 +1,9 @@
+{
+  "base": {
+    "style": {
+      "color": "var(--kpi-ink-strong)",
+      "fontSize": "24px",
+      "lineHeight": 1.35
+    }
+  }
+}

@@ -1,0 +1,176 @@
+{
+  "custom": {},
+  "params": {},
+  "props": {
+    "defaultSize": {
+      "width": 580
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "domId": "launchpadEditDashboard",
+          "name": "Dashboard"
+        },
+        "position": {
+          "basis": "400px",
+          "grow": 1
+        },
+        "propConfig": {
+          "custom.availableWidgetsDS": {
+            "binding": {
+              "type": "expr",
+              "config": {
+                "expression": "1"
+              },
+              "transforms": [
+                {
+                  "type": "script",
+                  "code": "\t# The widget palette. A named query needs a database and\n\t# Ignition Edge has none, so this asks launchpad.store,\n\t# which runs the same named query where there is one.\n\treturn launchpad.store.installedWidgets()"
+                }
+              ]
+            }
+          },
+          "props.availableWidgets": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "availableWidgetsDS": "{this.custom.availableWidgetsDS}",
+                  "editGridCols": "{session.custom.launchpad.dashboard.objects.edit.gridCols}",
+                  "editGridRows": "{session.custom.launchpad.dashboard.objects.edit.gridRows}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\tavailableWidgetsDS = system.dataset.toPyDataSet(value['availableWidgetsDS'])\n\treturn launchpad.dashboard.getInstalledWidgets(availableWidgetsDS, value['editGridRows'], value['editGridCols'])",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          },
+          "props.fixed.cellSize": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.dashboard.objects.edit.cellSize"
+              },
+              "type": "property"
+            }
+          },
+          "props.fixed.columnCount": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.dashboard.objects.edit.gridCols"
+              },
+              "type": "property"
+            }
+          },
+          "props.fixed.columnGutterSize": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.dashboard.objects.edit.gridColGutterSize"
+              },
+              "type": "property"
+            }
+          },
+          "props.fixed.rowCount": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.dashboard.objects.edit.gridRows"
+              },
+              "type": "property"
+            }
+          },
+          "props.fixed.rowGutterSize": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.dashboard.objects.edit.gridRowGutterSize"
+              },
+              "type": "property"
+            }
+          },
+          "props.grid": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.dashboard.objects.edit.grid"
+              },
+              "type": "property"
+            }
+          },
+          "props.stretch.columnCount": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.dashboard.objects.edit.gridCols"
+              },
+              "type": "property"
+            }
+          },
+          "props.stretch.columnGutterSize": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.dashboard.objects.edit.gridColGutterSize"
+              },
+              "type": "property"
+            }
+          },
+          "props.stretch.rowCount": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.dashboard.objects.edit.gridRows"
+              },
+              "type": "property"
+            }
+          },
+          "props.stretch.rowGutterSize": {
+            "binding": {
+              "config": {
+                "path": "session.custom.launchpad.dashboard.objects.edit.gridRowGutterSize"
+              },
+              "type": "property"
+            }
+          },
+          "props.widgets": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "columnCount": "{this.props.stretch.columnCount}",
+                  "rowCount": "{session.custom.launchpad.dashboard.objects.current.gridRows}",
+                  "widgets": "{session.custom.launchpad.dashboard.objects.edit.widgets}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\twidgets = value[\"widgets\"]\n\t\t\n\twidgets = launchpad.dashboard.getWidgets(widgets, False, value[\"rowCount\"], value['columnCount'], True)\n\treturn [] if value == None else widgets",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            },
+            "onChange": {
+              "enabled": null,
+              "script": "\tif origin == \"Browser\":\n\t\tlaunchpad.dashboard.addUpdateWidget(self)"
+            }
+          }
+        },
+        "props": {
+          "editingToggle": false,
+          "fixed": {},
+          "isEditing": true,
+          "pack": false,
+          "stretch": {}
+        },
+        "type": "ia.display.dashboard"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column"
+    },
+    "type": "ia.container.flex"
+  }
+}

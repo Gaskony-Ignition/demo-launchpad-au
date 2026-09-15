@@ -1,0 +1,583 @@
+{
+  "custom": {
+    "documentation": "Daily Production",
+    "projectName": "",
+    "tagHistory": [
+      {
+        "aggregate": "Average",
+        "alias": "value"
+      }
+    ],
+    "tagName": "DailyProduction"
+  },
+  "params": {
+    "historyProvider": "launchpad",
+    "path": "[Launchpad]KPI/DailyProduction"
+  },
+  "propConfig": {
+    "custom.documentation": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "path": "{view.params.path}"
+          },
+          "tagPath": "{path}.documentation"
+        },
+        "type": "tag"
+      },
+      "persistent": true
+    },
+    "custom.projectName": {
+      "binding": {
+        "config": {
+          "expression": "lower({[System]Gateway/SystemName})"
+        },
+        "type": "expr"
+      },
+      "persistent": true
+    },
+    "custom.tagHistory": {
+      "persistent": true
+    },
+    "custom.tagHistory[0].path": {
+      "binding": {
+        "config": {
+          "struct": {
+            "historyProvider": "{view.params.historyProvider}",
+            "path": "{view.params.path}",
+            "projectName": "{view.custom.projectName}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\treturn \"histprov:\" + value.historyProvider + \":/drv:\" + value.projectName + \":Launchpad:/tag:\" + value.path.replace(\"[Launchpad]\",\"\")",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.tagName": {
+      "binding": {
+        "config": {
+          "path": "view.params.path"
+        },
+        "transforms": [
+          {
+            "code": "\treturn value.split(\"/\")[-1]",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "params.historyProvider": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.path": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "width": 920
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Header"
+        },
+        "position": {
+          "grow": 1,
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "documentation": "{view.custom.documentation}",
+                  "tagName": "{view.custom.tagName}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\tif len(value.documentation) > 0:\n\t\tname = value.documentation\n\telse:\n\t\tname =  value.tagName\n\t\n\treturn name + \" Historical Data\"",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "classes": "launchpad/kpi/text/header"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "PowerChart"
+        },
+        "position": {
+          "basis": "560px",
+          "grow": 1
+        },
+        "propConfig": {
+          "props.pens[0].data.source": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "historyProvider": "{view.params.historyProvider}",
+                  "path": "{view.params.path}",
+                  "projectName": "{view.custom.projectName}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\treturn \"histprov:\" + value.historyProvider + \":/drv:\" + value.projectName + \":Launchpad:/tag:\" + value.path.replace(\"[Launchpad]\",\"\")",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          },
+          "props.pens[0].name": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "documentation": "{view.custom.documentation}",
+                  "tagName": "{view.custom.tagName}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\tif len(value.documentation) > 0:\n\t\treturn value.documentation\n\telse:\n\t\treturn value.tagName",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          }
+        },
+        "props": {
+          "config": {
+            "measureOfTime": "minutes",
+            "rangeEndDate": {
+              "$": [
+                "ts",
+                0,
+                1749564067478
+              ],
+              "$ts": 1749564049465
+            },
+            "rangeStartDate": {
+              "$": [
+                "ts",
+                0,
+                1749564067478
+              ],
+              "$ts": 1749558667465
+            },
+            "unitOfTime": 90,
+            "visibility": {
+              "buttons": {
+                "showRangeBrushButton": false,
+                "showTagBrowserButton": false
+              }
+            },
+            "dateFormat": "DD/MM/YYYY",
+            "timeFormat": "HH:mm:ss"
+          },
+          "dataColumns": {
+            "penControl": {
+              "axis": false,
+              "plot": false
+            }
+          },
+          "interaction": {
+            "chartZoomLevel": 1,
+            "mode": "xTrace",
+            "rangeZoomLevel": 1,
+            "xTrace": {
+              "infoBox": {
+                "dateFormat": "DD/MM/YYYY",
+                "timeFormat": "HH:mm:ss"
+              }
+            },
+            "annotation": {
+              "infoBox": {
+                "dateFormat": "DD/MM/YYYY",
+                "timeFormat": "HH:mm:ss"
+              }
+            }
+          },
+          "pens": [
+            {
+              "axis": "",
+              "data": {
+                "aggregateMode": "default"
+              },
+              "display": {
+                "breakLine": true,
+                "interpolation": "curveLinear",
+                "radius": 3,
+                "styles": {
+                  "highlighted": {
+                    "fill": {
+                      "color": "var(--kpi-primary)",
+                      "opacity": 1
+                    },
+                    "stroke": {
+                      "color": "var(--kpi-primary)",
+                      "dashArray": 0,
+                      "opacity": 1,
+                      "width": 1
+                    }
+                  },
+                  "muted": {
+                    "fill": {
+                      "color": "var(--kpi-primary)",
+                      "opacity": 0.4
+                    },
+                    "stroke": {
+                      "color": "var(--kpi-primary)",
+                      "dashArray": 0,
+                      "opacity": 0.4,
+                      "width": 1
+                    }
+                  },
+                  "normal": {
+                    "fill": {
+                      "color": "var(--kpi-primary)",
+                      "opacity": 0.8
+                    },
+                    "stroke": {
+                      "color": "var(--kpi-primary)",
+                      "dashArray": 0,
+                      "opacity": 0.8,
+                      "width": 1
+                    }
+                  },
+                  "selected": {
+                    "fill": {
+                      "color": "var(--kpi-primary)",
+                      "opacity": 1
+                    },
+                    "stroke": {
+                      "color": "var(--kpi-primary)",
+                      "dashArray": 0,
+                      "opacity": 1,
+                      "width": 1
+                    }
+                  }
+                },
+                "type": "line"
+              },
+              "enabled": true,
+              "plot": 0,
+              "selectable": true,
+              "visible": true
+            }
+          ],
+          "plots": [
+            {
+              "color": "transparent",
+              "markers": [],
+              "relativeWeight": 1,
+              "style": {
+                "classes": ""
+              }
+            }
+          ],
+          "timeAxis": {
+            "tick": {
+              "label": {
+                "format": "Auto"
+              }
+            }
+          }
+        },
+        "type": "ia.chart.powerchart"
+      },
+      {
+        "meta": {
+          "name": "TableHeader"
+        },
+        "position": {
+          "basis": "40px",
+          "grow": 1,
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "launchpad/kpi/text/units"
+          },
+          "text": "Data for Previous 90 Minutes:"
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Table"
+        },
+        "position": {
+          "basis": "230px",
+          "grow": 1,
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.data": {
+            "binding": {
+              "config": {
+                "avoidScanClassValidation": true,
+                "dateRange": {
+                  "mostRecent": "90",
+                  "mostRecentUnits": "MIN"
+                },
+                "enableValueCache": true,
+                "ignoreBadQuality": false,
+                "polling": {
+                  "enabled": true,
+                  "rate": "30"
+                },
+                "preventInterpolation": false,
+                "returnFormat": "Wide",
+                "returnSize": {
+                  "type": "RAW"
+                },
+                "tags": "{view.custom.tagHistory}",
+                "valueFormat": "DATASET"
+              },
+              "type": "tag-history"
+            }
+          }
+        },
+        "props": {
+          "columns": [
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "dd/MM/yy HH:mm:ss",
+              "editable": false,
+              "field": "t_stamp",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Date and Time"
+              },
+              "justify": "auto",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "date",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": 100
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "dd/MM/yyyy HH:mm:ss",
+              "editable": false,
+              "field": "value",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Value"
+              },
+              "justify": "auto",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": 30
+            }
+          ],
+          "pager": {
+            "activeOption": 1000,
+            "options": [
+              1000
+            ],
+            "top": false,
+            "bottom": false
+          },
+          "selection": {
+            "enableRowSelection": false
+          }
+        },
+        "type": "ia.display.table"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "launchpad/kpi/root",
+        "padding": 10
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

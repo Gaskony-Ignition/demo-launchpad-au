@@ -1,0 +1,754 @@
+{
+  "custom": {
+    "availability": 0.9,
+    "data": [
+      {
+        "stat": "OEE",
+        "value": 0.3
+      },
+      {
+        "stat": "A",
+        "value": 0.09999999999999998
+      },
+      {
+        "stat": "P",
+        "value": 0.19999999999999996
+      },
+      {
+        "stat": "Q",
+        "value": 0.30000000000000004
+      }
+    ],
+    "oee": 0.3,
+    "performance": 0.8,
+    "quality": 0.7,
+    "scheduledOn": true
+  },
+  "params": {
+    "stats": {
+      "availability": 0.9,
+      "currentShift": 0,
+      "downtime": 0.1,
+      "oee": 0.3,
+      "performance": 0.8,
+      "quality": 0.7
+    }
+  },
+  "propConfig": {
+    "custom.availability": {
+      "binding": {
+        "config": {
+          "path": "view.params.stats.availability"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.data": {
+      "binding": {
+        "config": {
+          "path": "view.params.stats"
+        },
+        "transforms": [
+          {
+            "code": "\tif value:\n\t\tstats \u003d [\n\t\t\t{\"stat\": \"OEE\", \"value\": value.oee},\n\t\t\t{\"stat\": \"A\", \"value\": 1-value.availability},\n\t\t\t{\"stat\": \"P\", \"value\": 1-value.performance},\n\t\t\t{\"stat\": \"Q\", \"value\": 1-value.quality}\n\t\t\t]\n\telse:\n\t\tstats \u003d [\n\t\t\t{\"stat\": \"OEE\", \"value\": 1},\n\t\t\t{\"stat\": \"A\", \"value\": 1},\n\t\t\t{\"stat\": \"P\", \"value\": 1},\n\t\t\t{\"stat\": \"Q\", \"value\": 1}\n\t\t\t]\n\treturn stats",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.oee": {
+      "binding": {
+        "config": {
+          "path": "view.params.stats.oee"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.performance": {
+      "binding": {
+        "config": {
+          "path": "view.params.stats.performance"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.quality": {
+      "binding": {
+        "config": {
+          "path": "view.params.stats.quality"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.scheduledOn": {
+      "binding": {
+        "config": {
+          "expression": "//if we are looking for shift interval, line is only on scheule if we are within a defined shift.\r\n//otherwise we assume line is available 24 hours / day\r\nif({session.custom.launchpad.oee.display.interval}\u003d\"Shift\"  \u0026\u0026 {session.custom.launchpad.oee.display.mode}\u003d \"Realtime\", {view.params.stats.currentShift}\u003e0,  True)\r\n\u0026\u0026\r\nif({session.custom.launchpad.oee.display.mode}\u003d \"Historical\", len({view.params.stats})\u003e0, True)\r\n"
+        },
+        "type": "expr"
+      },
+      "persistent": true
+    },
+    "params.stats": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 334,
+      "width": 346
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "LineName"
+        },
+        "propConfig": {
+          "props.text": {
+            "persistent": true
+          }
+        },
+        "props": {
+          "style": {
+            "classes": "launchpad/oee/text/header",
+            "textAlign": "start"
+          },
+          "text": "Line OEE"
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Value"
+                },
+                "position": {
+                  "basis": "50px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.style.color": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.oee"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tcolor \u003d \u0027var(--oee-good)\u0027\n\tif value \u003c\u003d self.session.custom.launchpad.oee.target:\n\t\tcolor \u003d \u0027var(--oee-bad)\u0027\n\t\n\treturn color\n\t\t",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.oee"
+                      },
+                      "transforms": [
+                        {
+                          "formatType": "numeric",
+                          "formatValue": "#0.0%",
+                          "type": "format"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "launchpad/oee/text/number",
+                    "key": "value",
+                    "marginLeft": 10,
+                    "textAlign": "start"
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "Oee"
+            },
+            "position": {
+              "basis": "20px"
+            },
+            "propConfig": {
+              "position.display": {
+                "persistent": true
+              }
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "classes": "launchpad/oee/text/label",
+                "overflow": "hidden",
+                "textAlign": "left"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Oee"
+                },
+                "propConfig": {
+                  "position.basis": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.oee"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\treturn str(value*100) + \"px\"",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.tag.Display.OEE"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "position.grow": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.oee"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\treturn value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.backgroundColor": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.oee"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tcolor \u003d \u0027var(--oee-good)\u0027\n\tif value \u003c\u003d self.session.custom.launchpad.oee.target:\n\t\tcolor \u003d \u0027var(--oee-bad)\u0027\n\t\n\treturn color\n\t\t",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    },
+                    "persistent": true
+                  }
+                },
+                "props": {
+                  "style": {
+                    "backgroundColor": "var(--oee-bad)",
+                    "marginBottom": 6,
+                    "marginTop": 6
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Availability"
+                },
+                "propConfig": {
+                  "position.basis": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.availability"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\treturn str((1-value)*100) + \"px\"",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.tag.Display.Availability"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "position.grow": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.availability"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\treturn 1-value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "backgroundColor": "var(--oee-gray-a)",
+                    "classes": "launchpad/oee/text/label",
+                    "color": "var(--oee-ink-inverse)",
+                    "fontWeight": "bold",
+                    "textAlign": "center"
+                  },
+                  "text": "A"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Performance"
+                },
+                "propConfig": {
+                  "position.basis": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.performance"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\treturn str((1-value)*100) + \"px\"",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.tag.Display.Performance"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "position.grow": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.performance"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\treturn 1-value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "backgroundColor": "var(--oee-gray-p)",
+                    "classes": "launchpad/oee/text/label",
+                    "color": "var(--oee-ink-inverse)",
+                    "fontWeight": "bold",
+                    "textAlign": "center"
+                  },
+                  "text": "P"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Quality"
+                },
+                "propConfig": {
+                  "position.basis": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.quality"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\treturn str((1-value)*100) + \"px\"",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.tag.Display.Quality"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "position.grow": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.quality"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\treturn 1-value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "backgroundColor": "var(--oee-gray-q)",
+                    "classes": "launchpad/oee/text/label",
+                    "color": "var(--oee-ink-inverse)",
+                    "fontWeight": "bold",
+                    "textAlign": "center"
+                  },
+                  "text": "Q"
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "Bar"
+            },
+            "position": {
+              "grow": 1
+            },
+            "props": {
+              "style": {
+                "marginLeft": 10,
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "OeeBar"
+        },
+        "position": {
+          "basis": "50px"
+        },
+        "propConfig": {
+          "position.display": {
+            "binding": {
+              "config": {
+                "path": "view.custom.scheduledOn"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "direction": "column"
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "50px",
+                  "grow": 1
+                },
+                "props": {
+                  "text": "Availability",
+                  "textStyle": {
+                    "classes": "launchpad/oee/text/label",
+                    "textAlign": "start"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Value"
+                },
+                "position": {
+                  "basis": "10px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.availability"
+                      },
+                      "transforms": [
+                        {
+                          "formatType": "numeric",
+                          "formatValue": "#0.0%",
+                          "type": "format"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "textStyle": {
+                    "classes": "launchpad/oee/text/number",
+                    "textAlign": "end"
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "Availability"
+            },
+            "position": {
+              "basis": "100px",
+              "grow": 1
+            },
+            "props": {
+              "alignItems": "flex-end",
+              "justify": "flex-end",
+              "style": {
+                "classes": "launchpad/oee/text/label"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "50px",
+                  "grow": 1
+                },
+                "props": {
+                  "text": "Performance",
+                  "textStyle": {
+                    "classes": "launchpad/oee/text/label",
+                    "textAlign": "start"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Value"
+                },
+                "position": {
+                  "basis": "10px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.performance"
+                      },
+                      "transforms": [
+                        {
+                          "formatType": "numeric",
+                          "formatValue": "#0.0%",
+                          "type": "format"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "textStyle": {
+                    "classes": "launchpad/oee/text/number",
+                    "textAlign": "end"
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "Performance"
+            },
+            "position": {
+              "basis": "100px",
+              "grow": 1
+            },
+            "props": {
+              "alignItems": "flex-end",
+              "justify": "flex-end",
+              "style": {
+                "classes": "launchpad/oee/text/label"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "50px",
+                  "grow": 1
+                },
+                "props": {
+                  "text": "Quality",
+                  "textStyle": {
+                    "classes": "launchpad/oee/text/label",
+                    "textAlign": "start"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Value"
+                },
+                "position": {
+                  "basis": "10px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.quality"
+                      },
+                      "transforms": [
+                        {
+                          "formatType": "numeric",
+                          "formatValue": "#0.0%",
+                          "type": "format"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "textStyle": {
+                    "classes": "launchpad/oee/text/number",
+                    "textAlign": "end"
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "Quality"
+            },
+            "position": {
+              "basis": "100px",
+              "grow": 1
+            },
+            "props": {
+              "alignItems": "flex-end",
+              "justify": "flex-end",
+              "style": {
+                "classes": "launchpad/oee/text/label"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "StatsContainer"
+        },
+        "position": {
+          "basis": "100px",
+          "grow": 1
+        },
+        "propConfig": {
+          "position.display": {
+            "binding": {
+              "config": {
+                "path": "view.custom.scheduledOn"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "marginTop": 10,
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "Label"
+        },
+        "position": {
+          "basis": "500px",
+          "grow": 1
+        },
+        "propConfig": {
+          "position.display": {
+            "binding": {
+              "config": {
+                "expression": "{view.custom.scheduledOn} \u003d False || len({view.custom.data})\u003d0"
+              },
+              "type": "expr"
+            }
+          },
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "if({session.custom.launchpad.oee.display.mode}\u003d \"Historical\",  \"No History Data\", \"Not Scheduled\")"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "classes": "launchpad/oee/text/header",
+            "textAlign": "center"
+          }
+        },
+        "type": "ia.display.label"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "alignContent": "space-between",
+      "direction": "column",
+      "style": {
+        "classes": "launchpad/oee/card"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

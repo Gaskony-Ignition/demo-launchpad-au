@@ -1,0 +1,1131 @@
+{
+  "custom": {},
+  "params": {},
+  "props": {
+    "defaultSize": {
+      "height": 749,
+      "width": 826
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Header"
+        },
+        "position": {
+          "basis": "40px"
+        },
+        "props": {
+          "style": {
+            "classes": "launchpad/oee/text/header"
+          },
+          "text": "Manage Rates"
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "events": {
+              "component": {
+                "onActionPerformed": {
+                  "config": {
+                    "script": "\tsystem.perspective.sendMessage(\"launchpad-oee-table-reset\", scope=\"page\")\n\tsystem.perspective.sendMessage(\"launchpad-oee-rate-mode\", payload = {\"mode\": \"add\"} , scope=\"page\")\n\t\n\t\n"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "NewRate"
+            },
+            "position": {
+              "basis": "193px"
+            },
+            "props": {
+              "image": {
+                "icon": {
+                  "path": "material/add"
+                }
+              },
+              "style": {
+                "classes": "launchpad/oee/action/button-save"
+              },
+              "text": "Add New Rate"
+            },
+            "type": "ia.input.button"
+          }
+        ],
+        "custom": {
+          "deleteMode": true
+        },
+        "meta": {
+          "name": "Actions"
+        },
+        "position": {
+          "basis": "40px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "padding": 5
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "Table"
+        },
+        "position": {
+          "grow": 1
+        },
+        "propConfig": {
+          "props.data": {
+            "binding": {
+              "config": {
+                "path": "parent.custom.data"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "bodyStyle": {
+            "classes": "launchpad/oee/production-summary/table-background"
+          },
+          "cells": {
+            "style": {
+              "color": "var(--oee-ink-inverse)"
+            }
+          },
+          "columns": [
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "dd/MM/yyyy",
+              "editable": false,
+              "field": "rate_name",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Name"
+              },
+              "justify": "auto",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": ""
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "dd/MM/yyyy",
+              "editable": false,
+              "field": "target_rate",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Rate"
+              },
+              "justify": "auto",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": ""
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "dd/MM/yyyy",
+              "editable": false,
+              "field": "uom",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": "UOM"
+              },
+              "justify": "auto",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": ""
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "dd/MM/yyyy",
+              "editable": false,
+              "field": "interval",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Interval"
+              },
+              "justify": "auto",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": ""
+            }
+          ],
+          "headerStyle": {
+            "classes": "launchpad/oee/production-summary/table-header"
+          },
+          "pager": {
+            "style": {
+              "classes": "launchpad/oee/production-summary/table-header"
+            },
+            "options": [
+              1000
+            ],
+            "activeOption": 1000,
+            "top": false,
+            "bottom": false
+          },
+          "rows": {
+            "striped": {
+              "color": {
+                "even": "var(--oee-gray-a)",
+                "odd": "var(--oee-gray-p)"
+              }
+            }
+          }
+        },
+        "scripts": {
+          "customMethods": [],
+          "extensionFunctions": null,
+          "messageHandlers": [
+            {
+              "messageType": "launchpad-oee-table-reset",
+              "pageScope": true,
+              "script": "\tself.props.selection.selectedRow = -1\n\tself.props.selection.selectedColumn = -1\n\tself.props.selection.selectedRow = None\n\tself.props.selection.selectedColumn = None",
+              "sessionScope": false,
+              "viewScope": false
+            }
+          ]
+        },
+        "type": "ia.display.table"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "RateNameLabel"
+            },
+            "position": {
+              "basis": "25px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": ".../Table.props.selection.data"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tif len(value) ==0:\n\t\treturn 'New Rate Entry'\n\telse:\n\t\treturn \"Edit Rate\"",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "launchpad/oee/text/header"
+              },
+              "textStyle": {
+                "textAlign": "start"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Header"
+            },
+            "position": {
+              "basis": "25px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "launchpad/oee/text/label"
+              },
+              "text": "Name for rate",
+              "textStyle": {
+                "textAlign": "start"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "TextEntry"
+                },
+                "position": {
+                  "basis": "400px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "struct": {
+                          "addMode": "{..../AddEdit.custom.addMode}",
+                          "selectionData": "{..../Table.props.selection.data}"
+                        },
+                        "waitOnAll": true
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tif value[\"addMode\"]:\n\t\treturn \"new_rate_name\"\n\telse:\n\t\treturn self.parent.parent.parent.getChild(\"Table\").props.selection.data[0].rate_name",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr-struct"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "launchpad/oee/control/text-entry-dark"
+                  }
+                },
+                "type": "ia.input.text-field"
+              }
+            ],
+            "meta": {
+              "name": "NameEntry"
+            },
+            "position": {
+              "basis": "35px",
+              "shrink": 0
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "meta": {
+              "name": "Label"
+            },
+            "position": {
+              "basis": "25px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "view.params.header"
+                  },
+                  "enabled": false,
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "launchpad/oee/text/label"
+              },
+              "text": "Ideal number of units per minute",
+              "textStyle": {
+                "textAlign": "start"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "NumericEntryField"
+                },
+                "position": {
+                  "basis": "150px"
+                },
+                "propConfig": {
+                  "props.value": {
+                    "binding": {
+                      "config": {
+                        "struct": {
+                          "addMode": "{..../AddEdit.custom.addMode}",
+                          "selectionData": "{..../Table.props.selection.data}"
+                        },
+                        "waitOnAll": true
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tif value[\"addMode\"]:\n\t\t\treturn 1\n\telse:\n\t\treturn value[\"selectionData\"][0].target_rate",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr-struct"
+                    }
+                  }
+                },
+                "props": {
+                  "inputBounds": {
+                    "minimum": 0
+                  },
+                  "style": {
+                    "classes": "launchpad/oee/control/text-entry-dark",
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.input.numeric-entry-field"
+              },
+              {
+                "meta": {
+                  "name": "UnitsEntry"
+                },
+                "position": {
+                  "basis": "150px"
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "struct": {
+                          "addMode": "{..../AddEdit.custom.addMode}",
+                          "selectionData": "{..../Table.props.selection.data}"
+                        },
+                        "waitOnAll": true
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tif value[\"addMode\"]:\n\t\t\treturn \"units\"\n\telse:\n\t\treturn value[\"selectionData\"][0].uom",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr-struct"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "launchpad/oee/control/text-entry-dark",
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.input.text-field"
+              },
+              {
+                "meta": {
+                  "name": "Interval"
+                },
+                "position": {
+                  "basis": "256px"
+                },
+                "propConfig": {
+                  "props.value": {
+                    "binding": {
+                      "config": {
+                        "struct": {
+                          "addMode": "{..../AddEdit.custom.addMode}",
+                          "selectionData": "{..../Table.props.selection.data}"
+                        },
+                        "waitOnAll": true
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tif value[\"addMode\"]:\n\t\t\treturn \"hour\"\n\telse:\n\t\treturn value[\"selectionData\"][0].interval",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr-struct"
+                    }
+                  }
+                },
+                "props": {
+                  "options": [
+                    {
+                      "label": "/minute",
+                      "value": "minute"
+                    },
+                    {
+                      "label": "/hour",
+                      "value": "hour"
+                    }
+                  ],
+                  "style": {
+                    "classes": "launchpad/oee/control/dropdown"
+                  }
+                },
+                "type": "ia.input.dropdown"
+              }
+            ],
+            "meta": {
+              "name": "RateEntry"
+            },
+            "position": {
+              "basis": "35px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "script": "\tself.parent.custom.deleteMode = True"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Delete"
+                },
+                "position": {
+                  "basis": "80px"
+                },
+                "propConfig": {
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "expression": "{parent.custom.deleteMode}=False"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "launchpad/oee/action/button-delete"
+                  },
+                  "text": "Delete"
+                },
+                "type": "ia.input.button"
+              },
+              {
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "script": "\tsystem.perspective.sendMessage(\"launchpad-oee-refresh-rates-table\", scope=\"page\")\t\n\tsystem.perspective.sendMessage(\"launchpad-oee-table-reset\", scope=\"page\")\n\tif self.parent.parent.parent.getChild(\"AddEdit\").custom.addMode:\n\t\tsystem.perspective.sendMessage(\"launchpad-oee-rate-mode\", payload = {\"mode\": \"\"} , scope=\"page\")"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Cancel"
+                },
+                "position": {
+                  "basis": "80px"
+                },
+                "propConfig": {
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "expression": "{parent.custom.deleteMode}=False"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "launchpad/oee/action/button-cancel",
+                    "marginLeft": "5%"
+                  },
+                  "text": "Cancel"
+                },
+                "type": "ia.input.button"
+              },
+              {
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "script": "\t#add or edit record\n\ttableName = \"ex_launchpad_oee_rate\"\n\tdatabaseName = launchpad.oee.db()\n\trate_name = self.parent.parent.getChild(\"NameEntry\").getChild(\"TextEntry\").props.text\n\tinterval = self.parent.parent.getChild(\"RateEntry\").getChild(\"Interval\").props.value\n\tuom = self.parent.parent.getChild(\"RateEntry\").getChild(\"UnitsEntry\").props.text\n\ttarget_rate = self.parent.parent.getChild(\"RateEntry\").getChild(\"NumericEntryField\").props.value\n\t\n\tif self.parent.parent.parent.getChild(\"AddEdit\").custom.updateMode:\n\t\t#update record\n\t\tdata = {\"rate_name\": rate_name , \"uom\": uom, \"target_rate\": target_rate, \"interval\": interval}\n\t\tkey_rate_name = self.parent.parent.parent.getChild(\"Table\").props.selection.data[0].rate_name\n\t\tkeys = {\"rate_name\": key_rate_name }\n\t\tlaunchpad.sql.runDatabaseUpdate(tableName, databaseName, data, keys)\n\telse:\n\t\t#add record\n\t\tdata = {\"rate_name\": rate_name , \"uom\": uom, \"target_rate\": target_rate, \"interval\": interval}\n\t\tlaunchpad.sql.runDatabaseInsert(tableName, databaseName, data)\n\tsystem.perspective.sendMessage(\"launchpad-oee-rate-mode\", payload = {\"mode\": \"\"} , scope=\"page\")\n\tsystem.perspective.sendMessage(\"launchpad-oee-refresh-rates-table\", scope=\"page\")\t\n\t\n\t\t\n\t\t"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Save"
+                },
+                "position": {
+                  "basis": "200px"
+                },
+                "propConfig": {
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "expression": "{parent.custom.deleteMode}=False"
+                      },
+                      "type": "expr"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "..../AddEdit.custom.updateMode"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tif value == True:\n\t\treturn \"Save Changes\"\n\telse:\n\t\treturn \"Save New Rate\"",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "image": {
+                    "icon": {
+                      "path": "material/save_alt"
+                    }
+                  },
+                  "style": {
+                    "classes": "launchpad/oee/action/button-save",
+                    "marginLeft": "5%"
+                  }
+                },
+                "type": "ia.input.button"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Label"
+                    },
+                    "position": {
+                      "basis": "184px"
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "launchpad/oee/text/label"
+                      },
+                      "text": "Are you sure?"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "events": {
+                      "component": {
+                        "onActionPerformed": {
+                          "config": {
+                            "script": "\tself.parent.parent.parent.getChild(\"Actions\").custom.deleteMode = False\n\t\n\t"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "Cancel"
+                    },
+                    "position": {
+                      "basis": "214px"
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "launchpad/oee/action/button-cancel",
+                        "marginLeft": 40
+                      },
+                      "text": "No.  Don't Delete Anything."
+                    },
+                    "type": "ia.input.button"
+                  },
+                  {
+                    "events": {
+                      "component": {
+                        "onActionPerformed": {
+                          "config": {
+                            "script": "\t\n\ttableName = \"ex_launchpad_oee_rate\"\n\n\tkey_rate_name = self.parent.parent.parent.parent.getChild(\"Table\").props.selection.data[0].rate_name\n\tdatabaseName = launchpad.oee.db()\n\tlaunchpad.sql.runDatabaseDelete(tableName, databaseName, idValue=key_rate_name, idField=\"rate_name\")\n\t\n\tsystem.perspective.sendMessage(\"launchpad-oee-refresh-rates-table\", scope=\"page\")\t\n\tself.parent.parent.parent.getChild(\"Actions\").custom.deleteMode = False\n\tsystem.perspective.sendMessage(\"launchpad-oee-table-reset\", scope=\"page\")\n\tsystem.perspective.sendMessage(\"launchpad-oee-rate-mode\", payload = {\"mode\": \"\"} , scope=\"page\")"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "Delete"
+                    },
+                    "position": {
+                      "basis": "196px"
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "launchpad/oee/action/button-delete",
+                        "marginLeft": 10
+                      },
+                      "text": "Yes.  Delete."
+                    },
+                    "type": "ia.input.button"
+                  }
+                ],
+                "meta": {
+                  "name": "DeleteConfirm"
+                },
+                "position": {
+                  "basis": "400px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "expression": "{parent.custom.deleteMode}"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "padding": 5
+                  },
+                  "wrap": "wrap"
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "custom": {
+              "deleteMode": false
+            },
+            "meta": {
+              "name": "Actions"
+            },
+            "position": {
+              "basis": "50px",
+              "grow": 1,
+              "shrink": 0
+            },
+            "props": {
+              "justify": "flex-end",
+              "style": {
+                "padding": 10
+              },
+              "wrap": "wrap"
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "custom": {
+          "addMode": false
+        },
+        "meta": {
+          "name": "AddEdit"
+        },
+        "position": {
+          "basis": "250px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "custom.updateMode": {
+            "binding": {
+              "config": {
+                "expression": "len({../Table.props.selection.data})>0"
+              },
+              "type": "expr"
+            }
+          },
+          "position.display": {
+            "binding": {
+              "config": {
+                "expression": "{this.custom.updateMode} || {this.custom.addMode}"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "classes": "launchpad/oee/card"
+          }
+        },
+        "scripts": {
+          "customMethods": [],
+          "extensionFunctions": null,
+          "messageHandlers": [
+            {
+              "messageType": "launchpad-oee-rate-mode",
+              "pageScope": true,
+              "script": "\t# set update or add mode \n\tmode = payload[\"mode\"]\n\tself.print(\"mode set\")\n\tif mode == \"add\":\n\t\tself.custom.addMode = True\n\t\tself.custom.updateMode = False\n\telif mode == \"update\":\n\t\tself.custom.addMode = False\n\t\tself.custom.updateMode = True\n\telse:\n\t\tself.custom.addMode = False\n\t\tself.custom.updateMode = False\t\n\t\t",
+              "sessionScope": false,
+              "viewScope": false
+            }
+          ]
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "propConfig": {
+      "custom.data": {
+        "binding": {
+          "type": "expr",
+          "config": {
+            "expression": "1"
+          },
+          "transforms": [
+            {
+              "type": "script",
+              "code": "\treturn launchpad.store.selectRates()\n"
+            }
+          ]
+        }
+      },
+      "custom.database": {
+        "binding": {
+          "config": {
+            "expression": "1"
+          },
+          "transforms": [
+            {
+              "code": "\treturn launchpad.oee.db()",
+              "type": "script"
+            }
+          ],
+          "type": "expr"
+        }
+      }
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "launchpad/oee/card launchpad/oee/root"
+      }
+    },
+    "scripts": {
+      "customMethods": [],
+      "extensionFunctions": null,
+      "messageHandlers": [
+        {
+          "messageType": "launchpad-oee-refresh-rates-table",
+          "pageScope": true,
+          "script": "\n\t# refresh rates\n\tself.refreshBinding(\"custom.data\")",
+          "sessionScope": false,
+          "viewScope": false
+        }
+      ]
+    },
+    "type": "ia.container.flex"
+  }
+}

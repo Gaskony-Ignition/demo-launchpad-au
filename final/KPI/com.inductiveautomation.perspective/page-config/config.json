@@ -1,0 +1,87 @@
+{
+  "pages": {
+    "/": {
+      "title": "",
+      "viewPath": "Launchpad/Kpi/Views/Overview"
+    },
+    "/alarming": {
+      "title": "",
+      "viewPath": "Launchpad/Kpi/Views/Alarming"
+    },
+    "/dashboard": {
+      "docks": {
+        "left": [
+          {
+            "anchor": "fixed",
+            "autoBreakpoint": 480,
+            "content": "cover",
+            "handle": "hide",
+            "iconUrl": "",
+            "id": "editDashDetails",
+            "modal": false,
+            "resizable": false,
+            "show": "onDemand",
+            "size": 405,
+            "viewParams": {
+              "currEdit": ""
+            },
+            "viewPath": "Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Details"
+          }
+        ]
+      },
+      "title": "",
+      "viewPath": "Launchpad/Kpi/Views/Dashboard"
+    },
+    "/dashboard/:dashboard": {
+      "docks": {
+        "left": [
+          {
+            "anchor": "fixed",
+            "autoBreakpoint": 480,
+            "content": "cover",
+            "handle": "hide",
+            "iconUrl": "",
+            "id": "editDashDetails",
+            "modal": false,
+            "resizable": false,
+            "show": "onDemand",
+            "size": 405,
+            "viewParams": {
+              "currEdit": ""
+            },
+            "viewPath": "Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Details"
+          }
+        ]
+      },
+      "title": "",
+      "viewPath": "Launchpad/Kpi/Views/Dashboard"
+    },
+    "/settings": {
+      "title": "",
+      "viewPath": "Launchpad/Kpi/Views/Settings"
+    },
+    "/trending": {
+      "title": "",
+      "viewPath": "Launchpad/Kpi/Views/Trending"
+    }
+  },
+  "sharedDocks": {
+    "cornerPriority": "top-bottom",
+    "top": [
+      {
+        "anchor": "fixed",
+        "autoBreakpoint": 480,
+        "content": "push",
+        "handle": "hide",
+        "iconUrl": "",
+        "id": "",
+        "modal": false,
+        "resizable": false,
+        "show": "visible",
+        "size": 52,
+        "viewParams": {},
+        "viewPath": "Launchpad/Kpi/EmbeddedViews/Header"
+      }
+    ]
+  }
+}

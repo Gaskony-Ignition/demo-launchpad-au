@@ -1,0 +1,182 @@
+{
+  "custom": {},
+  "params": {
+    "id": "",
+    "mode": "realtime"
+  },
+  "propConfig": {
+    "params.id": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.mode": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 476,
+      "width": 342
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "events": {
+          "component": {
+            "onItemClicked": {
+              "config": {
+                "script": "\tcurrentLevel \u003d {}\n\t\n\tself.props.interactable \u003d False\n\t\n\tfor item in event.itemPath:\n\t\tif currentLevel \u003d\u003d {}:\n\t\t\tcurrentLevel \u003d self.props.items[item]\n\t\telse:\n\t\t\tcurrentLevel \u003d currentLevel[\"items\"][item]\n\t\t\n\tif currentLevel[\"expanded\"] and currentLevel[\"data\"][\"hasChildren\"]:\n\t\tcurrentLevel[\"items\"] \u003d [{\"label\":\"Fake Item\",\"expanded\":False,\"data\":{},\"items\":[]}]\n\telse:\n\t\titemPath \u003d \"/\".join(map(str,event.itemPath))\n\t\ttags \u003d []\n\t\t\n\t\tif currentLevel[\"data\"].has_key(\"folder\"):\n\t\t\tbaseTagFolder \u003d currentLevel[\"data\"][\"folder\"]\n\t\t\tif self.view.params.mode \u003d\u003d \u0027history\u0027:\n\t\t\t\tresults \u003d system.tag.browseHistoricalTags(baseTagFolder).getResults()\n\n\t\t\t\tif results !\u003d None:\n\t\t\t\t\tfor result in results:\n\t\t\t\t\t\tif result.hasChildren() \u003d\u003d True:\n\t\t\t\t\t\t\ttag \u003d {\u0027label\u0027: result.path.lastPathComponent, \u0027expanded\u0027: False, \u0027data\u0027: {\u0027folder\u0027: result.path, \u0027hasChildren\u0027:result.hasChildren}, \"items\":[{\"label\":\"Fake Item\",\"expanded\":False,\"data\":{\u0027hasChildren\u0027:False},\"items\":[]}]}\n\t\t\t\t\t\t\ttags.append(tag)\n\t\t\t\t\t\telse:\n\t\t\t\t\t\t\ttags.append({\u0027label\u0027: result.path.lastPathComponent, \u0027data\u0027: {\u0027tag\u0027: result.path, \u0027hasChildren\u0027:result.hasChildren}, \u0027expanded\u0027: False, \"items\":[]})\n\t\t\t\t\t\t\n\t\t\t\t\tcurrentLevel[\"items\"] \u003d  tags\n\t\t\telse:\n\t\t\t\tif currentLevel[\"data\"].has_key(\"folder\"):\n\t\t\t\t\tresults \u003d system.tag.browse(baseTagFolder).getResults()\n\t\t\t\t\t\n\t\t\t\t\tfor result in results:\n\t\t\t\t\t\tif result[\"name\"] !\u003d \"_types_\":\n\t\t\t\t\t\t\tif str(result[\"tagType\"]) in [\"Folder\", \"UdtInstance\"]:\n\t\t\t\t\t\t\t\ttag \u003d {\u0027label\u0027: result[\"name\"], \u0027expanded\u0027: False, \u0027data\u0027: {\u0027folder\u0027:result[\"fullPath\"], \u0027hasChildren\u0027:result[\"hasChildren\"]}, \"items\":[]}\n\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\tif result[\"hasChildren\"]:\n\t\t\t\t\t\t\t\t\ttag[\u0027items\u0027].append({\"label\":\"Fake Item\",\"expanded\":False,\"data\":{},\"items\":[]})\n\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\ttags.append(tag)\n\t\t\t\t\t\t\telse:\n\t\t\t\t\t\t\t\ttags.append({\u0027label\u0027: result[\"name\"], \u0027data\u0027: {\u0027tag\u0027: result[\"fullPath\"], \u0027hasChildren\u0027:result[\"hasChildren\"]}, \u0027items\u0027: [], \u0027expanded\u0027: False})\n\t\t\t\t\n\t\t\t\t\tcurrentLevel[\"items\"] \u003d  tags\n\t\t\t\n\t\tself.props.selection \u003d []\n\t\tself.props.selection.append(itemPath)\n\t\tself.props.selectionData \u003d []\n\t\tself.props.selectionData.append({\"itemPath\":itemPath,\"value\":currentLevel[\"data\"]})\n\n\tcurrentLevel[\"expanded\"] \u003d not currentLevel[\"expanded\"]"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          },
+          "dom": {
+            "onMouseMove": {
+              "config": {
+                "script": "\tself.props.interactable \u003d False"
+              },
+              "scope": "G",
+              "type": "script"
+            },
+            "onMouseOver": {
+              "config": {
+                "script": "\tself.props.interactable \u003d False"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Tree"
+        },
+        "position": {
+          "grow": 1
+        },
+        "propConfig": {
+          "props.items": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "date": "now(0)",
+                  "mode": "{view.params.mode}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\tif value[\"mode\"] \u003d\u003d \"realtime\":\n\t\tret \u003d launchpad.tags.browseTags()\n\telse:\n\t\tret \u003d launchpad.tags.browseHistoryTags()\n\treturn ret",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          }
+        },
+        "props": {
+          "appearance": {
+            "defaultNodeIcons": {
+              "collapsed": {
+                "color": "#5F707E",
+                "path": "material/folder"
+              },
+              "empty": {
+                "color": "#869DB1",
+                "path": "material/stop"
+              },
+              "expanded": {
+                "color": "#5F707E",
+                "path": "material/folder_open"
+              }
+            },
+            "expandIcons": {
+              "collapsed": {
+                "color": "#869DB1",
+                "path": "material/arrow_right"
+              },
+              "empty": {
+                "color": "#869DB1"
+              },
+              "expanded": {
+                "color": "#869DB1",
+                "path": "material/arrow_drop_down"
+              }
+            }
+          },
+          "interactable": false,
+          "selection": [
+            "0/0"
+          ],
+          "selectionData": [
+            {
+              "itemPath": "0/0",
+              "value": {
+                "folder": "[Launchpad]KPI",
+                "hasChildren": true
+              }
+            }
+          ]
+        },
+        "type": "ia.display.tree"
+      },
+      {
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "script": "\tid \u003d self.view.params.id\n\tpath \u003d self.getSibling(\"Tree\").props.selectionData[0].value.get(\u0027tag\u0027)\n\t\n\tif path \u003d\u003d None:\n\t\t# Must be a folder selected.\n\t\tpath \u003d self.getSibling(\"Tree\").props.selectionData[0].value.get(\u0027folder\u0027)\n\t\n\tsystem.perspective.sendMessage(messageType\u003d\"tag-selection\", payload\u003d{\"id\":id, \"path\":path})\n\tsystem.perspective.closePopup(id\u003d\"tag-tree\")"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Select"
+        },
+        "position": {
+          "basis": "32px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.enabled": {
+            "binding": {
+              "config": {
+                "path": "../Tree.props.selection"
+              },
+              "transforms": [
+                {
+                  "code": "\treturn len(value) \u003e 0",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "border-width": "1px",
+            "classes": "launchpad/kpi/header/button-selected",
+            "margin": "0px"
+          },
+          "text": "Select"
+        },
+        "type": "ia.input.button"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "padding": "10px"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}
