@@ -1,0 +1,174 @@
+{
+  "custom": {
+    "launchpad": {
+      "dashboard": {
+        "mobileBreakpoint": 1100,
+        "objects": {
+          "edit": {}
+        },
+        "options": {
+          "overrideUsername": "admin",
+          "url": ""
+        }
+      },
+      "historyProvider": "launchpad"
+    }
+  },
+  "propConfig": {
+    "custom.launchpad.dashboard.dashboards": {
+      "binding": {
+        "config": {
+          "path": "this.custom.launchpad.dashboard.options.username"
+        },
+        "transforms": [
+          {
+            "code": "\t# Through launchpad.store, which runs the same named query on a gateway\n\t# that has a database and answers from the file store on one that does\n\t# not - Ignition Edge cannot run a named query at all. Without this the\n\t# dashboard list is empty there and every page offers to make the first\n\t# one, on a gateway that already has two.\n\tvalue = system.dataset.toPyDataSet(launchpad.store.dashboards())\n\treturn launchpad.dashboard.getDashboards(value)",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      }
+    },
+    "custom.launchpad.dashboard.dbValid": {
+      "binding": {
+        "config": {
+          "queryPath": "Launchpad/Dashboard/DB Check"
+        },
+        "transforms": [
+          {
+            "code": "\treturn False if value == None else value == 1",
+            "type": "script"
+          }
+        ],
+        "type": "query"
+      }
+    },
+    "custom.launchpad.dashboard.objects.current": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dashboards": "{this.custom.launchpad.dashboard.dashboards}",
+            "url": "{this.custom.launchpad.dashboard.options.url}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\turl = value[\"url\"]\n\tdashboards = value[\"dashboards\"]\n\treturn launchpad.dashboard.getCurrentDashboard(dashboards, url)",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.launchpad.dashboard.objects.currentLastModified": {
+      "binding": {
+        "config": {
+          "parameters": {
+            "id": "{this.custom.launchpad.dashboard.objects.current.id}"
+          },
+          "polling": {
+            "enabled": true,
+            "rate": "30"
+          },
+          "queryPath": "Launchpad/Dashboard/Last Modified"
+        },
+        "type": "query"
+      }
+    },
+    "custom.launchpad.dashboard.options.isDesigner": {
+      "binding": {
+        "config": {
+          "expression": "{this.props.device.type} = 'designer'"
+        },
+        "type": "expr"
+      }
+    },
+    "custom.launchpad.dashboard.options.username": {
+      "binding": {
+        "config": {
+          "expression": "if({this.custom.launchpad.dashboard.options.isDesigner}, \r\n{this.custom.launchpad.dashboard.options.overrideUsername},\r\n{this.props.auth.user.userName})"
+        },
+        "transforms": [
+          {
+            "code": "\treturn value if value else 'Anonymous'",
+            "type": "script"
+          }
+        ],
+        "type": "expr"
+      }
+    },
+    "props.auth": {
+      "access": "PRIVATE",
+      "persistent": false
+    },
+    "props.device.accelerometer": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.device.identifier": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.device.timezone": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.device.type": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.device.userAgent": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.gateway": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.geolocation.data": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.geolocation.permissionGranted": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.host": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.id": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.lastActivity": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.offline.capable": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.offline.enabled": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.offline.lastSynced": {
+      "access": "SYSTEM",
+      "persistent": false
+    }
+  },
+  "props": {
+    "address": "127.0.0.1",
+    "appBar": {
+      "togglePosition": "hidden"
+    },
+    "device": {},
+    "geolocation": {},
+    "locale": "en-AU",
+    "offline": {},
+    "theme": "dark-cool",
+    "timeZoneId": ""
+  }
+}

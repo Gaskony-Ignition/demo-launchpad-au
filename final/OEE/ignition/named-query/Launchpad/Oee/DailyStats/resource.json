@@ -1,0 +1,59 @@
+{
+  "scope": "DG",
+  "version": 2,
+  "restricted": false,
+  "overridable": true,
+  "files": [
+    "query.sql"
+  ],
+  "attributes": {
+    "useMaxReturnSize": false,
+    "autoBatchEnabled": false,
+    "fallbackValue": "",
+    "maxReturnSize": 100,
+    "cacheUnit": "SEC",
+    "type": "Query",
+    "enabled": true,
+    "cacheAmount": 1,
+    "cacheEnabled": false,
+    "database": "OEE",
+    "fallbackEnabled": false,
+    "permissions": [
+      {
+        "zone": "",
+        "role": ""
+      }
+    ],
+    "lastModification": {
+      "actor": "external",
+      "timestamp": "2026-08-07T03:21:40Z"
+    },
+    "parameters": [
+      {
+        "type": "Database",
+        "identifier": "database",
+        "sqlType": 7
+      },
+      {
+        "type": "Parameter",
+        "identifier": "line_name",
+        "sqlType": 7
+      },
+      {
+        "type": "Parameter",
+        "identifier": "stop_time",
+        "sqlType": 8
+      },
+      {
+        "type": "Parameter",
+        "identifier": "start_time",
+        "sqlType": 8
+      },
+      {
+        "type": "Parameter",
+        "identifier": "tag_folder",
+        "sqlType": 7
+      }
+    ]
+  }
+}

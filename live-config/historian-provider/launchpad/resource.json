@@ -1,0 +1,18 @@
+{
+  "scope": "A",
+  "description": "History for the Launchpad example tags",
+  "version": 1,
+  "restricted": false,
+  "overridable": true,
+  "files": [
+    "config.json"
+  ],
+  "attributes": {
+    "uuid": "43660dfe-b3aa-49ca-b29f-3a82211b844d",
+    "enabled": true,
+    "lastModification": {
+      "actor": "external",
+      "timestamp": "2026-08-07T03:21:40Z"
+    }
+  }
+}

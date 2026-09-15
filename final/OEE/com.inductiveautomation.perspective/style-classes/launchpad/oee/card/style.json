@@ -1,0 +1,13 @@
+{
+  "base": {
+    "style": {
+      "backgroundColor": "var(--oee-card)",
+      "borderTopLeftRadius": "8px",
+      "borderTopRightRadius": "8px",
+      "borderBottomLeftRadius": "8px",
+      "borderBottomRightRadius": "8px",
+      "margin": "12px",
+      "padding": "14px"
+    }
+  }
+}

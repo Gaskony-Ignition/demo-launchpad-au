@@ -1,0 +1,466 @@
+{
+  "custom": {
+    "instances": [
+      {
+        "path": "[Launchpad]KPI/Lines/Line1/OilPressure"
+      },
+      {
+        "path": "[Launchpad]KPI/Lines/Line1/ProductionRate"
+      },
+      {
+        "path": "[Launchpad]KPI/Lines/Line1/CoilTemperature"
+      },
+      {
+        "path": "[Launchpad]KPI/Lines/Line1/BatteryCapacity"
+      },
+      {
+        "path": "[Launchpad]KPI/Lines/Line1/ReserveOilPressure"
+      },
+      {
+        "path": "[Launchpad]KPI/Lines/Line1/Reserve2Pressure"
+      }
+    ],
+    "linePath": "[Launchpad]KPI/Lines/Line1/",
+    "tags": [
+      "OilPressure",
+      "ProductionRate",
+      "CoilTemperature",
+      "BatteryCapacity",
+      "ReserveOilPressure",
+      "Reserve2Pressure"
+    ]
+  },
+  "params": {},
+  "propConfig": {
+    "custom.instances": {
+      "binding": {
+        "config": {
+          "struct": {
+            "linePath": "{view.custom.linePath}",
+            "tags": "{view.custom.tags}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\treturn [{'path':'%s%s' % (value.linePath, t)} for t in value.tags]",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.linePath": {
+      "persistent": true
+    },
+    "custom.tags": {
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 476,
+      "width": 880
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Label"
+        },
+        "position": {
+          "basis": "32px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "launchpad/kpi/text/header",
+            "margin": 8
+          },
+          "text": "Object KPIs"
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Dropdown"
+        },
+        "position": {
+          "basis": "32px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.value": {
+            "binding": {
+              "config": {
+                "bidirectional": true,
+                "path": "view.custom.linePath"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "dropdownOptionStyle": {
+            "borderBottomLeftRadius": 0,
+            "borderBottomRightRadius": 0,
+            "borderTopLeftRadius": 0,
+            "borderTopRightRadius": 0,
+            "classes": "launchpad/kpi/card",
+            "margin": 0
+          },
+          "options": [
+            {
+              "label": "Line 1",
+              "value": "[Launchpad]KPI/Lines/Line1/"
+            },
+            {
+              "label": "Line 2",
+              "value": "[Launchpad]KPI/Lines/Line2/"
+            },
+            {
+              "label": "Line 3",
+              "value": "[Launchpad]KPI/Lines/Line3/"
+            },
+            {
+              "label": "Line 4",
+              "value": "[Launchpad]KPI/Lines/Line4/"
+            },
+            {
+              "label": "Line 5",
+              "value": "[Launchpad]KPI/Lines/Line5/"
+            },
+            {
+              "label": "Line 6",
+              "value": "[Launchpad]KPI/Lines/Line6/"
+            },
+            {
+              "label": "Line 7",
+              "value": "[Launchpad]KPI/Lines/Line7/"
+            }
+          ],
+          "style": {
+            "classes": "launchpad/kpi/card",
+            "margin": 6,
+            "marginBottom": 12,
+            "marginTop": 12,
+            "padding": 0,
+            "paddingLeft": 16,
+            "paddingRight": 10,
+            "width": "200px"
+          }
+        },
+        "type": "ia.input.dropdown"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "ValueUnitLabel1"
+                },
+                "position": {
+                  "basis": "320px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.params.path": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.instances[0].path"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.style": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.params.path"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "path": "Launchpad/Kpi/Components/ValueUnitLabel"
+                },
+                "type": "ia.display.view"
+              },
+              {
+                "meta": {
+                  "name": "ValueUnitLabel2"
+                },
+                "position": {
+                  "basis": "320px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.params.path": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.instances[1].path"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.style": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.params.path"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "path": "Launchpad/Kpi/Components/ValueUnitLabel"
+                },
+                "type": "ia.display.view"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer1"
+            },
+            "position": {
+              "basis": "114px",
+              "grow": 1,
+              "shrink": 1
+            },
+            "type": "ia.container.flex",
+            "props": {
+              "style": {
+                "minHeight": 114
+              }
+            }
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "ValueUnitLabel1"
+                },
+                "position": {
+                  "basis": "320px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.params.path": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.instances[2].path"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.style": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.params.path"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "path": "Launchpad/Kpi/Components/ValueUnitLabel"
+                },
+                "type": "ia.display.view"
+              },
+              {
+                "meta": {
+                  "name": "ValueUnitLabel2"
+                },
+                "position": {
+                  "basis": "320px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.params.path": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.instances[3].path"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.style": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.params.path"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "path": "Launchpad/Kpi/Components/ValueUnitLabel"
+                },
+                "type": "ia.display.view"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer2"
+            },
+            "position": {
+              "basis": "114px",
+              "grow": 1,
+              "shrink": 1
+            },
+            "type": "ia.container.flex",
+            "props": {
+              "style": {
+                "minHeight": 114
+              }
+            }
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "ValueUnitLabel1"
+                },
+                "position": {
+                  "basis": "320px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.params.path": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.instances[4].path"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.style": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.params.path"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "path": "Launchpad/Kpi/Components/ValueUnitLabel"
+                },
+                "type": "ia.display.view"
+              },
+              {
+                "meta": {
+                  "name": "ValueUnitLabel2"
+                },
+                "position": {
+                  "basis": "320px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.params.path": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.instances[5].path"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.style": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.params.path"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "path": "Launchpad/Kpi/Components/ValueUnitLabel"
+                },
+                "type": "ia.display.view"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer3"
+            },
+            "position": {
+              "basis": "114px",
+              "grow": 1,
+              "shrink": 1
+            },
+            "type": "ia.container.flex",
+            "props": {
+              "style": {
+                "minHeight": 114
+              }
+            }
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer"
+        },
+        "position": {
+          "basis": "342px",
+          "grow": 1,
+          "shrink": 1
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "overflow": "auto",
+            "minHeight": 150
+          }
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "justify": "space-between",
+      "style": {
+        "margin": 12
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

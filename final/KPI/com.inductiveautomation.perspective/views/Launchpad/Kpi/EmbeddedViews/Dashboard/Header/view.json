@@ -1,0 +1,327 @@
+{
+  "custom": {},
+  "params": {},
+  "propConfig": {
+    "params.key": {
+      "paramDirection": "input"
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 64
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Icon"
+            },
+            "position": {
+              "basis": "24px"
+            },
+            "propConfig": {
+              "position.display": {
+                "binding": {
+                  "config": {
+                    "path": "session.custom.launchpad.dashboard.objects.current.icon"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tif value:\n\t\treturn True\n\telse:\n\t\treturn False",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.path": {
+                "binding": {
+                  "config": {
+                    "path": "session.custom.launchpad.dashboard.objects.current.icon"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\treturn \"\" if value \u003d\u003d None else \"material/%s\" % value",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "launchpad/kpi/dashboard/header/icon",
+                "width": "24px"
+              }
+            },
+            "type": "ia.display.icon"
+          },
+          {
+            "events": {
+              "component": {
+                "onActionPerformed": {
+                  "config": {
+                    "script": "\toptions \u003d self.props.options\n\tselectedValue \u003d self.props.value\n\t\n\tfor option in options:\n\t\tif option.get(\u0027value\u0027) \u003d\u003d selectedValue:\n\t\t\tdashboardUrl \u003d option.get(\u0027url\u0027)\n\t\t\tbreak\n\t\t\t\n\tsystem.perspective.navigate(dashboardUrl)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Dropdown"
+            },
+            "position": {
+              "basis": "190px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.options": {
+                "binding": {
+                  "config": {
+                    "path": "session.custom.launchpad.dashboard.dashboards"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\treturn launchpad.dashboard.getDropdownOptions(value)",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.value": {
+                "binding": {
+                  "config": {
+                    "path": "session.custom.launchpad.dashboard.objects.current.name"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "placeholder": {
+                "text": "Select a dashboard"
+              },
+              "search": {
+                "enabled": false
+              },
+              "style": {
+                "classes": "launchpad/kpi/dashboard/header/dropdown",
+                "height": "34px",
+                "width": "190px"
+              }
+            },
+            "type": "ia.input.dropdown"
+          },
+          {
+            "events": {
+              "component": {
+                "onActionPerformed": {
+                  "config": {
+                    "script": "\tlaunchpad.dashboard.refresh(self)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Initiate"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.display": {
+                "binding": {
+                  "config": {
+                    "expression": "isnull({session.custom.launchpad.dashboard.objects.current.name})"
+                  },
+                  "type": "expr"
+                }
+              }
+            },
+            "props": {
+              "primary": false,
+              "text": "Initiate Dashboard"
+            },
+            "type": "ia.input.button"
+          }
+        ],
+        "meta": {
+          "name": "DropdownAndIcon"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "alignItems": "center",
+          "style": {
+            "gap": "15px"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\tlaunchpad.dashboard.editDashboard(self, False)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Edit",
+              "tooltip": {
+                "enabled": true,
+                "location": "bottom",
+                "text": "Edit current dashboard"
+              }
+            },
+            "position": {
+              "basis": "34px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.display": {
+                "binding": {
+                  "config": {
+                    "path": "session.custom.launchpad.dashboard.objects.current.allow_edit"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\treturn False if value \u003d\u003d None else value",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "path": "material/edit",
+              "style": {
+                "classes": "launchpad/kpi/dashboard/header/icon launchpad/kpi/dashboard/header/button",
+                "width": "34px"
+              }
+            },
+            "type": "ia.display.icon"
+          },
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\tlaunchpad.dashboard.editDashboard(self)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Add",
+              "tooltip": {
+                "enabled": true,
+                "location": "bottom",
+                "text": "Add new dashboard"
+              }
+            },
+            "position": {
+              "basis": "34px",
+              "shrink": 0
+            },
+            "props": {
+              "path": "material/add",
+              "style": {
+                "classes": "launchpad/kpi/dashboard/header/icon launchpad/kpi/dashboard/header/button",
+                "width": "34px"
+              }
+            },
+            "type": "ia.display.icon"
+          },
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\tlaunchpad.dashboard.refresh(self)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Refresh",
+              "tooltip": {
+                "enabled": true,
+                "location": "bottom",
+                "text": "Refresh dashboards"
+              }
+            },
+            "position": {
+              "basis": "34px",
+              "shrink": 0
+            },
+            "props": {
+              "path": "material/refresh",
+              "style": {
+                "classes": "launchpad/kpi/dashboard/header/icon launchpad/kpi/dashboard/header/button",
+                "width": "34px"
+              }
+            },
+            "type": "ia.display.icon"
+          }
+        ],
+        "meta": {
+          "name": "Actions"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "propConfig": {
+          "position.display": {
+            "binding": {
+              "config": {
+                "expression": "{page.props.dimensions.viewport.width} \u003e\u003d {session.custom.launchpad.dashboard.mobileBreakpoint}\r\n|| {session.props.device.userAgent}\u003d\u0027\u003cdesigner\u003e\u0027"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "props": {
+          "alignItems": "center",
+          "style": {
+            "gap": "15px"
+          }
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "justify": "space-between",
+      "style": {
+        "classes": "launchpad/kpi/dashboard/header/header",
+        "paddingLeft": "15px",
+        "paddingRight": "15px"
+      },
+      "wrap": "wrap"
+    },
+    "type": "ia.container.flex"
+  }
+}

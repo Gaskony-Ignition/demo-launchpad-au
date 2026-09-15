@@ -1,0 +1,17 @@
+{
+  "scope": "A",
+  "version": 1,
+  "restricted": false,
+  "overridable": true,
+  "files": [
+    "handleScheduleEvent.py"
+  ],
+  "attributes": {
+    "cronExpression": "0 0 * * *",
+    "lastModification": {
+      "actor": "external",
+      "timestamp": "2026-08-07T03:21:40Z"
+    },
+    "enabled": true
+  }
+}

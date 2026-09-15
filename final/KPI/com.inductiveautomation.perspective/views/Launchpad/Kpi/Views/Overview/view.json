@@ -1,0 +1,472 @@
+{
+  "custom": {},
+  "params": {},
+  "props": {
+    "defaultSize": {
+      "height": 900,
+      "width": 1726
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Icon"
+                },
+                "position": {
+                  "basis": "30px"
+                },
+                "props": {
+                  "path": "material/location_on"
+                },
+                "type": "ia.display.icon"
+              },
+              {
+                "meta": {
+                  "name": "Location"
+                },
+                "position": {
+                  "grow": 1
+                },
+                "props": {
+                  "style": {
+                    "classes": "launchpad/kpi/text/header",
+                    "color": "--kpi-highlight",
+                    "margin-left": 16
+                  },
+                  "text": "Australia"
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "Location"
+            },
+            "position": {
+              "basis": "40px"
+            },
+            "props": {
+              "justify": "space-around",
+              "style": {
+                "background": "none",
+                "classes": "launchpad/kpi/card",
+                "padding": 0
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "meta": {
+              "name": "Notepad"
+            },
+            "position": {
+              "basis": "132px",
+              "grow": 0,
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.style": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.params.path"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "params": {
+                "path": "[Launchpad]KPI/Notepad"
+              },
+              "path": "Launchpad/Kpi/Components/Notepad"
+            },
+            "type": "ia.display.view"
+          },
+          {
+            "meta": {
+              "name": "DailyProduction"
+            },
+            "position": {
+              "basis": "152px",
+              "grow": 0,
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.style": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.params.path"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "params": {
+                "path": "[Launchpad]KPI/DailyProduction"
+              },
+              "path": "Launchpad/Kpi/Components/DailyProduction"
+            },
+            "type": "ia.display.view"
+          },
+          {
+            "meta": {
+              "name": "LineKpi"
+            },
+            "position": {
+              "basis": "464px",
+              "grow": 1,
+              "shrink": 1
+            },
+            "props": {
+              "path": "Launchpad/Kpi/Components/LineKpi",
+              "style": {
+                "minHeight": 238
+              }
+            },
+            "type": "ia.display.view"
+          }
+        ],
+        "meta": {
+          "name": "Left"
+        },
+        "position": {
+          "basis": "300px",
+          "grow": 1
+        },
+        "props": {
+          "direction": "column",
+          "justify": "space-between"
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "BarChart"
+            },
+            "position": {
+              "basis": "380px",
+              "grow": 1,
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.style": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.params.path1"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "params": {
+                "path1": "[Launchpad]KPI/DailyProduction",
+                "path2": "[Launchpad]KPI/DailyProductionExpected"
+              },
+              "path": "Launchpad/Kpi/Components/BarChart"
+            },
+            "type": "ia.display.view"
+          },
+          {
+            "meta": {
+              "name": "FlexRepeater"
+            },
+            "position": {
+              "shrink": 1
+            },
+            "propConfig": {
+              "props.instances[0].instanceStyle": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.instances[0].path"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.instances[1].instanceStyle": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.instances[1].path"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.instances[2].instanceStyle": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.instances[2].path"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.instances[3].instanceStyle": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.instances[3].path"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.instances[4].instanceStyle": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.instances[4].path"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.instances[5].instanceStyle": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.instances[5].path"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.instances[6].instanceStyle": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.instances[6].path"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.instances[7].instanceStyle": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.instances[7].path"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "alignContent": "flex-start",
+              "alignItems": "flex-start",
+              "elementPosition": {
+                "basis": "155px"
+              },
+              "elementStyle": {
+                "height": 112
+              },
+              "instances": [
+                {
+                  "path": "[Launchpad]KPI/AmbientTemperature"
+                },
+                {
+                  "path": "[Launchpad]KPI/AmbientHumidity"
+                },
+                {
+                  "path": "[Launchpad]KPI/WorkInProcess"
+                },
+                {
+                  "path": "[Launchpad]KPI/Buffer"
+                },
+                {
+                  "path": "[Launchpad]KPI/CycleTime"
+                },
+                {
+                  "path": "[Launchpad]KPI/SetupTime"
+                },
+                {
+                  "path": "[Launchpad]KPI/AirPressure"
+                },
+                {
+                  "path": "[Launchpad]KPI/EnergyYesterday"
+                }
+              ],
+              "justify": "flex-start",
+              "path": "Launchpad/Kpi/Components/Sparkline",
+              "style": {
+                "margin": 12,
+                "overflow": "auto",
+                "minHeight": 232
+              },
+              "useDefaultViewHeight": false,
+              "useDefaultViewWidth": false,
+              "wrap": "wrap"
+            },
+            "type": "ia.display.flex-repeater"
+          }
+        ],
+        "meta": {
+          "name": "Middle"
+        },
+        "position": {
+          "basis": "750px",
+          "grow": 1
+        },
+        "props": {
+          "direction": "column"
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "LineChart"
+            },
+            "position": {
+              "basis": "236px",
+              "grow": 1,
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.style": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.params.path1"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "params": {
+                "path1": "[Launchpad]KPI/DailyProduction",
+                "path2": "[Launchpad]KPI/DailyProductionExpected",
+                "title": "Hourly Case Analysis"
+              },
+              "path": "Launchpad/Kpi/Components/LineChart"
+            },
+            "type": "ia.display.view"
+          },
+          {
+            "meta": {
+              "name": "ProgressKpi"
+            },
+            "position": {
+              "basis": "400px",
+              "shrink": 1
+            },
+            "props": {
+              "params": {
+                "folderPath": "[Launchpad]KPI/Lines"
+              },
+              "path": "Launchpad/Kpi/Components/ProgressKpi",
+              "style": {
+                "minHeight": 284
+              }
+            },
+            "type": "ia.display.view"
+          }
+        ],
+        "meta": {
+          "name": "Right"
+        },
+        "position": {
+          "basis": "404px",
+          "grow": 1
+        },
+        "props": {
+          "direction": "column"
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "events": {
+      "system": {
+        "onStartup": {
+          "config": {
+            "script": "\tsystem.perspective.sendMessage(\"navigation\", \"Overview\")"
+          },
+          "scope": "G",
+          "type": "script"
+        }
+      }
+    },
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "style": {
+        "backgroundClip": "border-box",
+        "classes": "launchpad/kpi/root",
+        "margin": 0,
+        "padding": 18
+      },
+      "wrap": "nowrap"
+    },
+    "type": "ia.container.flex"
+  }
+}

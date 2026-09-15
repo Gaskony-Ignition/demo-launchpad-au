@@ -1,0 +1,13 @@
+{
+  "base": {
+    "style": {
+      "backgroundColor": "var(--oee-card)",
+      "borderTopLeftRadius": "6px",
+      "borderTopRightRadius": "6px",
+      "borderBottomLeftRadius": "6px",
+      "borderBottomRightRadius": "6px",
+      "color": "var(--oee-ink-strong)",
+      "fontSize": "14px"
+    }
+  }
+}

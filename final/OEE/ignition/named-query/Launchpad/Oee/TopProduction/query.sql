@@ -1,0 +1,2 @@
+SELECT hour_timestamp, hour_production_count, target_rate*60 as "target_hour" FROM ex_launchpad_oee_hour 
+WHERE line_name = :lineName and hour_timestamp BETWEEN :startTime and :endTime order by (target_rate*60.0 - hour_production_count)/(target_rate*60.0) ASC

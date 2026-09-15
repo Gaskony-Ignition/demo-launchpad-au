@@ -1,0 +1,312 @@
+{
+  "custom": {},
+  "params": {
+    "add": false
+  },
+  "propConfig": {
+    "params.add": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.feature": {
+      "paramDirection": "input"
+    },
+    "params.tier1": {
+      "paramDirection": "input"
+    },
+    "params.tier2": {
+      "paramDirection": "input"
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "width": 860
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Editing"
+                },
+                "position": {
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "classes": "launchpad/kpi/dashboard/secondary"
+                  },
+                  "text": "Editing:"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "EditDashName"
+                },
+                "position": {
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "session.custom.launchpad.dashboard.objects.edit"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\teditName = value.get('name')\n\t\n\treturn '' if editName == None else editName",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "launchpad/kpi/dashboard/primary"
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "EditDash"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "gap": "5px"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "events": {
+              "component": {
+                "onActionPerformed": {
+                  "config": {
+                    "script": "\t# Get the current dash settings to pass into dash details side panel,\n\t# so that if user clicks Cancel button after testing out different\n\t# settings then we can set the dash settings back.\n\tcurrEdit = {key: value for key, value in self.session.custom.launchpad.dashboard.objects.edit.iteritems() if key != 'widgets'}\t\n\tsystem.perspective.openDock('editDashDetails',params={'currEdit':currEdit})"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "DashDetails"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "image": {
+                "icon": {
+                  "path": "material/settings"
+                }
+              },
+              "style": {
+                "border-width": "1px",
+                "classes": "launchpad/kpi/dashboard/secondary-button",
+                "margin": "0px"
+              },
+              "text": "Edit Details"
+            },
+            "type": "ia.input.button"
+          }
+        ],
+        "meta": {
+          "name": "TitleAndDetails"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "gap": "35px",
+            "padding": "10px"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "Widgets"
+        },
+        "position": {
+          "grow": 1
+        },
+        "props": {
+          "path": "Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Widgets",
+          "style": {
+            "paddingBottom": "5px",
+            "paddingLeft": "5px",
+            "paddingRight": "5px"
+          }
+        },
+        "type": "ia.display.view"
+      },
+      {
+        "children": [
+          {
+            "events": {
+              "component": {
+                "onActionPerformed": {
+                  "config": {
+                    "script": "\tlaunchpad.dashboard.showConfirmation(\"Are you sure you want to delete this dashboard?\", \"launchpad.dashboard.deleteDashboard\")"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Delete"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.display": {
+                "binding": {
+                  "config": {
+                    "expression": "!{view.params.add}"
+                  },
+                  "type": "expr"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "backgroundColor": "var(--error)",
+                "borderRadius": "10px"
+              },
+              "text": "Delete"
+            },
+            "type": "ia.input.button"
+          },
+          {
+            "children": [
+              {
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "script": "\tlaunchpad.dashboard.back(self)"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Cancel"
+                },
+                "position": {
+                  "basis": "100px",
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "border-width": "1px",
+                    "classes": "launchpad/kpi/header/button-unselected",
+                    "margin": "0px",
+                    "width": "100px"
+                  },
+                  "text": "Cancel"
+                },
+                "type": "ia.input.button"
+              },
+              {
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "script": "\tlaunchpad.dashboard.syncDashboardDB(self)"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Save"
+                },
+                "position": {
+                  "basis": "100px",
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "border-width": "1px",
+                    "classes": "launchpad/kpi/header/button-selected",
+                    "margin": "0px",
+                    "width": "100px"
+                  },
+                  "text": "Save"
+                },
+                "type": "ia.input.button"
+              }
+            ],
+            "meta": {
+              "name": "SaveAndCancel"
+            },
+            "position": {
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "gap": "30px"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "Actions"
+        },
+        "position": {
+          "basis": "58px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.justify": {
+            "binding": {
+              "config": {
+                "expression": "if({view.params.add}, 'flex-end', 'space-between')"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "borderTopColor": "var(--neutral-30)",
+            "borderTopStyle": "solid",
+            "borderTopWidth": "1px",
+            "padding": "10px"
+          }
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": ""
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

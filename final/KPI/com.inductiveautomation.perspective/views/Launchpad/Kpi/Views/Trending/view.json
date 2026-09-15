@@ -1,0 +1,323 @@
+{
+  "custom": {
+    "gatewayName": ""
+  },
+  "params": {},
+  "props": {
+    "defaultSize": {
+      "width": 1200
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "PowerChart"
+        },
+        "position": {
+          "grow": 1
+        },
+        "props": {
+          "config": {
+            "measureOfTime": "minutes",
+            "rangeEndDate": {
+              "$": [
+                "ts",
+                0,
+                1777955065364
+              ],
+              "$ts": 1777955046988
+            },
+            "rangeStartDate": {
+              "$": [
+                "ts",
+                0,
+                1777955065363
+              ],
+              "$ts": 1777949664988
+            },
+            "tagBrowserStartPath": "histprov:launchpad:/drv:gateway:launchpad:/tag:kpi",
+            "unitOfTime": 90,
+            "visibility": {
+              "showTagBrowser": true
+            },
+            "dateFormat": "DD/MM/YYYY",
+            "timeFormat": "HH:mm:ss"
+          },
+          "dataColumns": {
+            "penControl": {
+              "axis": false,
+              "plot": false
+            }
+          },
+          "interaction": {
+            "chartZoomLevel": 1,
+            "mode": "xTrace",
+            "rangeZoomLevel": 1,
+            "xTrace": {
+              "values": [
+                -0.10904886659234485
+              ],
+              "infoBox": {
+                "dateFormat": "DD/MM/YYYY",
+                "timeFormat": "HH:mm:ss"
+              }
+            },
+            "annotation": {
+              "infoBox": {
+                "dateFormat": "DD/MM/YYYY",
+                "timeFormat": "HH:mm:ss"
+              }
+            }
+          },
+          "pens": [
+            {
+              "axis": "",
+              "data": {
+                "aggregateMode": "default",
+                "source": "histprov:launchpad:/drv:gateway:launchpad:/tag:kpi/dailyproduction"
+              },
+              "display": {
+                "breakLine": true,
+                "interpolation": "curveLinear",
+                "radius": 3,
+                "styles": {
+                  "highlighted": {
+                    "fill": {
+                      "color": "#63BEA2",
+                      "opacity": 1
+                    },
+                    "stroke": {
+                      "color": "#63BEA2",
+                      "dashArray": 0,
+                      "opacity": 1,
+                      "width": 1
+                    }
+                  },
+                  "muted": {
+                    "fill": {
+                      "color": "#63BEA2",
+                      "opacity": 0.4
+                    },
+                    "stroke": {
+                      "color": "#63BEA2",
+                      "dashArray": 0,
+                      "opacity": 0.4,
+                      "width": 1
+                    }
+                  },
+                  "normal": {
+                    "fill": {
+                      "color": "#63BEA2",
+                      "opacity": 0.8
+                    },
+                    "stroke": {
+                      "color": "#63BEA2",
+                      "dashArray": 0,
+                      "opacity": 0.8,
+                      "width": 1
+                    }
+                  },
+                  "selected": {
+                    "fill": {
+                      "color": "#63BEA2",
+                      "opacity": 1
+                    },
+                    "stroke": {
+                      "color": "#63BEA2",
+                      "dashArray": 0,
+                      "opacity": 1,
+                      "width": 1
+                    }
+                  }
+                },
+                "type": "line"
+              },
+              "enabled": true,
+              "name": "Daily Production",
+              "plot": 0,
+              "selectable": true,
+              "visible": true
+            },
+            {
+              "axis": "",
+              "data": {
+                "aggregateMode": "default",
+                "source": "histprov:launchpad:/drv:gateway:launchpad:/tag:kpi/dailyproductionexpected"
+              },
+              "display": {
+                "breakLine": true,
+                "interpolation": "curveLinear",
+                "radius": 3,
+                "styles": {
+                  "highlighted": {
+                    "fill": {
+                      "color": "#FC8D62",
+                      "opacity": 1
+                    },
+                    "stroke": {
+                      "color": "#fc8d62",
+                      "dashArray": 0,
+                      "opacity": 1,
+                      "width": 1
+                    }
+                  },
+                  "muted": {
+                    "fill": {
+                      "color": "#FC8D62",
+                      "opacity": 0.4
+                    },
+                    "stroke": {
+                      "color": "#fc8d62",
+                      "dashArray": 0,
+                      "opacity": 0.4,
+                      "width": 1
+                    }
+                  },
+                  "normal": {
+                    "fill": {
+                      "color": "#FC8D62",
+                      "opacity": 0.8
+                    },
+                    "stroke": {
+                      "color": "#fc8d62",
+                      "dashArray": 0,
+                      "opacity": 0.8,
+                      "width": 1
+                    }
+                  },
+                  "selected": {
+                    "fill": {
+                      "color": "#FC8D62",
+                      "opacity": 1
+                    },
+                    "stroke": {
+                      "color": "#fc8d62",
+                      "dashArray": 0,
+                      "opacity": 1,
+                      "width": 1
+                    }
+                  }
+                },
+                "type": "line"
+              },
+              "enabled": true,
+              "name": "Daily Production Expected",
+              "plot": 0,
+              "selectable": true,
+              "visible": true
+            }
+          ],
+          "plots": [
+            {
+              "color": "transparent",
+              "markers": [],
+              "relativeWeight": 1,
+              "style": {
+                "classes": ""
+              }
+            }
+          ],
+          "style": {
+            "classes": "launchpad/kpi/root",
+            "overflow": "hidden"
+          },
+          "timeAxis": {
+            "tick": {
+              "label": {
+                "format": "Auto"
+              }
+            }
+          }
+        },
+        "type": "ia.chart.powerchart",
+        "propConfig": {
+          "props.pens[0].data.source": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "gw": "{view.custom.gatewayName}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\treturn \"histprov:launchpad:/drv:%s:launchpad:/tag:kpi/dailyproduction\" % value.gw",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          },
+          "props.pens[1].data.source": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "gw": "{view.custom.gatewayName}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\treturn \"histprov:launchpad:/drv:%s:launchpad:/tag:kpi/dailyproductionexpected\" % value.gw",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          },
+          "props.config.tagBrowserStartPath": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "gw": "{view.custom.gatewayName}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\treturn \"histprov:launchpad:/drv:%s:launchpad:/tag:kpi\" % value.gw",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          }
+        }
+      }
+    ],
+    "events": {
+      "system": {
+        "onStartup": {
+          "config": {
+            "script": "\tsystem.perspective.sendMessage(\"navigation\", \"Trending\")\t"
+          },
+          "scope": "G",
+          "type": "script"
+        }
+      }
+    },
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "justify": "center",
+      "style": {
+        "classes": "launchpad/kpi/root"
+      }
+    },
+    "type": "ia.container.flex"
+  },
+  "propConfig": {
+    "custom.gatewayName": {
+      "binding": {
+        "config": {
+          "expression": "lower({[System]Gateway/SystemName})"
+        },
+        "type": "expr"
+      },
+      "persistent": true
+    }
+  }
+}

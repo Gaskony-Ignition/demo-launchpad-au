@@ -1,0 +1,89 @@
+{
+  "scope": "DG",
+  "version": 2,
+  "restricted": false,
+  "overridable": true,
+  "files": [
+    "query.sql"
+  ],
+  "attributes": {
+    "useMaxReturnSize": false,
+    "autoBatchEnabled": false,
+    "fallbackValue": "",
+    "maxReturnSize": 100,
+    "cacheUnit": "SEC",
+    "type": "UpdateQuery",
+    "enabled": true,
+    "cacheAmount": 1,
+    "cacheEnabled": false,
+    "database": "KPI",
+    "fallbackEnabled": false,
+    "permissions": [
+      {
+        "zone": "",
+        "role": ""
+      }
+    ],
+    "lastModification": {
+      "actor": "external",
+      "timestamp": "2026-08-07T03:21:40Z"
+    },
+    "parameters": [
+      {
+        "type": "Parameter",
+        "identifier": "icon",
+        "sqlType": 7
+      },
+      {
+        "type": "Parameter",
+        "identifier": "name",
+        "sqlType": 7
+      },
+      {
+        "type": "Parameter",
+        "identifier": "url",
+        "sqlType": 7
+      },
+      {
+        "type": "Parameter",
+        "identifier": "username",
+        "sqlType": 7
+      },
+      {
+        "type": "Parameter",
+        "identifier": "id",
+        "sqlType": 2
+      },
+      {
+        "type": "Parameter",
+        "identifier": "grid",
+        "sqlType": 7
+      },
+      {
+        "type": "Parameter",
+        "identifier": "cell_size",
+        "sqlType": 2
+      },
+      {
+        "type": "Parameter",
+        "identifier": "grid_rows",
+        "sqlType": 2
+      },
+      {
+        "type": "Parameter",
+        "identifier": "grid_cols",
+        "sqlType": 2
+      },
+      {
+        "type": "Parameter",
+        "identifier": "grid_row_gutter_size",
+        "sqlType": 2
+      },
+      {
+        "type": "Parameter",
+        "identifier": "grid_col_gutter_size",
+        "sqlType": 2
+      }
+    ]
+  }
+}

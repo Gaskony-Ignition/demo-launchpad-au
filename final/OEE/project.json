@@ -1,0 +1,7 @@
+{
+  "title": "Launchpad OEE (AU) (dev)",
+  "description": "Australian port of the Inductive Automation Launchpad OEE example. Seven simulated lines with OEE per hour, shift and day, metric units, and a 3 x 8h roster (22-06, 06-14, 14-22). Tags live flat under [Launchpad]OEE/. Requires the gateway scripting project to be set to this project.",
+  "enabled": true,
+  "inheritable": false,
+  "parent": ""
+}

@@ -1,0 +1,71 @@
+{
+  "custom": {},
+  "params": {},
+  "props": {},
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "TagBrowseTree"
+        },
+        "position": {
+          "basis": "400px"
+        },
+        "type": "ia.display.tag-browse-tree"
+      },
+      {
+        "events": {
+          "component": {
+            "onActionPerformed": {
+              "config": {
+                "script": "\ttagProvider \u003d \"[Launchpad]\"\n\tresults \u003d system.tag.browse(tagProvider, {\"tagType\":\"AtomicTag\", \"valueSource\":\"opc\", \"recursive\":True}).results\n\tdata \u003d []\n\tfor result in results:\n\t\tpathList \u003d str(result[\u0027fullPath\u0027]).split(\u0027/\u0027)\n\t\ttagName \u003d pathList[-1]\n\t\tif \u0027Line\u0027 in pathList[-2]:\n\t\t\tline \u003d int(pathList[-2].replace(\u0027Line\u0027,\u0027\u0027))\n\t\telse:\n\t\t\tline \u003d 0\n\t\tperiod \u003d 3100.0-line*100\n\t\tif tagName \u003d\u003d \u0027BatteryCapacity\u0027: function \u003d \u0027cosine(%s, %s, %s, true)\u0027 % (18+line, 100, period)\n\t\telif tagName \u003d\u003d \u0027CoilTemperature\u0027: function \u003d \u0027cosine(%s, %s, %s, true)\u0027 % (90+line, 147-line, period)\n\t\telif tagName \u003d\u003d \u0027OilPressure\u0027: function \u003d \u0027random(%s, %s, true)\u0027 % (20+line, 21+line)\t\n\t\telif tagName \u003d\u003d \u0027ProductionRate\u0027: function \u003d \u0027random(%s, %s, true)\u0027 % (20+line, 21+line)\n\t\telif tagName \u003d\u003d \u0027Reserve2Pressure\u0027: function \u003d \u0027random(%s, %s, true)\u0027 % (30+line, 31+line)\n\t\telif tagName \u003d\u003d \u0027ReserveOilPressure\u0027: function \u003d \u0027random(%s, %s, true)\u0027 % (30+line, 31+line)\n\t\telif tagName \u003d\u003d \u0027ActivePower\u0027: function \u003d \u0027random(%s, %s, true)\u0027 % (3300, 3500)\n\t\t\n\t\telif tagName \u003d\u003d \u0027AirPressure\u0027: function \u003d \u0027random(%s, %s, true)\u0027 % (90, 95)\n\t\telif tagName \u003d\u003d \u0027AmbientHumidity\u0027: function \u003d \u0027random(%s, %s, true)\u0027 % (44.6, 45.5)\n\t\telif tagName \u003d\u003d \u0027AmbientTemperature\u0027: function \u003d \u0027random(%s, %s, true)\u0027 % (72.00, 72.06)\n\t\telif tagName \u003d\u003d \u0027Buffer\u0027: function \u003d \u0027random(%s, %s, true)\u0027 % (80, 100)\n\t\telif tagName \u003d\u003d \u0027CycleTime\u0027: function \u003d \u0027random(%s, %s, true)\u0027 % (2.1, 2.4)\n\t\telif tagName \u003d\u003d \u0027EnergyYesterday\u0027: function \u003d \u0027random(%s, %s, true)\u0027 % (3.796, 3.806)\n\t\telif tagName \u003d\u003d \u0027SetupTime\u0027: function \u003d \u0027random(%s, %s, true)\u0027 % (15.00, 15.06)\n\t\telif tagName \u003d\u003d \u0027WorkInProcess\u0027: function \u003d \u0027random(%s, %s, true)\u0027 % (105, 120)\n\t\t\n\t\telse: function \u003d \u0027random(0, 100, true)\u0027\n\t\t\n\t\tdata.append([0,str(result[\u0027fullPath\u0027]).replace(tagProvider,\u0027\u0027),function,\u0027Double\u0027])\n\theaders \u003d [\u0027Time Interval\u0027, \u0027Browse Path\u0027, \u0027Value Source\u0027, \u0027Data Type\u0027]\n\tdataset \u003d system.dataset.toDataSet(headers, data)\n\t\n\tfilename \u003d \u0027Launchpad-OPC-%s.csv\u0027 % system.date.now()\n\tdata \u003d system.dataset.toCSV(dataset)\n\tsystem.perspective.download(filename, data)"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "ExportPds"
+        },
+        "position": {
+          "basis": "34px"
+        },
+        "props": {
+          "text": "Export PDS"
+        },
+        "type": "ia.input.button"
+      },
+      {
+        "events": {
+          "component": {
+            "onActionPerformed": {
+              "config": {
+                "script": "\ttagProvider \u003d \"[Launchpad]\"\n\tresults \u003d system.tag.browse(tagProvider, {\"tagType\":\"AtomicTag\", \"valueSource\":\"opc\", \"recursive\":True}).results\n\t\n\tfor result in results:\n\t\ttagPath \u003d str(result[\u0027fullPath\u0027])\n\t\topcPath \u003d \u0027ns\u003d1;s\u003d[Launchpad]%s\u0027 % tagPath.replace(tagProvider,\u0027\u0027)\n\t\t\n\t\ttag \u003d system.tag.getConfiguration(tagPath, recursive \u003d False)\n\t\ttag[0][\u0027opcItemPath\u0027] \u003d opcPath\n\t\tbasePath \u003d tagPath[:tagPath.rfind(\u0027/\u0027)]\n\t\tsystem.tag.configure(basePath, tag[0])"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "PointOpc"
+        },
+        "position": {
+          "basis": "34px"
+        },
+        "props": {
+          "text": "Point OPC to PDS"
+        },
+        "type": "ia.input.button"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column"
+    },
+    "type": "ia.container.flex"
+  }
+}

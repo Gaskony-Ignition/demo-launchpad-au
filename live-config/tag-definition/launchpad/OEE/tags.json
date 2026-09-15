@@ -1,0 +1,9 @@
+[
+  {
+    "valueSource": "memory",
+    "dataType": "String",
+    "name": "Notepad",
+    "defaultValue": "write notes here to save them to a tag.",
+    "tagType": "AtomicTag"
+  }
+]

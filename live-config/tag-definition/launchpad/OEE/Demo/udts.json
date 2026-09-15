@@ -1,0 +1,274 @@
+[
+  {
+    "name": "Line 7",
+    "typeId": "OEE/LineConfig",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "name": "Plc",
+        "tagType": "Folder",
+        "tags": [
+          {
+            "valueSource": "memory",
+            "name": "ProductionCounter",
+            "tagType": "AtomicTag",
+            "value": 0
+          },
+          {
+            "valueSource": "memory",
+            "expression": "1",
+            "name": "State",
+            "tagType": "AtomicTag"
+          },
+          {
+            "valueSource": "memory",
+            "enabled": true,
+            "name": "RejectCounter",
+            "tagType": "AtomicTag",
+            "value": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Line 2",
+    "typeId": "OEE/LineConfig",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "name": "Plc",
+        "tagType": "Folder",
+        "tags": [
+          {
+            "valueSource": "memory",
+            "enabled": true,
+            "name": "RejectCounter",
+            "tagType": "AtomicTag",
+            "value": 0
+          },
+          {
+            "valueSource": "memory",
+            "name": "State",
+            "tagType": "AtomicTag"
+          },
+          {
+            "valueSource": "memory",
+            "name": "ProductionCounter",
+            "tagType": "AtomicTag",
+            "value": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Line 5",
+    "typeId": "OEE/LineConfig",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "name": "Plc",
+        "tagType": "Folder",
+        "tags": [
+          {
+            "valueSource": "memory",
+            "expression": "1",
+            "name": "State",
+            "tagType": "AtomicTag"
+          },
+          {
+            "valueSource": "memory",
+            "name": "ProductionCounter",
+            "tagType": "AtomicTag",
+            "value": 0
+          },
+          {
+            "valueSource": "memory",
+            "enabled": true,
+            "name": "RejectCounter",
+            "tagType": "AtomicTag",
+            "value": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Line 4",
+    "typeId": "OEE/LineConfig",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "name": "Plc",
+        "tagType": "Folder",
+        "tags": [
+          {
+            "valueSource": "memory",
+            "enabled": true,
+            "name": "RejectCounter",
+            "tagType": "AtomicTag",
+            "value": 0
+          },
+          {
+            "valueSource": "memory",
+            "name": "ProductionCounter",
+            "tagType": "AtomicTag",
+            "value": 0
+          },
+          {
+            "valueSource": "memory",
+            "expression": "1",
+            "name": "State",
+            "tagType": "AtomicTag"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Line 1",
+    "typeId": "OEE/LineConfig",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "name": "Config",
+        "tagType": "Folder",
+        "tags": [
+          {
+            "tooltip": "slow",
+            "name": "TargetRate",
+            "tagType": "AtomicTag"
+          }
+        ]
+      },
+      {
+        "name": "DayOee",
+        "tagType": "UdtInstance",
+        "tags": [
+          {
+            "expression": "setTime(now(500),0,0,0)",
+            "name": "CurrentInterval",
+            "tagType": "AtomicTag"
+          }
+        ]
+      },
+      {
+        "name": "HourOee",
+        "tagType": "UdtInstance",
+        "tags": [
+          {
+            "formatString": "#,##0.##",
+            "name": "Duration",
+            "tagType": "AtomicTag"
+          }
+        ]
+      },
+      {
+        "name": "Plc",
+        "tagType": "Folder",
+        "tags": [
+          {
+            "valueSource": "memory",
+            "name": "ProductionCounter",
+            "tagType": "AtomicTag",
+            "value": 0
+          },
+          {
+            "valueSource": "memory",
+            "expression": "1",
+            "name": "State",
+            "tagType": "AtomicTag"
+          },
+          {
+            "valueSource": "memory",
+            "enabled": true,
+            "name": "RejectCounter",
+            "tagType": "AtomicTag",
+            "value": 0
+          }
+        ]
+      },
+      {
+        "name": "Schedule",
+        "tagType": "UdtInstance",
+        "tags": [
+          {
+            "name": "2",
+            "tagType": "UdtInstance",
+            "tags": [
+              {
+                "formatString": "#,##0.##",
+                "name": "ShiftSeconds",
+                "tagType": "AtomicTag"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Line 3",
+    "typeId": "OEE/LineConfig",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "name": "Plc",
+        "tagType": "Folder",
+        "tags": [
+          {
+            "valueSource": "memory",
+            "name": "State",
+            "tagType": "AtomicTag"
+          },
+          {
+            "valueSource": "memory",
+            "name": "ProductionCounter",
+            "tagType": "AtomicTag",
+            "value": 0
+          },
+          {
+            "valueSource": "memory",
+            "enabled": true,
+            "name": "RejectCounter",
+            "tagType": "AtomicTag",
+            "value": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Line 6",
+    "typeId": "OEE/LineConfig",
+    "tagType": "UdtInstance",
+    "tags": [
+      {
+        "name": "Plc",
+        "tagType": "Folder",
+        "tags": [
+          {
+            "valueSource": "memory",
+            "expression": "1",
+            "name": "State",
+            "tagType": "AtomicTag"
+          },
+          {
+            "valueSource": "memory",
+            "enabled": true,
+            "name": "RejectCounter",
+            "tagType": "AtomicTag",
+            "value": 0
+          },
+          {
+            "valueSource": "memory",
+            "name": "ProductionCounter",
+            "tagType": "AtomicTag",
+            "value": 0
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,280 @@
+{
+  "custom": {
+    "launchpad": {
+      "oee": {
+        "display": {
+          "customTime": {
+            "start": {
+              "$": [
+                "ts",
+                192,
+                1778208665073
+              ],
+              "$ts": 1778112000000
+            },
+            "stop": {
+              "$": [
+                "ts",
+                192,
+                1778208665073
+              ],
+              "$ts": 1778198399000
+            }
+          },
+          "interval": "Hour",
+          "mode": "Realtime",
+          "rangeDays": {
+            "period": 0,
+            "start": -1,
+            "stop": 0
+          }
+        },
+        "lines": [],
+        "report": {
+          "customTime": {
+            "start": {
+              "$": [
+                "ts",
+                192,
+                1752787578813
+              ],
+              "$ts": 1752649200000
+            },
+            "stop": {
+              "$": [
+                "ts",
+                192,
+                1752787578813
+              ],
+              "$ts": 1752735599000
+            }
+          },
+          "mode": "Summary",
+          "rangeDays": {
+            "period": 0,
+            "start": -1,
+            "stop": 0
+          }
+        },
+        "selectedLine": "Line 1",
+        "target": 0.45
+      }
+    }
+  },
+  "propConfig": {
+    "custom.launchpad.oee.display.rangeDays": {
+      "onChange": {
+        "enabled": null,
+        "script": "\n\tif currentValue.value[\"period\"].value != \"\":\n\t\t# if value in dropdown changes (but not empties, set start/end time to the bound start and end time)\n\t\tself.custom.launchpad.oee.display.customTime.start = system.date.addDays(system.date.midnight(system.date.now()),currentValue.value[\"start\"].value)\n\t\tself.custom.launchpad.oee.display.customTime.stop = system.date.addSeconds(system.date.addDays(system.date.midnight(system.date.now()),currentValue.value[\"stop\"].value),-1)"
+      }
+    },
+    "custom.launchpad.oee.display.startTime": {
+      "binding": {
+        "config": {
+          "struct": {
+            "customTime": "{this.custom.launchpad.oee.display.customTime}",
+            "interval": "{this.custom.launchpad.oee.display.interval}",
+            "mode": "{this.custom.launchpad.oee.display.mode}",
+            "now": "now(60000)",
+            "rangeDays": "{this.custom.launchpad.oee.display.rangeDays}",
+            "shiftStart": "{this.custom.launchpad.oee.selectedLineShiftStart}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tif value.mode == \"Realtime\":\n\t\t# A window anchored to midnight leaves this page empty for the first hours of\n\t\t# every day -- at 00:20 there is not one completed interval to draw, and the\n\t\t# charts, the averages and Top Production all come up blank. Realtime is a\n\t\t# rolling window instead, long enough that each interval has something to plot.\n\t\tif value.interval == \"Day\":\n\t\t\treturn system.date.midnight(system.date.addDays(value.now, -29))\n\t\telif value.interval == \"Shift\":\n\t\t\treturn system.date.addDays(value.now, -7)\n\t\telse:\n\t\t\treturn system.date.addHours(value.now, -24)\n\n\tif value.mode == \"Historical\":\n\t\tif value.rangeDays.period != \"\":\n\t\t\t# if historical, return 12:00:00 AM of whatever day is today + rangeDays.start\n\t\t\treturn system.date.addDays(system.date.midnight(system.date.now()),value.rangeDays.start)\n\t\telse:\n\t\t\t# if historical but custom time\n\t\t\treturn value.customTime.start\n",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.launchpad.oee.display.stopTime": {
+      "binding": {
+        "config": {
+          "struct": {
+            "customTime": "{this.custom.launchpad.oee.display.customTime}",
+            "mode": "{this.custom.launchpad.oee.display.mode}",
+            "now": "now(60000)",
+            "rangeDays": "{this.custom.launchpad.oee.display.rangeDays}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t#//in realtime mode we want to poll the stop time to keep up with the current time \n\t#if({this.custom.launchpad.oee.display.mode} = \"Realtime\",now(60000), addSeconds(addDays(midnight(now(0)),{this.custom.launchpad.oee.display.rangeDays.stop}),-1))\n\t\n\tif value.mode == \"Realtime\":\n\t\t# if realtime, return now every 60 seconds\n\t\treturn value.now\n\t\n\tif value.mode == \"Historical\":\n\t\tif value.rangeDays.period != \"\":\n\t\t\t# if historical and not custom time selected, return 11:59:59 PM of whatever day is today + rangeDays.stop\n\t\t\treturn system.date.addSeconds(system.date.addDays(system.date.midnight(system.date.now()),value.rangeDays.stop),-1)\n\t\telse:\n\t\t\t# if historical and custom time selected\n\t\t\treturn value.customTime.stop",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.launchpad.oee.lineTagFolder": {
+      "binding": {
+        "config": {
+          "expression": "now(0)"
+        },
+        "transforms": [
+          {
+            "code": "\treturn launchpad.oee.BASE_TAG_FOLDER\n\t",
+            "type": "script"
+          }
+        ],
+        "type": "expr"
+      }
+    },
+    "custom.launchpad.oee.lines": {
+      "binding": {
+        "config": {
+          "expression": "now(30000)"
+        },
+        "transforms": [
+          {
+            "code": "\t# Re-browsed on a timer, not once at session start. A session opened before\n\t# the tags exist -- which is exactly what happens between importing the\n\t# project and pressing Set up -- used to hold an empty list for its whole\n\t# life, and an empty list leaves the line dropdown with nothing to select,\n\t# every live value null and a quality overlay over the card.\n\treturn launchpad.oee.getLineNames(launchpad.oee.BASE_TAG_FOLDER)\n\t",
+            "type": "script"
+          }
+        ],
+        "type": "expr"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\t# Only on the empty -> populated transition. That is the recovery case:\n\t# the session started before the tags existed, so nothing could be\n\t# selected, and without this the page stays null after the tags arrive.\n\t# Restricting it to the transition is what keeps <All Lines> working on\n\t# the Production Summary -- that deliberately selects \"\", and this must\n\t# not undo it.\n\tdef names(qv):\n\t\treturn [str(getattr(v, \"value\", v)) for v in (qv.value or [])] if qv else []\n\tnow = names(currentValue)\n\tif now and not names(previousValue):\n\t\tif self.custom.launchpad.oee.selectedLine not in now:\n\t\t\tself.custom.launchpad.oee.selectedLine = now[0]\n\t"
+      }
+    },
+    "custom.launchpad.oee.report.rangeDays": {
+      "onChange": {
+        "enabled": null,
+        "script": "\t\n\tif currentValue.value[\"period\"].value != \"\":\n\t\t# if value in dropdown changes (but not empties, set start/end time to the bound start and end time)\n\t\tself.custom.launchpad.oee.report.customTime.start = system.date.addDays(system.date.midnight(system.date.now()),currentValue.value[\"start\"].value)\n\t\tself.custom.launchpad.oee.report.customTime.stop = system.date.addSeconds(system.date.addDays(system.date.midnight(system.date.now()),currentValue.value[\"stop\"].value),-1)"
+      }
+    },
+    "custom.launchpad.oee.report.startTime": {
+      "binding": {
+        "config": {
+          "struct": {
+            "customTime": "{this.custom.launchpad.oee.report.customTime}",
+            "rangeDays": "{this.custom.launchpad.oee.report.rangeDays}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tif value.rangeDays.period != \"\":\n\t\t# if historical, return 12:00:00 AM of whatever day is today + rangeDays.start\n\t\treturn system.date.addDays(system.date.midnight(system.date.now()),value.rangeDays.start)\n\telse:\n\t\t# if historical but custom time\n\t\treturn value.customTime.start",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.launchpad.oee.report.stopTime": {
+      "binding": {
+        "config": {
+          "struct": {
+            "customTime": "{this.custom.launchpad.oee.report.customTime}",
+            "rangeDays": "{this.custom.launchpad.oee.report.rangeDays}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tif value.rangeDays.period != \"\":\n\t\t# if historical and not custom time selected, return 11:59:59 PM of whatever day is today + rangeDays.stop\n\t\treturn system.date.addSeconds(system.date.addDays(system.date.midnight(system.date.now()),value.rangeDays.stop),-1)\n\telse:\n\t\t# if historical and custom time selected\n\t\treturn value.customTime.stop",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.launchpad.oee.selectedLine": {
+      "onChange": {
+        "enabled": null,
+        "script": "\tsystem.perspective.sendMessage(\"selectedLine\", {\"line\": currentValue.value, \"timestamp\": system.date.now()}, \"session\")"
+      }
+    },
+    "custom.launchpad.oee.selectedLineShiftStart": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "1": "{this.custom.launchpad.oee.lineTagFolder}",
+            "2": "{this.custom.launchpad.oee.selectedLine}"
+          },
+          "tagPath": "{1}/{2}/Schedule/CurrentShiftStartTime"
+        },
+        "type": "tag"
+      }
+    },
+    "props.auth": {
+      "access": "PRIVATE",
+      "persistent": false
+    },
+    "props.device.accelerometer": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.device.identifier": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.device.timezone": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.device.type": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.device.userAgent": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.gateway": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.geolocation.data": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.geolocation.permissionGranted": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.host": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.id": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.lastActivity": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.offline.capable": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.offline.enabled": {
+      "access": "SYSTEM",
+      "persistent": false
+    },
+    "props.offline.lastSynced": {
+      "access": "SYSTEM",
+      "persistent": false
+    }
+  },
+  "props": {
+    "address": "127.0.0.1",
+    "appBar": {
+      "togglePosition": "hidden"
+    },
+    "device": {},
+    "geolocation": {},
+    "locale": "en-AU",
+    "offline": {},
+    "theme": "dark-cool",
+    "timeZoneId": ""
+  }
+}
