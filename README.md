@@ -43,6 +43,8 @@ gateway's Perspective theme.*
 - **A Setup button** that builds the gateway, and a **Check** button that reports it.
 - **Themed.** Both projects follow the gateway's Perspective theme — Ignition's own
   six and any custom theme installed on the gateway. Pick one on Settings.
+- **Accessible.** Every screen meets WCAG 2.1 AA, short of limits in Perspective
+  itself: no page language setting, and chart and table internals.
 
 ## How to use it
 

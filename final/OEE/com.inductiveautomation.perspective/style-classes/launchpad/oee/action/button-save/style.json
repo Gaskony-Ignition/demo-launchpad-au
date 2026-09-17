@@ -2,7 +2,7 @@
   "base": {
     "style": {
       "backgroundColor": "var(--oee-good)",
-      "color": "var(--oee-ink-inverse)"
+      "color": "var(--oee-highlight-ink)"
     }
   }
 }

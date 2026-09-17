@@ -670,16 +670,16 @@
                       },
                       "transforms": [
                         {
-                          "fallback": "var(--oee-orange)",
+                          "fallback": "var(--oee-status-orange)",
                           "inputType": "scalar",
                           "mappings": [
                             {
                               "input": 1,
-                              "output": "var(--oee-good)"
+                              "output": "var(--oee-status-good)"
                             },
                             {
                               "input": 2,
-                              "output": "var(--oee-bad)"
+                              "output": "var(--oee-status-bad)"
                             }
                           ],
                           "outputType": "scalar",
@@ -888,7 +888,7 @@
                       },
                       "transforms": [
                         {
-                          "code": "\tcolor = 'var(--oee-good)'\n\tif value <= self.session.custom.launchpad.oee.target:\n\t\tcolor = 'var(--oee-bad)'\n\t\n\treturn color\n\t\t",
+                          "code": "\tcolor = 'var(--oee-status-good)'\n\tif value <= self.session.custom.launchpad.oee.target:\n\t\tcolor = 'var(--oee-status-bad)'\n\t\n\treturn color\n\t\t",
                           "type": "script"
                         }
                       ],
@@ -1586,7 +1586,7 @@
                           },
                           "transforms": [
                             {
-                              "code": "\tif value.currentRate < value.rate.number:\n\t\treturn \"var(--oee-bad)\"\n\telse:\n\t\treturn \"var(--oee-good)\"",
+                              "code": "\tif value.currentRate < value.rate.number:\n\t\treturn \"var(--oee-status-bad)\"\n\telse:\n\t\treturn \"var(--oee-status-good)\"",
                               "type": "script"
                             }
                           ],
@@ -1953,11 +1953,19 @@
           },
           "scope": "G",
           "type": "script"
+        },
+        "onKeyDown": {
+          "type": "script",
+          "scope": "G",
+          "config": {
+            "script": "\tif event.key in ('Enter', ' '):\n\t\t#set current line and navigate to line view page\n\t\tself.session.custom.launchpad.oee.selectedLine = self.view.custom.lineName\n\t\tsystem.perspective.navigate(page=\"/line-view\")\n\t\t"
+          }
         }
       }
     },
     "meta": {
-      "name": "root"
+      "name": "root",
+      "tabIndex": 0
     },
     "propConfig": {
       "props.style.backgroundColor": {

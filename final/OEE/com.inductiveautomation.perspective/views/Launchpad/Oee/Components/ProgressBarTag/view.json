@@ -173,7 +173,8 @@
           "style": {
             "classes": "launchpad/oee/text/label",
             "marginRight": 5,
-            "textAlign": "start"
+            "textAlign": "start",
+            "cursor": "default"
           }
         },
         "type": "ia.display.label"
@@ -209,7 +210,8 @@
             "fontSize": "14px",
             "fontWeight": "bold",
             "padding": 7,
-            "textAlign": "start"
+            "textAlign": "start",
+            "cursor": "default"
           }
         },
         "type": "ia.display.label"

@@ -998,7 +998,8 @@
                   }
                 ],
                 "meta": {
-                  "name": "Data"
+                  "name": "Data",
+                  "tabIndex": 0
                 },
                 "position": {
                   "basis": "1000px",
@@ -1366,7 +1367,8 @@
                   }
                 ],
                 "meta": {
-                  "name": "Data"
+                  "name": "Data",
+                  "tabIndex": 0
                 },
                 "position": {
                   "basis": "1000px",

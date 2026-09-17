@@ -53,6 +53,16 @@
 	   secondary/target one drawn beside it */
 	--kpi-primary:     var(--callToAction, #62C3DA);
 	--kpi-secondary:   var(--warning, #FFB35E);
+
+	/* --kpi-ink-inverse mirrors Perspective's own --neutral-10, which stock
+	   `.ia_button--primary` pairs with --callToAction -- and on dark-cool that
+	   pairing itself is only 2.86:1, since neutral-10 there resolves light
+	   rather than dark. The selected-button style class copies that exact
+	   pairing (fill = --kpi-highlight, an alias of the theme's own accent
+	   token), so it inherits the same failure. A measured dark ink passes
+	   comfortably against every shipped theme's mid-tone accent, which
+	   --neutral-10 does not reliably do. */
+	--kpi-highlight-ink: #14181a;
 }
 
 /* The project's own colour-scheme declaration, and the one place it is
@@ -92,6 +102,37 @@
    Checked directly, not assumed. Running the Theme Installer is the only fix. */
 html {
 	color-scheme: dark;
+}
+
+/* Focus ring for a stock theme. `ignition-themes` v1.17.0 draws its own
+   measured ring (dropdown box and table grid included) and wins there; on a
+   stock theme this is the only ring drawn, so it has to stand alone at 3:1 --
+   the heading ink is what stands in when no theme's own ring variable is set. */
+:focus-visible,
+.ia_dropdown.ia_dropdown--focused {
+	outline: 2px solid var(--a11y-focus-ring, var(--kpi-ink-strong));
+	outline-offset: 1px;
+}
+.ReactVirtualized__Grid:focus-visible {
+	outline: 2px solid var(--a11y-focus-ring, var(--kpi-ink-strong)) !important;
+	outline-offset: -2px;
+}
+
+/* Stock `.ia_button--primary` (background = --callToAction, text = --neutral-10)
+   only reaches 2.86:1 on dark-cool, and a project style class layered on top of
+   it (background = --kpi-highlight, an alias of the same --callToAction) wins
+   the cascade for background on some renders and loses it on others -- same
+   specificity, so whichever CSS was generated later wins per property, and the
+   two halves of the pairing can end up from different renders (verified on
+   the OEE side of this port, 8.3.8; KPI shares the same platform button).
+   `!important` here, after every theme's own stylesheet, makes the pairing
+   deterministic instead of a coin flip. */
+.ia_button--primary {
+	background-color: var(--a11y-button-fill, var(--kpi-highlight)) !important;
+	border-color: var(--a11y-button-fill, var(--kpi-highlight)) !important;
+}
+.ia_button--primary .text {
+	color: var(--a11y-button-ink, var(--kpi-highlight-ink)) !important;
 }
 
 #launchpadDashboard > div > div > div > div {
@@ -152,6 +193,14 @@ html {
 
 /* line chart x trace popup colors -- ink on the info box's own light ground,
    which inverts with the theme the same way --kpi-ink-inverse does */
+/* The tag browser's own "no results" placeholder is drawn at a fixed
+   dark grey regardless of theme, which reads at 2.33:1 on a dark ground --
+   the project stylesheet can restyle this platform class directly since it
+   is plain CSS, not a themed variable. */
+.ia_tagBrowser__noResultsDisplay__message {
+	color: var(--kpi-ink);
+}
+
 .ia_timeSeriesChartComponent__labelText{
 	fill: var(--kpi-ink-inverse);
 	stroke: var(--neutral-90, #e9e9e9);

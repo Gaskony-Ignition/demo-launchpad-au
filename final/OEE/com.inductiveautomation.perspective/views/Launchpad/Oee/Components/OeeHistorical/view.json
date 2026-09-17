@@ -51,7 +51,7 @@
         },
         "transforms": [
           {
-            "code": "\tif value:\n\t\tstats \u003d [\n\t\t\t{\"stat\": \"OEE\", \"value\": value.oee},\n\t\t\t{\"stat\": \"A\", \"value\": 1-value.availability},\n\t\t\t{\"stat\": \"P\", \"value\": 1-value.performance},\n\t\t\t{\"stat\": \"Q\", \"value\": 1-value.quality}\n\t\t\t]\n\telse:\n\t\tstats \u003d [\n\t\t\t{\"stat\": \"OEE\", \"value\": 1},\n\t\t\t{\"stat\": \"A\", \"value\": 1},\n\t\t\t{\"stat\": \"P\", \"value\": 1},\n\t\t\t{\"stat\": \"Q\", \"value\": 1}\n\t\t\t]\n\treturn stats",
+            "code": "\tif value:\n\t\tstats = [\n\t\t\t{\"stat\": \"OEE\", \"value\": value.oee},\n\t\t\t{\"stat\": \"A\", \"value\": 1-value.availability},\n\t\t\t{\"stat\": \"P\", \"value\": 1-value.performance},\n\t\t\t{\"stat\": \"Q\", \"value\": 1-value.quality}\n\t\t\t]\n\telse:\n\t\tstats = [\n\t\t\t{\"stat\": \"OEE\", \"value\": 1},\n\t\t\t{\"stat\": \"A\", \"value\": 1},\n\t\t\t{\"stat\": \"P\", \"value\": 1},\n\t\t\t{\"stat\": \"Q\", \"value\": 1}\n\t\t\t]\n\treturn stats",
             "type": "script"
           }
         ],
@@ -89,7 +89,7 @@
     "custom.scheduledOn": {
       "binding": {
         "config": {
-          "expression": "//if we are looking for shift interval, line is only on scheule if we are within a defined shift.\r\n//otherwise we assume line is available 24 hours / day\r\nif({session.custom.launchpad.oee.display.interval}\u003d\"Shift\"  \u0026\u0026 {session.custom.launchpad.oee.display.mode}\u003d \"Realtime\", {view.params.stats.currentShift}\u003e0,  True)\r\n\u0026\u0026\r\nif({session.custom.launchpad.oee.display.mode}\u003d \"Historical\", len({view.params.stats})\u003e0, True)\r\n"
+          "expression": "//if we are looking for shift interval, line is only on scheule if we are within a defined shift.\r\n//otherwise we assume line is available 24 hours / day\r\nif({session.custom.launchpad.oee.display.interval}=\"Shift\"  && {session.custom.launchpad.oee.display.mode}= \"Realtime\", {view.params.stats.currentShift}>0,  True)\r\n&&\r\nif({session.custom.launchpad.oee.display.mode}= \"Historical\", len({view.params.stats})>0, True)\r\n"
         },
         "type": "expr"
       },
@@ -146,7 +146,7 @@
                       },
                       "transforms": [
                         {
-                          "code": "\tcolor \u003d \u0027var(--oee-good)\u0027\n\tif value \u003c\u003d self.session.custom.launchpad.oee.target:\n\t\tcolor \u003d \u0027var(--oee-bad)\u0027\n\t\n\treturn color\n\t\t",
+                          "code": "\tcolor = 'var(--oee-status-good)'\n\tif value <= self.session.custom.launchpad.oee.target:\n\t\tcolor = 'var(--oee-status-bad)'\n\t\n\treturn color\n\t\t",
                           "type": "script"
                         }
                       ],
@@ -251,7 +251,7 @@
                       },
                       "transforms": [
                         {
-                          "code": "\tcolor \u003d \u0027var(--oee-good)\u0027\n\tif value \u003c\u003d self.session.custom.launchpad.oee.target:\n\t\tcolor \u003d \u0027var(--oee-bad)\u0027\n\t\n\treturn color\n\t\t",
+                          "code": "\tcolor = 'var(--oee-good)'\n\tif value <= self.session.custom.launchpad.oee.target:\n\t\tcolor = 'var(--oee-bad)'\n\t\n\treturn color\n\t\t",
                           "type": "script"
                         }
                       ],
@@ -716,7 +716,7 @@
           "position.display": {
             "binding": {
               "config": {
-                "expression": "{view.custom.scheduledOn} \u003d False || len({view.custom.data})\u003d0"
+                "expression": "{view.custom.scheduledOn} = False || len({view.custom.data})=0"
               },
               "type": "expr"
             }
@@ -724,7 +724,7 @@
           "props.text": {
             "binding": {
               "config": {
-                "expression": "if({session.custom.launchpad.oee.display.mode}\u003d \"Historical\",  \"No History Data\", \"Not Scheduled\")"
+                "expression": "if({session.custom.launchpad.oee.display.mode}= \"Historical\",  \"No History Data\", \"Not Scheduled\")"
               },
               "type": "expr"
             }

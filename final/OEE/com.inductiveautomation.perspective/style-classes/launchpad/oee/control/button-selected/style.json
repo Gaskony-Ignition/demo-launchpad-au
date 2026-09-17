@@ -9,7 +9,7 @@
       "borderTopRightRadius": "10px",
       "borderBottomLeftRadius": "10px",
       "borderBottomRightRadius": "10px",
-      "color": "var(--oee-ink-inverse)",
+      "color": "var(--oee-highlight-ink)",
       "fontFamily": "Noto Sans",
       "fontSize": "14px",
       "marginBottom": "0px",

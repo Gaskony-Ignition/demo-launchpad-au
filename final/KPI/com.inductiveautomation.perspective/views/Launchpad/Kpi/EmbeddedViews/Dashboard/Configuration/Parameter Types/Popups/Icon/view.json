@@ -22,15 +22,27 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\tsystem.perspective.sendMessage(messageType\u003d\"icon-selected\", payload\u003d{\"icon\":self.view.params.icon})"
+                "script": "\tsystem.perspective.sendMessage(messageType=\"icon-selected\", payload={\"icon\":self.view.params.icon})"
               },
               "scope": "G",
               "type": "script"
+            },
+            "onKeyDown": {
+              "type": "script",
+              "scope": "G",
+              "config": {
+                "script": "\tif event.key in ('Enter', ' '):\n\t\tsystem.perspective.sendMessage(messageType=\"icon-selected\", payload={\"icon\":self.view.params.icon})"
+              }
             }
           }
         },
         "meta": {
-          "name": "Icon"
+          "name": "Icon",
+          "tabIndex": 0,
+          "tooltip": {
+            "enabled": true,
+            "text": "Select this icon"
+          }
         },
         "position": {
           "basis": "32px",
