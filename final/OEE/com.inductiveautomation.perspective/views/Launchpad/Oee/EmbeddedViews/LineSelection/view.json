@@ -48,7 +48,7 @@
           "name": "Dropdown"
         },
         "position": {
-          "basis": "350px"
+          "basis": "340px"
         },
         "propConfig": {
           "props.options": {
@@ -103,7 +103,7 @@
           }
         },
         "position": {
-          "basis": "50px"
+          "basis": "110px"
         },
         "props": {
           "image": {
@@ -114,7 +114,7 @@
           "style": {
             "classes": "launchpad/oee/control/button-selected"
           },
-          "text": ""
+          "text": "Refresh"
         },
         "type": "ia.input.button"
       }

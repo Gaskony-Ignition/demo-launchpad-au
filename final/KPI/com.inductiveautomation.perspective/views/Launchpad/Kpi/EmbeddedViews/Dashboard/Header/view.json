@@ -44,7 +44,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\treturn \"\" if value \u003d\u003d None else \"material/%s\" % value",
+                      "code": "\treturn \"\" if value == None else \"material/%s\" % value",
                       "type": "script"
                     }
                   ],
@@ -65,7 +65,7 @@
               "component": {
                 "onActionPerformed": {
                   "config": {
-                    "script": "\toptions \u003d self.props.options\n\tselectedValue \u003d self.props.value\n\t\n\tfor option in options:\n\t\tif option.get(\u0027value\u0027) \u003d\u003d selectedValue:\n\t\t\tdashboardUrl \u003d option.get(\u0027url\u0027)\n\t\t\tbreak\n\t\t\t\n\tsystem.perspective.navigate(dashboardUrl)"
+                    "script": "\toptions = self.props.options\n\tselectedValue = self.props.value\n\t\n\tfor option in options:\n\t\tif option.get('value') == selectedValue:\n\t\t\tdashboardUrl = option.get('url')\n\t\t\tbreak\n\t\t\t\n\tsystem.perspective.navigate(dashboardUrl)"
                   },
                   "scope": "G",
                   "type": "script"
@@ -178,6 +178,13 @@
                   },
                   "scope": "G",
                   "type": "script"
+                },
+                "onKeyDown": {
+                  "type": "script",
+                  "scope": "G",
+                  "config": {
+                    "script": "\tif event.key in ('Enter', ' '):\n\t\tlaunchpad.dashboard.editDashboard(self, False)"
+                  }
                 }
               }
             },
@@ -187,7 +194,8 @@
                 "enabled": true,
                 "location": "bottom",
                 "text": "Edit current dashboard"
-              }
+              },
+              "tabIndex": 0
             },
             "position": {
               "basis": "34px",
@@ -201,7 +209,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\treturn False if value \u003d\u003d None else value",
+                      "code": "\treturn False if value == None else value",
                       "type": "script"
                     }
                   ],
@@ -227,6 +235,13 @@
                   },
                   "scope": "G",
                   "type": "script"
+                },
+                "onKeyDown": {
+                  "type": "script",
+                  "scope": "G",
+                  "config": {
+                    "script": "\tif event.key in ('Enter', ' '):\n\t\tlaunchpad.dashboard.editDashboard(self)"
+                  }
                 }
               }
             },
@@ -236,7 +251,8 @@
                 "enabled": true,
                 "location": "bottom",
                 "text": "Add new dashboard"
-              }
+              },
+              "tabIndex": 0
             },
             "position": {
               "basis": "34px",
@@ -260,6 +276,13 @@
                   },
                   "scope": "G",
                   "type": "script"
+                },
+                "onKeyDown": {
+                  "type": "script",
+                  "scope": "G",
+                  "config": {
+                    "script": "\tif event.key in ('Enter', ' '):\n\t\tlaunchpad.dashboard.refresh(self)"
+                  }
                 }
               }
             },
@@ -269,7 +292,8 @@
                 "enabled": true,
                 "location": "bottom",
                 "text": "Refresh dashboards"
-              }
+              },
+              "tabIndex": 0
             },
             "position": {
               "basis": "34px",
@@ -295,7 +319,7 @@
           "position.display": {
             "binding": {
               "config": {
-                "expression": "{page.props.dimensions.viewport.width} \u003e\u003d {session.custom.launchpad.dashboard.mobileBreakpoint}\r\n|| {session.props.device.userAgent}\u003d\u0027\u003cdesigner\u003e\u0027"
+                "expression": "{page.props.dimensions.viewport.width} >= {session.custom.launchpad.dashboard.mobileBreakpoint}\r\n|| {session.props.device.userAgent}='<designer>'"
               },
               "type": "expr"
             }

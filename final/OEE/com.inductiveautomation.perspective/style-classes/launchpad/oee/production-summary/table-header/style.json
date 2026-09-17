@@ -2,7 +2,7 @@
   "base": {
     "style": {
       "backgroundColor": "var(--oee-gray-q)",
-      "color": "var(--oee-ink-inverse)",
+      "color": "var(--oee-ink-strong)",
       "fontWeight": "bold"
     }
   }

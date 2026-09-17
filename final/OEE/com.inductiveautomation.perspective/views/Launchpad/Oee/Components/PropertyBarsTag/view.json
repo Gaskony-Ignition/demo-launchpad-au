@@ -162,7 +162,8 @@
       }
     ],
     "meta": {
-      "name": "root"
+      "name": "root",
+      "tabIndex": 0
     },
     "props": {
       "direction": "column",

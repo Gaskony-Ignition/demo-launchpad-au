@@ -366,11 +366,19 @@
           },
           "scope": "G",
           "type": "script"
+        },
+        "onKeyDown": {
+          "type": "script",
+          "scope": "G",
+          "config": {
+            "script": "\tif event.key in ('Enter', ' '):\n\t\tviewPath = 'Launchpad/Kpi/EmbeddedViews/PopupDualTag'\n\t\ttags = self.view.custom.tags\n\t\tif len(tags) == 0:\n\t\t\tpath1 = ''\n\t\t\tpath2 = ''\n\t\telif len(tags) == 1:\n\t\t\tpath1 = tags[0]['path']\n\t\t\tpath2 = ''\n\t\telif len(tags) == 2:\n\t\t\tpath1 = tags[0]['path']\n\t\t\tpath2 = tags[1]['path']\n\t\t\n\t\tviewParams = {'path1': path1, 'path2': path2, 'historyProvider': self.session.custom.launchpad.historyProvider}\n\t\tpopupTitle = self.view.params.title\n\t\tlaunchpad.util.popup(self, viewPath, viewParams, popupTitle)"
+          }
         }
       }
     },
     "meta": {
-      "name": "root"
+      "name": "root",
+      "tabIndex": 0
     },
     "props": {
       "direction": "column",

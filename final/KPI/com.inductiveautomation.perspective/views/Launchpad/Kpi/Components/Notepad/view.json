@@ -40,6 +40,13 @@
                   },
                   "scope": "G",
                   "type": "script"
+                },
+                "onKeyDown": {
+                  "type": "script",
+                  "scope": "G",
+                  "config": {
+                    "script": "\tif event.key in ('Enter', ' '):\n\t\n\t\tif self.parent.parent.getChild(\"TextArea\").props.enabled:\n\t\t\tself.parent.parent.getChild(\"TextArea\").props.enabled = False\n\t\telse:\n\t\t\tself.parent.parent.getChild(\"TextArea\").props.enabled = True"
+                  }
                 }
               }
             },
@@ -48,7 +55,8 @@
               "tooltip": {
                 "enabled": true,
                 "text": "Toggle editing of the note"
-              }
+              },
+              "tabIndex": 0
             },
             "position": {
               "basis": "30px"
@@ -113,7 +121,8 @@
       }
     ],
     "meta": {
-      "name": "root"
+      "name": "root",
+      "tabIndex": 0
     },
     "props": {
       "direction": "column",

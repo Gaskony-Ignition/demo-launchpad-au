@@ -45,9 +45,32 @@
 
 	/* --- accents and status --------------------------------------------- */
 	--oee-highlight:   var(--callToAction, #51C49E);    /* selection, primary action */
-	--oee-good:        var(--success, #6CDAF4);         /* at or above target */
-	--oee-bad:         var(--error, #E20505);           /* below target */
+	--oee-good:        var(--success, #6CDAF4);         /* at or above target: fills, borders */
+	--oee-bad:         var(--error, #E20505);           /* below target: fills, borders */
 	--oee-orange:      var(--warning, #FFB35E);         /* line stopped */
+
+	/* --- status AS TEXT --------------------------------------------------
+	   --oee-good/--oee-bad mirror the theme's --success/--error, which stock
+	   themes tune to pass as a FILL (3:1) but not always as running text on a
+	   card (4.5:1) -- measured 4.49:1 on dark-cool. Nudging 15% toward
+	   --oee-ink-strong (the theme's own high-contrast ink, near-white on a
+	   dark theme and near-black on a light one) buys the extra margin in
+	   whichever direction that theme needs, without a fixed hex that would
+	   only be right for one of the two. Use these ONLY where the colour is
+	   text; a fill or border wants --oee-good/--oee-bad direct. */
+	--oee-status-good:   color-mix(in srgb, var(--oee-good) 85%, var(--oee-ink-strong) 15%);
+	--oee-status-bad:    color-mix(in srgb, var(--oee-bad) 85%, var(--oee-ink-strong) 15%);
+	--oee-status-orange: color-mix(in srgb, var(--oee-orange) 85%, var(--oee-ink-strong) 15%);
+
+	/* --oee-ink-inverse mirrors Perspective's own --neutral-10, which stock
+	   `.ia_button--primary` pairs with --callToAction -- and on dark-cool that
+	   pairing itself is only 2.86:1, since neutral-10 there resolves light
+	   rather than dark. The selected/save buttons below copy that exact
+	   pairing (fill = --oee-highlight/--oee-good, both aliases of the theme's
+	   accent tokens), so they inherit the same failure. A measured dark ink
+	   passes comfortably against every shipped theme's mid-tone accent, which
+	   --neutral-10 does not reliably do. */
+	--oee-highlight-ink: #14181a;
 
 	/* --- the A / P / Q ramp --------------------------------------------- */
 	--oee-gray-a:      var(--neutral-70, #B4B4B4);      /* Availability */
@@ -94,6 +117,36 @@ html {
 	color-scheme: dark;
 }
 
+/* Focus ring for a stock theme. `ignition-themes` v1.17.0 draws its own
+   measured ring (dropdown box and table grid included) and wins there; on a
+   stock theme this is the only ring drawn, so it has to stand alone at 3:1 --
+   the heading ink is what stands in when no theme's own ring variable is set. */
+:focus-visible,
+.ia_dropdown.ia_dropdown--focused {
+	outline: 2px solid var(--a11y-focus-ring, var(--oee-ink-strong));
+	outline-offset: 1px;
+}
+.ReactVirtualized__Grid:focus-visible {
+	outline: 2px solid var(--a11y-focus-ring, var(--oee-ink-strong)) !important;
+	outline-offset: -2px;
+}
+
+/* Stock `.ia_button--primary` (background = --callToAction, text = --neutral-10)
+   only reaches 2.86:1 on dark-cool, and a project style class layered on top of
+   it (background = --oee-highlight, an alias of the same --callToAction) wins
+   the cascade for background on some renders and loses it on others -- same
+   specificity, so whichever CSS was generated later wins per property, and the
+   two halves of the pairing can end up from different renders (verified: text
+   and fill disagreeing on the OEE nav and the Realtime/Historical toggle,
+   8.3.8). `!important` here, after every theme's own stylesheet, makes the
+   pairing deterministic instead of a coin flip. */
+.ia_button--primary {
+	background-color: var(--a11y-button-fill, var(--oee-highlight)) !important;
+	border-color: var(--a11y-button-fill, var(--oee-highlight)) !important;
+}
+.ia_button--primary .text {
+	color: var(--a11y-button-ink, var(--oee-highlight-ink)) !important;
+}
 /* line chart x trace popup colors -- ink on the info box's own light ground,
    which inverts with the theme the same way --oee-ink-inverse does */
 .ia_timeSeriesChartComponent__labelText{

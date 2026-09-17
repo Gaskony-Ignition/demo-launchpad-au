@@ -85,7 +85,7 @@
                 {
                   "messageType": "tag-selection",
                   "pageScope": true,
-                  "script": "\tid \u003d self.view.custom.id\n\tif id \u003d\u003d payload[\"id\"]:\n\t\tpath \u003d payload[\"path\"]\n\t\tself.props.text \u003d path",
+                  "script": "\tid = self.view.custom.id\n\tif id == payload[\"id\"]:\n\t\tpath = payload[\"path\"]\n\t\tself.props.text = path",
                   "sessionScope": false,
                   "viewScope": false
                 }
@@ -115,11 +115,23 @@
                   },
                   "scope": "C",
                   "type": "popup"
+                },
+                "onKeyDown": {
+                  "type": "script",
+                  "scope": "G",
+                  "config": {
+                    "script": "\tif event.key in ('Enter', ' '):\n\t\tsystem.perspective.openPopup('tag-tree', 'Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Parameter Types/Popups/Tag Tree',\n\t\t\tparams={'id': self.view.custom.id, 'mode': 'realtime'}, title='Choose Tag',\n\t\t\tmodal=True, draggable=False, resizable=True, showCloseIcon=True, overlayDismiss=True)"
+                  }
                 }
               }
             },
             "meta": {
-              "name": "Search"
+              "name": "Search",
+              "tabIndex": 0,
+              "tooltip": {
+                "enabled": true,
+                "text": "Choose tag"
+              }
             },
             "position": {
               "basis": "24px",

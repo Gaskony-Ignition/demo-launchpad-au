@@ -111,7 +111,7 @@
                 {
                   "messageType": "icon-selection",
                   "pageScope": true,
-                  "script": "\tid \u003d self.view.custom.id\n\tif id \u003d\u003d payload[\"id\"]:\n\t\ticon \u003d payload[\"icon\"]\n\t\tself.props.text \u003d icon",
+                  "script": "\tid = self.view.custom.id\n\tif id == payload[\"id\"]:\n\t\ticon = payload[\"icon\"]\n\t\tself.props.text = icon",
                   "sessionScope": false,
                   "viewScope": false
                 }
@@ -141,11 +141,23 @@
                   },
                   "scope": "C",
                   "type": "popup"
+                },
+                "onKeyDown": {
+                  "type": "script",
+                  "scope": "G",
+                  "config": {
+                    "script": "\tif event.key in ('Enter', ' '):\n\t\ticon = self.view.getChild('root').getChild('FlexContainer').getChild('Field').props.text\n\t\tsystem.perspective.openPopup('icon-picker', 'Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Parameter Types/Popups/Icon Picker',\n\t\t\tparams={'icon': icon, 'id': self.view.custom.id}, title='Choose Icon',\n\t\t\tmodal=True, draggable=False, resizable=True, showCloseIcon=True, overlayDismiss=True)"
+                  }
                 }
               }
             },
             "meta": {
-              "name": "Search"
+              "name": "Search",
+              "tabIndex": 0,
+              "tooltip": {
+                "enabled": true,
+                "text": "Choose icon"
+              }
             },
             "position": {
               "basis": "24px",

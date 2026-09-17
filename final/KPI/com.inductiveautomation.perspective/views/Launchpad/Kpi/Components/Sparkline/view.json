@@ -1074,11 +1074,19 @@
           },
           "scope": "G",
           "type": "script"
+        },
+        "onKeyDown": {
+          "type": "script",
+          "scope": "G",
+          "config": {
+            "script": "\tif event.key in ('Enter', ' '):\n\t\tviewPath = 'Launchpad/Kpi/EmbeddedViews/Popup'\n\t\tviewParams = {'path': self.view.custom.realtimePath, 'historyProvider': self.session.custom.launchpad.historyProvider}\n\t\tpopupTitle = 'Historical Data'\n\t\tlaunchpad.util.popup(self, viewPath, viewParams, popupTitle)"
+          }
         }
       }
     },
     "meta": {
-      "name": "root"
+      "name": "root",
+      "tabIndex": 0
     },
     "props": {
       "direction": "column",
