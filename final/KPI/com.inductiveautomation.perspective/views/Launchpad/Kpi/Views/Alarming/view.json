@@ -61,6 +61,121 @@
           "responsive": {
             "breakpoint": 800,
             "enabled": true
+          },
+          "rowStyles": {
+            "activeUnacked": {
+              "base": {
+                "classes": "launchpad/kpi/alarm-row"
+              },
+              "priorities": {
+                "critical": {
+                  "classes": "launchpad/kpi/alarm-critical",
+                  "backgroundColor": "rgba(229,34,91,0.34)"
+                },
+                "high": {
+                  "classes": "launchpad/kpi/alarm-high",
+                  "backgroundColor": "rgba(245,130,32,0.30)"
+                },
+                "medium": {
+                  "classes": "launchpad/kpi/alarm-medium",
+                  "backgroundColor": "rgba(245,197,24,0.24)"
+                },
+                "low": {
+                  "classes": "launchpad/kpi/alarm-low",
+                  "backgroundColor": "rgba(78,168,255,0.22)"
+                },
+                "diagnostic": {
+                  "classes": "launchpad/kpi/alarm-diagnostic",
+                  "backgroundColor": "rgba(139,152,169,0.18)"
+                }
+              }
+            },
+            "activeAcked": {
+              "base": {
+                "classes": "launchpad/kpi/alarm-row"
+              },
+              "priorities": {
+                "critical": {
+                  "classes": "launchpad/kpi/alarm-critical",
+                  "backgroundColor": "rgba(229,34,91,0.17)"
+                },
+                "high": {
+                  "classes": "launchpad/kpi/alarm-high",
+                  "backgroundColor": "rgba(245,130,32,0.15)"
+                },
+                "medium": {
+                  "classes": "launchpad/kpi/alarm-medium",
+                  "backgroundColor": "rgba(245,197,24,0.12)"
+                },
+                "low": {
+                  "classes": "launchpad/kpi/alarm-low",
+                  "backgroundColor": "rgba(78,168,255,0.11)"
+                },
+                "diagnostic": {
+                  "classes": "launchpad/kpi/alarm-diagnostic",
+                  "backgroundColor": "rgba(139,152,169,0.09)"
+                }
+              }
+            },
+            "clearUnacked": {
+              "base": {
+                "classes": "launchpad/kpi/alarm-row launchpad/kpi/alarm-cleared",
+                "color": "#96A2B1"
+              },
+              "priorities": {
+                "critical": {
+                  "classes": "launchpad/kpi/alarm-critical",
+                  "backgroundColor": "rgba(110,122,136,0.10)"
+                },
+                "high": {
+                  "classes": "launchpad/kpi/alarm-high",
+                  "backgroundColor": "rgba(110,122,136,0.10)"
+                },
+                "medium": {
+                  "classes": "launchpad/kpi/alarm-medium",
+                  "backgroundColor": "rgba(110,122,136,0.10)"
+                },
+                "low": {
+                  "classes": "launchpad/kpi/alarm-low",
+                  "backgroundColor": "rgba(110,122,136,0.10)"
+                },
+                "diagnostic": {
+                  "classes": "launchpad/kpi/alarm-diagnostic",
+                  "backgroundColor": "rgba(110,122,136,0.10)"
+                }
+              }
+            },
+            "clearAcked": {
+              "base": {
+                "classes": "launchpad/kpi/alarm-row launchpad/kpi/alarm-cleared",
+                "color": "#96A2B1"
+              },
+              "priorities": {
+                "critical": {
+                  "classes": "launchpad/kpi/alarm-critical",
+                  "backgroundColor": "rgba(110,122,136,0.10)"
+                },
+                "high": {
+                  "classes": "launchpad/kpi/alarm-high",
+                  "backgroundColor": "rgba(110,122,136,0.10)"
+                },
+                "medium": {
+                  "classes": "launchpad/kpi/alarm-medium",
+                  "backgroundColor": "rgba(110,122,136,0.10)"
+                },
+                "low": {
+                  "classes": "launchpad/kpi/alarm-low",
+                  "backgroundColor": "rgba(110,122,136,0.10)"
+                },
+                "diagnostic": {
+                  "classes": "launchpad/kpi/alarm-diagnostic",
+                  "backgroundColor": "rgba(110,122,136,0.10)"
+                }
+              }
+            }
+          },
+          "style": {
+            "classes": "launchpad/kpi/alarm-table"
           }
         },
         "type": "ia.display.alarmstatustable"

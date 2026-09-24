@@ -1,6 +1,7 @@
 // Fail if a project page SCROLLS AS A PAGE at the smallest window we support.
 //
 //   node tools/check_page_scroll.js http://localhost:8988 KPI / /trending /alarming
+//   node tools/check_page_scroll.js --gateway module-testing KPI / /trending
 //
 // A page scrollbar is a defect here, not a preference (Nigel, standing rule):
 // on an operations screen the thing you need is as likely to be below the fold
@@ -13,9 +14,16 @@
 // written against the document passes. The KPI Overview shipped in 3.3.0
 // hiding 844px that way.
 //
-// It measures at 1366x768 by default, which is the floor the layouts are built
-// to. Widen it with --size WxH; the page is expected to be correct at anything
-// larger, so the floor is the only size worth gating.
+// It measures at 1366x640 by default -- the laptop-first floor
+// (ui-design-guidelines.md §0: a 1366x768 laptop screen after the browser's
+// own chrome), not the full 768 a maximised browser window gets before
+// subtracting that chrome. Widen it with --size WxH; the page is expected to
+// be correct at anything larger, so the floor is the only size worth gating.
+//
+// --gateway <name> resolves the URL from the toolkit's credentials file
+// instead of a positional BASE, the same convention a11y-check.js uses, so
+// package.sh's release gate never has to carry a gateway address in a
+// public repo's tracked file.
 //
 // RUN IT AGAINST THE STANDARD GATEWAY. Not because Edge is exempt, but because
 // Edge's Perspective session cap is one at a time and it does not release a
@@ -29,10 +37,29 @@
 //
 // - and check Edge's own behaviour, the parts that really do differ, one page
 // at a time with tools/shoot-page.js.
+const fs = require('fs');
+const path = require('path');
 const { chromium } = require('./lib/toolkit').playwright('check_page_scroll');
 
 function arg(n, d) { const i = process.argv.indexOf('--' + n); return i > -1 ? process.argv[i + 1] : d; }
-const SIZE = arg('size', '1366x768');
+const SIZE = arg('size', '1366x640');
+const GW_NAME = arg('gateway', '');
+
+// Same credentials file and KEY=VALUE format a11y-check.js reads (the scan
+// skill's convention) -- read directly rather than importing across skills.
+function credentialsUrl(name) {
+  const cfg = path.join('/Home-Claude/ignition-claude-toolkit/plugins/ignition/config.local.json');
+  let file = process.env.IGNITION_SCAN_CREDS;
+  try { file = file || JSON.parse(fs.readFileSync(cfg, 'utf8')).scan_credentials_file; } catch (e) { /* none */ }
+  const kv = {};
+  for (const line of (file && fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : '').split('\n')) {
+    const i = line.indexOf('=');
+    if (i > 0 && !line.trim().startsWith('#')) kv[line.slice(0, i).trim()] = line.slice(i + 1).trim();
+  }
+  const url = kv[name + '.url'];
+  if (!url) throw new Error('no credentials for gateway ' + name);
+  return url;
+}
 // Closing the browser context does not free an Ignition Edge Perspective
 // session immediately - the gateway holds it for a while, and the next page
 // gets "Sessions Exceeded" instead of a page. Edge's cap is small enough that
@@ -48,9 +75,10 @@ for (let i = 2; i < process.argv.length; i++) {
   if (process.argv[i].startsWith('--')) { i++; continue; }
   rest.push(process.argv[i]);
 }
-const BASE = (rest[0] || 'http://localhost:8988').replace(/\/+$/, '');
-const PROJECT = rest[1] || 'KPI';
-const PAGES = rest.slice(2).length ? rest.slice(2) : ['/'];
+const BASE = (GW_NAME ? credentialsUrl(GW_NAME) : (rest[0] || 'http://localhost:8988')).replace(/\/+$/, '');
+const PROJECT = (GW_NAME ? rest[0] : rest[1]) || 'KPI';
+const _routes = GW_NAME ? rest.slice(1) : rest.slice(2);
+const PAGES = _routes.length ? _routes : ['/'];
 
 (async () => {
   const browser = await chromium.launch();

@@ -394,16 +394,6 @@
           "basis": "60px",
           "shrink": 0
         },
-        "propConfig": {
-          "position.display": {
-            "binding": {
-              "config": {
-                "expression": "{parent.custom.showManageRates}=False"
-              },
-              "type": "expr"
-            }
-          }
-        },
         "props": {
           "style": {
             "marginLeft": "10px",
@@ -417,908 +407,143 @@
           "name": "Schedule"
         },
         "position": {
+          "basis": "44px",
           "shrink": 0
         },
         "propConfig": {
           "position.display": {
             "binding": {
               "config": {
-                "expression": "{parent.custom.showManageRates}=False && len({view.custom.selectedLine})>0"
+                "expression": "len({view.custom.selectedLine})>0"
               },
               "type": "expr"
             }
-          },
-          "props.params.lineName": {
-            "binding": {
-              "config": {
-                "path": "view.custom.selectedLine"
-              },
-              "type": "property"
-            }
           }
         },
         "props": {
-          "path": "Launchpad/Oee/EmbeddedViews/Schedule"
-        },
-        "type": "ia.display.view"
-      },
-      {
-        "children": [
-          {
-            "meta": {
-              "name": "RatesManageView"
-            },
-            "position": {
-              "grow": 1
-            },
-            "props": {
-              "path": "Launchpad/Oee/Views/Rates"
-            },
-            "type": "ia.display.view"
+          "style": {
+            "classes": "launchpad/oee/control/button-unselected",
+            "marginTop": "6px",
+            "marginBottom": "6px"
           },
-          {
-            "events": {
-              "component": {
-                "onActionPerformed": {
-                  "config": {
-                    "script": "\tsystem.perspective.sendMessage(\"launchpad-oee-refresh-rates\", scope=\"page\")"
-                  },
-                  "scope": "G",
-                  "type": "script"
-                }
-              }
-            },
-            "meta": {
-              "name": "ShowSettings"
-            },
-            "position": {
-              "basis": "34px"
-            },
-            "props": {
-              "image": {
-                "icon": {
-                  "path": "material/arrow_back"
-                }
-              },
-              "style": {
-                "classes": "launchpad/oee/control/button-selected"
-              },
-              "text": "Back to Settings"
-            },
-            "type": "ia.input.button"
-          }
-        ],
-        "meta": {
-          "name": "RatesManage"
+          "text": "Shift Schedule..."
         },
-        "position": {
-          "basis": "100%",
-          "grow": 1
-        },
-        "propConfig": {
-          "position.display": {
-            "binding": {
+        "events": {
+          "dom": {
+            "onClick": {
               "config": {
-                "path": "parent.custom.showManageRates"
+                "draggable": false,
+                "id": "oee-schedule-popup",
+                "modal": true,
+                "overlayDismiss": true,
+                "resizable": true,
+                "showCloseIcon": true,
+                "title": "Shift Schedule",
+                "type": "open",
+                "viewParams": {
+                  "lineName": "{view.custom.selectedLine}"
+                },
+                "viewPath": "Launchpad/Oee/EmbeddedViews/Schedule",
+                "viewportBound": false
               },
-              "type": "property"
+              "scope": "C",
+              "type": "popup"
             }
           }
         },
-        "props": {
-          "direction": "column"
-        },
-        "type": "ia.container.flex"
+        "type": "ia.input.button"
       },
       {
-        "children": [
-          {
-            "meta": {
-              "name": "Header"
-            },
-            "position": {
-              "basis": "32px"
-            },
-            "propConfig": {
-              "props.text": {
-                "binding": {
-                  "config": {
-                    "expression": "{session.custom.launchpad.oee.selectedLine} + \" Rates\""
-                  },
-                  "type": "expr"
-                }
-              }
-            },
-            "props": {
-              "style": {
-                "classes": "launchpad/oee/text/header",
-                "marginBottom": "10px"
-              }
-            },
-            "type": "ia.display.label"
-          },
-          {
-            "meta": {
-              "name": "TargetRate"
-            },
-            "position": {
-              "basis": "90px",
-              "display": false,
-              "grow": 1
-            },
-            "propConfig": {
-              "props.params.path": {
-                "binding": {
-                  "config": {
-                    "struct": {
-                      "lineTagFolder": "{session.custom.launchpad.oee.lineTagFolder}",
-                      "selectedLine": "{session.custom.launchpad.oee.selectedLine}"
-                    },
-                    "waitOnAll": true
-                  },
-                  "transforms": [
-                    {
-                      "code": "\treturn \"%s/%s/Config/TargetRate\" %(value[\"lineTagFolder\"],value[\"selectedLine\"])\n\t\n\t",
-                      "type": "script"
-                    }
-                  ],
-                  "type": "expr-struct"
-                }
-              }
-            },
-            "props": {
-              "params": {
-                "header": "Target Rate"
-              },
-              "path": "Launchpad/Oee/Components/ConfigEntry"
-            },
-            "type": "ia.display.view"
-          },
-          {
-            "meta": {
-              "name": "CurrentRateValue"
-            },
-            "position": {
-              "basis": "30px",
-              "shrink": 0
-            },
-            "propConfig": {
-              "position.display": {
-                "binding": {
-                  "config": {
-                    "expression": "{../CurrentRate/CurrentRate.props.value}!={../CurrentRate/CurrentRate.custom.tagValue}"
-                  },
-                  "type": "expr"
-                }
-              },
-              "props.text": {
-                "binding": {
-                  "config": {
-                    "fallbackDelay": 2.5,
-                    "mode": "indirect",
-                    "references": {
-                      "path": "{../CurrentRate.custom.path}"
-                    },
-                    "tagPath": "{path}.tooltip"
-                  },
-                  "transforms": [
-                    {
-                      "expression": "\"Current Rate = \" + {value}",
-                      "type": "expression"
-                    }
-                  ],
-                  "type": "tag"
-                }
-              }
-            },
-            "props": {
-              "style": {
-                "classes": "launchpad/oee/text/label",
-                "textAlign": "start"
-              }
-            },
-            "type": "ia.display.label"
-          },
-          {
-            "children": [
-              {
-                "meta": {
-                  "name": "Label"
-                },
-                "position": {
-                  "basis": "95px"
-                },
-                "propConfig": {
-                  "props.text": {
-                    "binding": {
-                      "config": {
-                        "expression": "{../CurrentRate.props.value}={../CurrentRate.custom.tagValue}"
-                      },
-                      "transforms": [
-                        {
-                          "fallback": "Current Rate",
-                          "inputType": "scalar",
-                          "mappings": [
-                            {
-                              "input": false,
-                              "output": "New Rate"
-                            }
-                          ],
-                          "outputType": "scalar",
-                          "type": "map"
-                        }
-                      ],
-                      "type": "expr"
-                    }
-                  }
-                },
-                "props": {
-                  "style": {
-                    "classes": "launchpad/oee/text/label"
-                  }
-                },
-                "type": "ia.display.label"
-              },
-              {
-                "meta": {
-                  "name": "CurrentRate"
-                },
-                "position": {
-                  "basis": "378px"
-                },
-                "propConfig": {
-                  "custom.data": {
-                    "binding": {
-                      "type": "expr",
-                      "config": {
-                        "expression": "1"
-                      },
-                      "transforms": [
-                        {
-                          "type": "script",
-                          "code": "\treturn launchpad.store.selectRates()\n"
-                        }
-                      ]
-                    }
-                  },
-                  "custom.tagValue": {
-                    "binding": {
-                      "config": {
-                        "fallbackDelay": 2.5,
-                        "mode": "indirect",
-                        "references": {
-                          "path": "{parent.custom.path}"
-                        },
-                        "tagPath": "{path}.tooltip"
-                      },
-                      "type": "tag"
-                    }
-                  },
-                  "props.options": {
-                    "binding": {
-                      "config": {
-                        "path": "this.custom.data"
-                      },
-                      "transforms": [
-                        {
-                          "code": "\toptions = []\n\tfor row in range(value.rowCount):\n\t\toption = {\n\t\t  \"value\": value.getValueAt(row,\"rate_name\"),\n\t\t  \"label\": \"%s: %s %s /%s\" %(value.getValueAt(row,\"rate_name\"), value.getValueAt(row,\"target_rate\") ,value.getValueAt(row,\"uom\"), value.getValueAt(row,\"interval\"))\n\t\t}\n\t\toptions.append(option)\n\treturn options",
-                          "type": "script"
-                        }
-                      ],
-                      "type": "property"
-                    }
-                  },
-                  "props.style.classes": {
-                    "binding": {
-                      "config": {
-                        "expression": "{this.props.value}={this.custom.tagValue}"
-                      },
-                      "transforms": [
-                        {
-                          "fallback": "launchpad/oee/control/dropdown",
-                          "inputType": "scalar",
-                          "mappings": [
-                            {
-                              "input": true,
-                              "output": "launchpad/oee/control/dropdown"
-                            },
-                            {
-                              "input": false,
-                              "output": "launchpad/oee/control/dropdown_unset"
-                            }
-                          ],
-                          "outputType": "style-list",
-                          "type": "map"
-                        }
-                      ],
-                      "type": "expr"
-                    }
-                  },
-                  "props.value": {
-                    "binding": {
-                      "config": {
-                        "fallbackDelay": 2.5,
-                        "mode": "indirect",
-                        "references": {
-                          "path": "{parent.custom.path}"
-                        },
-                        "tagPath": "{path}.tooltip"
-                      },
-                      "type": "tag"
-                    }
-                  }
-                },
-                "props": {
-                  "style": {}
-                },
-                "scripts": {
-                  "customMethods": [],
-                  "extensionFunctions": null,
-                  "messageHandlers": [
-                    {
-                      "messageType": "launchpad-oee-refresh-rates",
-                      "pageScope": true,
-                      "script": "\t# refresh rat dropdown\n\tself.refreshBinding(\"custom.data\")\n\n\t",
-                      "sessionScope": false,
-                      "viewScope": false
-                    }
-                  ]
-                },
-                "type": "ia.input.dropdown"
-              },
-              {
-                "events": {
-                  "component": {
-                    "onActionPerformed": {
-                      "config": {
-                        "script": "\t#set current line rate\n\tlineBasePath = self.session.custom.launchpad.oee.lineTagFolder\n\ttagWritePaths = [self.parent.custom.path, \"%s.Tooltip\" %(self.parent.custom.path), \"%s.EngUnit\"%(self.parent.custom.path), self.parent.custom.path.replace(\"TargetRate\", \"RateName\"), self.parent.custom.path.replace(\"TargetRate\", \"RateTime\")]\n\tdata = self.parent.custom.selectedData[0]\n\tinterval = data.interval\n\tif interval.lower() == \"hour\":\n\t\tnewTargetRate = data.target_rate/60.0\n\telse:\n\t\tnewTargetRate = data.target_rate\n\ttagWriteValues = [newTargetRate, data.rate_name, data.uom, data.rate_name, data.interval]\n\t\n\tsystem.tag.writeBlocking(tagWritePaths, tagWriteValues)\n\t\t\n\t#record rate changes in database\n\tcurrentShift = self.view.custom.currentShift\n\tlineName = self.view.custom.selectedLine\n\tnewTargetRateName = data.rate_name\n\thourTimestamp = self.view.custom.currentHourTimestamp\n\tif currentShift > 0:\n\t\tlaunchpad.oee.recordShiftRateChange(currentShift,  lineName, lineBasePath, newTargetRate, data.rate_name)\n\tlaunchpad.oee.recordHourRateChange(hourTimestamp,  lineName,  lineBasePath, newTargetRate, data.rate_name)\n\t\n\t\n\t\n\t\n\t"
-                      },
-                      "scope": "G",
-                      "type": "script"
-                    }
-                  }
-                },
-                "meta": {
-                  "name": "SetRate"
-                },
-                "position": {
-                  "basis": "80px"
-                },
-                "props": {
-                  "style": {
-                    "classes": "launchpad/oee/control/button-selected",
-                    "margin": 5
-                  },
-                  "text": "Set"
-                },
-                "type": "ia.input.button"
-              },
-              {
-                "events": {
-                  "component": {
-                    "onActionPerformed": {
-                      "config": {
-                        "script": "\tself.view.getChild(\"root\").custom.showManageRates = True\n\n\tsystem.perspective.sendMessage(\"launchpad-oee-refresh-rates-table\", scope=\"page\")\t\n\t"
-                      },
-                      "scope": "G",
-                      "type": "script"
-                    }
-                  }
-                },
-                "meta": {
-                  "name": "ManageRates"
-                },
-                "position": {
-                  "basis": "163px"
-                },
-                "props": {
-                  "style": {
-                    "classes": "launchpad/oee/control/button-selected",
-                    "margin": 5,
-                    "marginLeft": 0
-                  },
-                  "text": "Manage Rates"
-                },
-                "type": "ia.input.button"
-              }
-            ],
-            "meta": {
-              "name": "CurrentRate"
-            },
-            "propConfig": {
-              "custom.path": {
-                "binding": {
-                  "config": {
-                    "struct": {
-                      "lineTagFolder": "{session.custom.launchpad.oee.lineTagFolder}",
-                      "selectedLine": "{session.custom.launchpad.oee.selectedLine}"
-                    },
-                    "waitOnAll": true
-                  },
-                  "transforms": [
-                    {
-                      "code": "\treturn \"%s/%s/Config/TargetRate\" %(value[\"lineTagFolder\"],value[\"selectedLine\"])\n\t\n\t",
-                      "type": "script"
-                    }
-                  ],
-                  "type": "expr-struct"
-                }
-              },
-              "custom.selectedData": {
-                "binding": {
-                  "type": "expr",
-                  "config": {
-                    "expression": "toStr({./CurrentRate.props.value})"
-                  },
-                  "transforms": [
-                    {
-                      "type": "script",
-                      "code": "\t# The expression carries the parameters through as text so that its\n\t# references, not this script, are what make the binding re-evaluate.\n\tparts = (value or u\"\").split(u\"|~|\")\n\tif len(parts) != 1:\n\t\t# A date that has not arrived yet leaves the expression short. The\n\t\t# query this replaced was simply not run in that state, so nothing\n\t\t# is the honest answer - and an empty result renders, where an\n\t\t# exception renders as a red box over the chart.\n\t\treturn None\n\trate_name = parts[0]\n\treturn launchpad.store.rowsAsJson(launchpad.store.rateData(rate_name))"
-                    }
-                  ]
-                }
-              }
-            },
-            "props": {
-              "wrap": "wrap"
-            },
-            "type": "ia.container.flex"
-          },
-          {
-            "meta": {
-              "name": "OutfeedMultiplier"
-            },
-            "position": {
-              "basis": "50px",
-              "shrink": 0
-            },
-            "propConfig": {
-              "props.params.path": {
-                "binding": {
-                  "config": {
-                    "struct": {
-                      "lineTagFolder": "{session.custom.launchpad.oee.lineTagFolder}",
-                      "selectedLine": "{session.custom.launchpad.oee.selectedLine}"
-                    },
-                    "waitOnAll": true
-                  },
-                  "transforms": [
-                    {
-                      "code": "\treturn \"%s/%s/Config/OutfeedFactor\" %(value[\"lineTagFolder\"],value[\"selectedLine\"])\n\t\n\t",
-                      "type": "script"
-                    }
-                  ],
-                  "type": "expr-struct"
-                }
-              }
-            },
-            "props": {
-              "params": {
-                "direction": "row",
-                "header": "Outfeed Multiplier",
-                "showUnits": false
-              },
-              "path": "Launchpad/Oee/Components/ConfigEntry"
-            },
-            "type": "ia.display.view"
-          },
-          {
-            "meta": {
-              "name": "RejectMultiplier"
-            },
-            "position": {
-              "basis": "50px",
-              "shrink": 0
-            },
-            "propConfig": {
-              "props.params.path": {
-                "binding": {
-                  "config": {
-                    "struct": {
-                      "lineTagFolder": "{session.custom.launchpad.oee.lineTagFolder}",
-                      "selectedLine": "{session.custom.launchpad.oee.selectedLine}"
-                    },
-                    "waitOnAll": true
-                  },
-                  "transforms": [
-                    {
-                      "code": "\treturn \"%s/%s/Config/RejectFactor\" %(value[\"lineTagFolder\"],value[\"selectedLine\"])\n\t\n\t",
-                      "type": "script"
-                    }
-                  ],
-                  "type": "expr-struct"
-                }
-              }
-            },
-            "props": {
-              "params": {
-                "direction": "row",
-                "header": "Reject Multiplier",
-                "showUnits": false
-              },
-              "path": "Launchpad/Oee/Components/ConfigEntry"
-            },
-            "type": "ia.display.view"
-          }
-        ],
         "meta": {
           "name": "LineRates"
         },
         "position": {
+          "basis": "44px",
           "shrink": 0
         },
         "propConfig": {
           "position.display": {
             "binding": {
               "config": {
-                "expression": "{parent.custom.showManageRates}=False  && len({view.custom.selectedLine})>0"
+                "expression": "len({view.custom.selectedLine})>0"
               },
               "type": "expr"
             }
           }
         },
         "props": {
-          "direction": "column",
           "style": {
-            "classes": "launchpad/oee/card",
-            "overflow": "hidden"
+            "classes": "launchpad/oee/control/button-unselected",
+            "marginTop": "6px",
+            "marginBottom": "6px"
+          },
+          "text": "Line Rates..."
+        },
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "draggable": false,
+                "id": "oee-line-rates-popup",
+                "modal": true,
+                "overlayDismiss": true,
+                "resizable": true,
+                "showCloseIcon": true,
+                "title": "Line Rates",
+                "type": "open",
+                "viewParams": {},
+                "viewPath": "Launchpad/Oee/EmbeddedViews/Popups/LineRates",
+                "viewportBound": false
+              },
+              "scope": "C",
+              "type": "popup"
+            }
           }
         },
-        "type": "ia.container.flex"
+        "type": "ia.input.button"
       },
       {
-        "children": [
-          {
-            "meta": {
-              "name": "Header"
-            },
-            "position": {
-              "basis": "35px",
-              "shrink": 0
-            },
-            "props": {
-              "style": {
-                "classes": "launchpad/oee/text/header",
-                "marginBottom": "10px"
-              },
-              "text": "Project Settings"
-            },
-            "type": "ia.display.label"
-          },
-          {
-            "children": [
-              {
-                "children": [
-                  {
-                    "meta": {
-                      "name": "Label"
-                    },
-                    "position": {
-                      "basis": "90px",
-                      "shrink": 0
-                    },
-                    "props": {
-                      "style": {
-                        "classes": "launchpad/oee/text/label",
-                        "textAlign": "left"
-                      },
-                      "text": "Database Connection"
-                    },
-                    "type": "ia.display.label",
-                    "children": []
-                  },
-                  {
-                    "meta": {
-                      "name": "DatabaseConnection"
-                    },
-                    "position": {
-                      "basis": "175px",
-                      "shrink": 0
-                    },
-                    "propConfig": {
-                      "props.text": {
-                        "binding": {
-                          "config": {
-                            "expression": "now(0)"
-                          },
-                          "transforms": [
-                            {
-                              "code": "\treturn launchpad.oee.db()",
-                              "type": "script"
-                            }
-                          ],
-                          "type": "expr"
-                        }
-                      }
-                    },
-                    "props": {
-                      "enabled": false,
-                      "style": {
-                        "classes": "launchpad/oee/control/text-entry-dark",
-                        "marginBottom": 5,
-                        "marginTop": 5
-                      }
-                    },
-                    "type": "ia.input.text-field",
-                    "children": []
-                  }
-                ],
-                "meta": {
-                  "name": "Settings"
-                },
-                "position": {
-                  "shrink": 0
-                },
-                "props": {
-                  "wrap": "wrap"
-                },
-                "type": "ia.container.flex"
-              }
-            ],
-            "meta": {
-              "name": "DatabaseInit"
-            },
-            "position": {
-              "shrink": 0
-            },
-            "props": {
-              "direction": "column",
-              "justify": "space-between",
-              "style": {
-                "overflow": "visible"
-              }
-            },
-            "type": "ia.container.flex"
-          },
-          {
-            "children": [
-              {
-                "children": [
-                  {
-                    "meta": {
-                      "name": "Label"
-                    },
-                    "position": {
-                      "basis": "90px",
-                      "shrink": 0
-                    },
-                    "props": {
-                      "style": {
-                        "classes": "launchpad/oee/text/label",
-                        "textAlign": "start"
-                      },
-                      "text": "Base Tag Folder"
-                    },
-                    "type": "ia.display.label"
-                  },
-                  {
-                    "meta": {
-                      "name": "LineTagFolder"
-                    },
-                    "position": {
-                      "grow": 1
-                    },
-                    "propConfig": {
-                      "props.text": {
-                        "binding": {
-                          "config": {
-                            "bidirectional": true,
-                            "path": "session.custom.launchpad.oee.lineTagFolder"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "enabled": false,
-                      "style": {
-                        "classes": "launchpad/oee/control/text-entry-dark",
-                        "marginBottom": 5,
-                        "marginTop": 5
-                      }
-                    },
-                    "type": "ia.input.text-field"
-                  }
-                ],
-                "meta": {
-                  "name": "Settings"
-                },
-                "position": {
-                  "basis": "50px",
-                  "grow": 1,
-                  "shrink": 0
-                },
-                "props": {
-                  "style": {
-                    "overflow": "visible"
-                  },
-                  "wrap": "wrap"
-                },
-                "type": "ia.container.flex"
-              },
-              {
-                "meta": {
-                  "name": "Info"
-                },
-                "position": {
-                  "grow": 1,
-                  "shrink": 0
-                },
-                "props": {
-                  "alignVertical": "top",
-                  "style": {
-                    "classes": "launchpad/oee/text/label"
-                  },
-                  "text": "All line UDT instances should all be in one folder.  Provide the path to the folder in order to get the list of all line names.",
-                  "textStyle": {
-                    "marginLeft": "20px",
-                    "textAlign": "start"
-                  }
-                },
-                "type": "ia.display.label"
-              }
-            ],
-            "meta": {
-              "name": "TagFolder"
-            },
-            "position": {
-              "shrink": 0
-            },
-            "props": {
-              "direction": "column",
-              "style": {
-                "overflow": "visible"
-              },
-              "wrap": "wrap"
-            },
-            "type": "ia.container.flex"
-          },
-          {
-            "children": [
-              {
-                "children": [
-                  {
-                    "meta": {
-                      "name": "Label"
-                    },
-                    "position": {
-                      "basis": "100px",
-                      "shrink": 0
-                    },
-                    "props": {
-                      "style": {
-                        "classes": "launchpad/oee/text/label"
-                      },
-                      "text": "OEE Target"
-                    },
-                    "type": "ia.display.label"
-                  },
-                  {
-                    "meta": {
-                      "name": "Slider"
-                    },
-                    "position": {
-                      "basis": "300px"
-                    },
-                    "propConfig": {
-                      "props.value": {
-                        "binding": {
-                          "config": {
-                            "bidirectional": true,
-                            "path": "session.custom.launchpad.oee.target"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "labels": {
-                        "interval": 0.05
-                      },
-                      "max": 1,
-                      "step": 0.01
-                    },
-                    "type": "ia.input.slider"
-                  },
-                  {
-                    "meta": {
-                      "name": "LedDisplay"
-                    },
-                    "position": {
-                      "basis": "50px",
-                      "shrink": 0
-                    },
-                    "propConfig": {
-                      "props.value": {
-                        "binding": {
-                          "config": {
-                            "path": "session.custom.launchpad.oee.target"
-                          },
-                          "transforms": [
-                            {
-                              "code": "\treturn str(value*100).split(\".\")[0] + \"%\"",
-                              "type": "script"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "backgroundColor": "var(--oee-card)",
-                      "diodeOnColor": "var(--oee-good)"
-                    },
-                    "type": "ia.display.led-display"
-                  }
-                ],
-                "meta": {
-                  "name": "OeeTarget"
-                },
-                "position": {
-                  "basis": "70px"
-                },
-                "type": "ia.container.flex"
-              },
-              {
-                "meta": {
-                  "name": "Info"
-                },
-                "props": {
-                  "markdown": {
-                    "escapeHtml": false
-                  },
-                  "source": "Adjust this value for the \"good\" OEE value you are targeting.\n\nAll displays of the OEE value that change color will show as red if below this value, and green if above it.\n\nThis is not stored historically, it is only used for the live display of colors.",
-                  "style": {
-                    "classes": "launchpad/oee/text/label",
-                    "marginLeft": 20,
-                    "textAlign": "start"
-                  }
-                },
-                "type": "ia.display.markdown"
-              }
-            ],
-            "meta": {
-              "name": "OeeTargetFlex"
-            },
-            "position": {
-              "grow": 1,
-              "shrink": 0
-            },
-            "props": {
-              "direction": "column"
-            },
-            "type": "ia.container.flex"
-          }
-        ],
         "meta": {
           "name": "Global"
         },
         "position": {
-          "grow": 1,
+          "basis": "44px",
+          "grow": 0,
           "shrink": 0
         },
-        "propConfig": {
-          "position.display": {
-            "binding": {
+        "props": {
+          "style": {
+            "classes": "launchpad/oee/control/button-unselected",
+            "marginTop": "6px",
+            "marginBottom": "6px"
+          },
+          "text": "Project Settings..."
+        },
+        "events": {
+          "dom": {
+            "onClick": {
               "config": {
-                "expression": "{parent.custom.showManageRates}=False"
+                "draggable": false,
+                "id": "oee-global-settings-popup",
+                "modal": true,
+                "overlayDismiss": true,
+                "resizable": true,
+                "showCloseIcon": true,
+                "title": "Project Settings",
+                "type": "open",
+                "viewParams": {},
+                "viewPath": "Launchpad/Oee/EmbeddedViews/Popups/GlobalSettings",
+                "viewportBound": false
               },
-              "type": "expr"
+              "scope": "C",
+              "type": "popup"
             }
           }
         },
-        "props": {
-          "direction": "column",
-          "style": {
-            "classes": "launchpad/oee/card"
-          }
-        },
-        "type": "ia.container.flex"
+        "type": "ia.input.button"
       }
     ],
-    "custom": {
-      "showManageRates": false
-    },
+    "custom": {},
     "events": {
       "system": {
         "onStartup": {
@@ -1358,15 +583,7 @@
     "scripts": {
       "customMethods": [],
       "extensionFunctions": null,
-      "messageHandlers": [
-        {
-          "messageType": "launchpad-oee-refresh-rates",
-          "pageScope": true,
-          "script": "\tself.custom.showManageRates = False\n\t",
-          "sessionScope": false,
-          "viewScope": false
-        }
-      ]
+      "messageHandlers": []
     },
     "type": "ia.container.flex"
   }

@@ -147,6 +147,26 @@ html {
 .ia_button--primary .text {
 	color: var(--a11y-button-ink, var(--oee-highlight-ink)) !important;
 }
+
+/* The slider handle turns its own outline off internally (verified 8.3.8,
+   same gap as the dropdown search box and the ReactVirtualized grid above)
+   and draws a box-shadow ring of its own instead -- real, but not on the
+   `outline` property, so `!important` here adds a second, standards-based
+   ring rather than fighting the box-shadow one. */
+.ia_slider__handle:focus-visible {
+	outline: 2px solid var(--a11y-focus-ring, var(--oee-ink-strong)) !important;
+	outline-offset: 2px;
+}
+
+/* Production Summary's date-range calendar opens a native <select> for its
+   month and year jump (.ia_select__select inside .monthSelector/
+   .yearSelector) -- Ignition strips the browser's own focus ring from every
+   .ia_select__select as part of its custom dropdown-arrow styling, native
+   selects included, and never draws a replacement. `!important` restores one. */
+.ia_select__select:focus-visible {
+	outline: 2px solid var(--a11y-focus-ring, var(--oee-ink-strong)) !important;
+	outline-offset: 1px;
+}
 /* line chart x trace popup colors -- ink on the info box's own light ground,
    which inverts with the theme the same way --oee-ink-inverse does */
 .ia_timeSeriesChartComponent__labelText{

@@ -193,6 +193,30 @@ html {
 
 /* line chart x trace popup colors -- ink on the info box's own light ground,
    which inverts with the theme the same way --kpi-ink-inverse does */
+/* Alarm status table: priority colour and focus.
+
+   The default un-tinted priority fill (e.g. a light blue for Low) is paired
+   with the component's own fixed light row text regardless of how light the
+   fill is -- 1.81:1 measured on dark-cool. `props.rowStyles` on the
+   component (set in the Alarming view, launchpad/kpi/alarm-<priority>) tints
+   each row with a translucent priority colour over the theme's own card
+   instead of the stock solid fill, which keeps the fixed light text legible
+   without touching the text itself -- same fix toolbox/alarms v3.2.0 made,
+   and it also resolves the low-contrast focus ring measured on those rows,
+   since the ring's contrast is measured against the row's own background. */
+.psc-launchpad\/kpi\/alarm-table .ia_alarmTableComponent__toolbar__tab {
+	color: var(--kpi-ink);
+}
+
+/* The alarm table's own filter input turns its outline off internally
+   (verified 8.3.8, same gap as the dropdown search box and the
+   ReactVirtualized grid) -- `!important` is what beats that, as it does for
+   the grid rule above. */
+.psc-launchpad\/kpi\/alarm-table .ia_alarmTableComponent__toolbar__activeFilterInput:focus-visible {
+	outline: 2px solid var(--a11y-focus-ring, var(--kpi-ink-strong)) !important;
+	outline-offset: 1px;
+}
+
 /* The tag browser's own "no results" placeholder is drawn at a fixed
    dark grey regardless of theme, which reads at 2.33:1 on a dark ground --
    the project stylesheet can restyle this platform class directly since it
@@ -242,6 +266,21 @@ html {
 ::-webkit-scrollbar-thumb:hover {
 	background: var(--kpi-highlight);
 	background-clip: content-box;
+}
+
+/* ---------- short windows ------------------------------------------------
+   A 1366x640 laptop leaves the page less room than the layouts were drawn
+   for. Rather than let the Overview's sensor-tile grid grow a scrollbar of
+   its own, take the difference out of chrome that was never content: the
+   grid's own floor (set generously for a wide monitor) and the page's own
+   outer padding. Every rule here overrides an INLINE style Perspective
+   writes from a `style` prop, so `!important` is required -- without it the
+   rule is in the sheet, matches, and does nothing. Unchanged above this
+   breakpoint, so a large monitor keeps the room the layout was drawn for. */
+@media (max-height: 700px) {
+	.psc-launchpad\/kpi\/tile-grid { min-height: 140px !important; }
+	.psc-launchpad\/kpi\/root      { padding: 10px !important; margin: 10px !important; }
+	.psc-launchpad\/kpi\/card      { margin: 8px !important; }
 }
 
 /* The dropdown and select overrides that used to live here forced white text on

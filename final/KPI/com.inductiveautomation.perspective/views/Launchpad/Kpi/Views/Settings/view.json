@@ -34,8 +34,7 @@
         "props": {
           "direction": "column",
           "style": {
-            "classes": "launchpad/kpi/card",
-            "padding": 20
+            "classes": "launchpad/kpi/card"
           }
         },
         "type": "ia.container.flex",
@@ -336,9 +335,7 @@
         "props": {
           "direction": "column",
           "style": {
-            "classes": "launchpad/kpi/card",
-            "padding": 20,
-            "marginTop": 20
+            "classes": "launchpad/kpi/card"
           }
         },
         "type": "ia.container.flex",
