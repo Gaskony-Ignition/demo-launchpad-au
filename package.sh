@@ -50,11 +50,27 @@ if [[ " $* " != *" --skip-a11y-check "* ]]; then
         echo "a11y-gate.sh not found above $_repo; gate skipped" >&2
     fi
 fi
-# Strip --skip-readme-check/--skip-a11y-check (already consumed by the gates
-# above) so this script's own argument parsing -- which rejects unrecognised
-# args -- never sees it.
+# Layout gate (laptop-first: 1366x640, no page scroll). Blocking; bypass
+# deliberately with --skip-layout-check. Checks the SAME already-deployed
+# gateway the a11y gate does - deploy before packaging, not the other way
+# round. Routes come from each project's own page-config, not a hardcoded
+# list, so a new page is covered without editing this script.
+if [[ " $* " != *" --skip-layout-check "* ]]; then
+    _repo=$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)
+    for _proj in OEE KPI; do
+        _pc="$_repo/final/$_proj/com.inductiveautomation.perspective/page-config/config.json"
+        _routes=$(python3 -c "import json; d=json.load(open('$_pc'))['pages']; print(' '.join(k for k in d if ':' not in k))")
+        echo "layout: $_proj $_routes"
+        # shellcheck disable=SC2086
+        node "$_repo/tools/check_page_scroll.js" --gateway module-testing "$_proj" $_routes \
+            || { echo "layout gate failed: give the overflowing card(s) a floor, move content to its own screen/popup, or pass --skip-layout-check" >&2; exit 1; }
+    done
+fi
+# Strip --skip-readme-check/--skip-a11y-check/--skip-layout-check (already
+# consumed by the gates above) so this script's own argument parsing --
+# which rejects unrecognised args -- never sees it.
 _pkgargs=(); for _a in "$@"; do
-    [[ "$_a" == "--skip-readme-check" || "$_a" == "--skip-a11y-check" ]] || _pkgargs+=("$_a")
+    [[ "$_a" == "--skip-readme-check" || "$_a" == "--skip-a11y-check" || "$_a" == "--skip-layout-check" ]] || _pkgargs+=("$_a")
 done
 set -- "${_pkgargs[@]}"
 

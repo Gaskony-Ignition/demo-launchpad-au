@@ -3,7 +3,7 @@
   "params": {},
   "props": {
     "defaultSize": {
-      "height": 749,
+      "height": 480,
       "width": 826
     }
   },
@@ -855,7 +855,7 @@
                   "component": {
                     "onActionPerformed": {
                       "config": {
-                        "script": "\t#add or edit record\n\ttableName = \"ex_launchpad_oee_rate\"\n\tdatabaseName = launchpad.oee.db()\n\trate_name = self.parent.parent.getChild(\"NameEntry\").getChild(\"TextEntry\").props.text\n\tinterval = self.parent.parent.getChild(\"RateEntry\").getChild(\"Interval\").props.value\n\tuom = self.parent.parent.getChild(\"RateEntry\").getChild(\"UnitsEntry\").props.text\n\ttarget_rate = self.parent.parent.getChild(\"RateEntry\").getChild(\"NumericEntryField\").props.value\n\t\n\tif self.parent.parent.parent.getChild(\"AddEdit\").custom.updateMode:\n\t\t#update record\n\t\tdata = {\"rate_name\": rate_name , \"uom\": uom, \"target_rate\": target_rate, \"interval\": interval}\n\t\tkey_rate_name = self.parent.parent.parent.getChild(\"Table\").props.selection.data[0].rate_name\n\t\tkeys = {\"rate_name\": key_rate_name }\n\t\tlaunchpad.sql.runDatabaseUpdate(tableName, databaseName, data, keys)\n\telse:\n\t\t#add record\n\t\tdata = {\"rate_name\": rate_name , \"uom\": uom, \"target_rate\": target_rate, \"interval\": interval}\n\t\tlaunchpad.sql.runDatabaseInsert(tableName, databaseName, data)\n\tsystem.perspective.sendMessage(\"launchpad-oee-rate-mode\", payload = {\"mode\": \"\"} , scope=\"page\")\n\tsystem.perspective.sendMessage(\"launchpad-oee-refresh-rates-table\", scope=\"page\")\t\n\t\n\t\t\n\t\t"
+                        "script": "\t#add or edit record\n\ttableName = \"ex_launchpad_oee_rate\"\n\tdatabaseName = launchpad.oee.db()\n\trate_name = self.parent.parent.getChild(\"NameEntry\").getChild(\"TextEntry\").props.text\n\tinterval = self.parent.parent.getChild(\"RateEntry\").getChild(\"Interval\").props.value\n\tuom = self.parent.parent.getChild(\"RateEntry\").getChild(\"UnitsEntry\").props.text\n\ttarget_rate = self.parent.parent.getChild(\"RateEntry\").getChild(\"NumericEntryField\").props.value\n\t\n\tif self.parent.parent.parent.getChild(\"AddEdit\").custom.updateMode:\n\t\t#update record\n\t\tdata = {\"rate_name\": rate_name , \"uom\": uom, \"target_rate\": target_rate, \"interval\": interval}\n\t\tkey_rate_name = self.parent.parent.parent.getChild(\"Table\").props.selection.data[0].rate_name\n\t\tkeys = {\"rate_name\": key_rate_name }\n\t\tlaunchpad.sql.runDatabaseUpdate(tableName, databaseName, data, keys)\n\telse:\n\t\t#add record\n\t\tdata = {\"rate_name\": rate_name , \"uom\": uom, \"target_rate\": target_rate, \"interval\": interval}\n\t\tlaunchpad.sql.runDatabaseInsert(tableName, databaseName, data)\n\tsystem.perspective.sendMessage(\"launchpad-oee-rate-mode\", payload = {\"mode\": \"\"} , scope=\"page\")\n\tsystem.perspective.sendMessage(\"launchpad-oee-refresh-rates-table\", scope=\"page\")\t\n\tsystem.perspective.sendMessage(\"launchpad-oee-refresh-rates\", scope=\"page\")\n\t\n\t\t\n\t\t"
                       },
                       "scope": "G",
                       "type": "script"
@@ -954,7 +954,7 @@
                       "component": {
                         "onActionPerformed": {
                           "config": {
-                            "script": "\t\n\ttableName = \"ex_launchpad_oee_rate\"\n\n\tkey_rate_name = self.parent.parent.parent.parent.getChild(\"Table\").props.selection.data[0].rate_name\n\tdatabaseName = launchpad.oee.db()\n\tlaunchpad.sql.runDatabaseDelete(tableName, databaseName, idValue=key_rate_name, idField=\"rate_name\")\n\t\n\tsystem.perspective.sendMessage(\"launchpad-oee-refresh-rates-table\", scope=\"page\")\t\n\tself.parent.parent.parent.getChild(\"Actions\").custom.deleteMode = False\n\tsystem.perspective.sendMessage(\"launchpad-oee-table-reset\", scope=\"page\")\n\tsystem.perspective.sendMessage(\"launchpad-oee-rate-mode\", payload = {\"mode\": \"\"} , scope=\"page\")"
+                            "script": "\t\n\ttableName = \"ex_launchpad_oee_rate\"\n\n\tkey_rate_name = self.parent.parent.parent.parent.getChild(\"Table\").props.selection.data[0].rate_name\n\tdatabaseName = launchpad.oee.db()\n\tlaunchpad.sql.runDatabaseDelete(tableName, databaseName, idValue=key_rate_name, idField=\"rate_name\")\n\t\n\tsystem.perspective.sendMessage(\"launchpad-oee-refresh-rates-table\", scope=\"page\")\t\n\tsystem.perspective.sendMessage(\"launchpad-oee-refresh-rates\", scope=\"page\")\n\tself.parent.parent.parent.getChild(\"Actions\").custom.deleteMode = False\n\tsystem.perspective.sendMessage(\"launchpad-oee-table-reset\", scope=\"page\")\n\tsystem.perspective.sendMessage(\"launchpad-oee-rate-mode\", payload = {\"mode\": \"\"} , scope=\"page\")"
                           },
                           "scope": "G",
                           "type": "script"

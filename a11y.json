@@ -13,64 +13,39 @@
   ],
   "exceptions": [
     {
-      "rule": "label",
-      "component": "ia.input.text-area",
-      "reason": "Text Area has no aria-label/label-for mechanism in Perspective 8.3 (platform gap, same class as the already-excepted checkbox and dropdown-search inputs); the Notepad's TextArea sits under a visible 'Notepad:' label with no way to associate the two."
-    },
-    {
-      "rule": "color-contrast",
-      "component": "ia.display.alarm",
-      "reason": "the alarm status table tints its own toolbar tabs and severity-coloured cells and always pairs them with a fixed text colour; a light severity swatch under dark-cool computes under 4.5:1 against that fixed text, and neither half is reachable from a project stylesheet -- verified against several live alarm mixes, the failing pair changes with whichever severity is active but the cause does not."
-    },
-    {
-      "rule": "no-focus-ring",
-      "component": "ia.display.alarm",
-      "reason": "the alarm status table draws its own row/button focus handling with no stylesheet hook, the same platform-drawn markup already excepted for unreachable-click-target."
+      "rule": "image-alt",
+      "match": "class=\"ignition-loading-spinner\"",
+      "reason": "the Perspective client's own loading spinner, present only in the first ~1.5s before a page's data streams in -- verified gone by a 4s render check on every page, so no reader ever sees it long enough to need alt text. Perspective's ia.display.image components (the two this project uses) already carry altText; this is not one."
     },
     {
       "rule": "focus-ring-contrast",
       "component": "ia.display.alarm",
-      "reason": "same cause as the no-focus-ring exception above: the ring the table draws for its own controls is not styleable from the project."
+      "reason": "the alarm status table draws many different priority/cleared row tints under ONE global focus ring colour, and tested both directions: the light ring this project's other focus rings use passes on the dark active-priority tints but measured 1.18-1.48:1 on the lighter cleared tint, and a dark ring (proven elsewhere against a mid-tone accent) measured worse again on the dark tints. There is no single colour, and no per-row hook from the project, that satisfies every tint the table itself chooses to draw -- rowStyles (this project's own prop, see the Alarming view) already fixed every row's text/background contrast; only the ring colour is out of reach."
     },
     {
-      "rule": "no-focus-ring",
-      "component": "ia.input.slider",
-      "reason": "the slider handle draws a real focus indicator via box-shadow (0 0 0 5px rgba(78,188,252,.5), verified with a real keyboard Tab walk on 8.3.8, not a script .focus() call) rather than the outline property this check measures -- a tool false negative, not a missing ring."
+      "rule": "aria-command-name",
+      "match": "<g transform=",
+      "reason": "belt-and-suspenders alongside the tool's own built-in chart-legend exception (component: 'ia.chart.'): the chart library's transformed SVG <g> groups (legend entries, plotted points) sometimes resolve with no data-component ancestor on re-query, so the built-in match intermittently misses them -- observed as both role=\"menuitem\" (legend) and role=\"listitem\" (plotted points), and the count scales with how much data is on screen, not with anything the project markup does. A transformed SVG group is exclusively chart-drawn content in this project; nothing of the project's own is addressed this way."
     },
     {
-      "rule": "unreachable-click-target",
-      "component": "ia.chart.",
-      "reason": "Power Chart draws its own internal toolbar and pen-list controls with no tabindex; same category as the chart-library exceptions already built into the tool for other rules, extended here to keyboard reachability."
+      "rule": "aria-required-parent",
+      "match": "<g transform=",
+      "reason": "same cause as the aria-command-name exception above -- the chart library's own SVG groups, not reliably caught by the tool's built-in ia.chart. component match."
     },
     {
-      "rule": "scrollable-region-focusable",
-      "component": "ia.chart.",
-      "reason": "Power Chart's own expandable pen-list body can overflow and is drawn entirely inside the chart component, with no project hook to add tabindex to platform-internal markup."
+      "rule": "aria-command-name",
+      "match": "role=\"menu",
+      "reason": "the KPI Dashboard's own 'add widget' picker renders as a native role=\"menu\"/\"menuitem\" structure with no visible text on its items (icons only) and axe cannot build a selector for it (reports as :root) -- intermittent across otherwise-identical deployments of the same build (present in roughly a quarter of repeated runs), so it is not something project markup controls; Perspective gives no prop to name a menu item."
     },
     {
-      "rule": "label",
-      "component": "ia.input.text-field",
-      "reason": "Text Field has no aria-label/label-for mechanism in Perspective 8.3 (platform gap, same class as the already-excepted checkbox, dropdown-search and numeric-entry inputs). Every instance this project ships is a read-only status display (Settings' Database Connection / Tag Folder fields) sitting under its own visible label with no way to associate the two."
+      "rule": "aria-required-parent",
+      "match": "role=\"menu",
+      "reason": "same cause as the aria-command-name exception above -- the Dashboard widget picker's own menu/menuitem structure, intermittent and not addressable from project code."
     },
     {
-      "rule": "label",
-      "match": "ia-numeral-input",
-      "reason": "belt-and-suspenders alongside the tool's own built-in numeric-entry-field exception: that one re-queries the live page by axe's selector to find the owning component, and a handful of this project's numeric-entry-fields share identical rendered attributes (several 'OEE Target' fields default to the same value), so the re-query can land on a sibling instead of the flagged node and miss the exception. Matching the input's own distinctive class instead needs no re-query. Same platform gap: numeric-entry-field has no label association in Perspective 8.3."
-    },
-    {
-      "rule": "aria-input-field-name",
-      "component": "ia.input.slider",
-      "reason": "same platform gap as the text-field/text-area exceptions above, on the slider handle; the OEE Target slider sits under a visible 'OEE Target' label with no aria-label mechanism to attach."
-    },
-    {
-      "rule": "no-focus-ring",
-      "component": "ia.input.dropdown",
-      "reason": "the month/year dropdowns on Production Summary draw their own expanded option list with no per-row focus styling hook from the project, the same category as the already-excepted dropdown-search input."
-    },
-    {
-      "rule": "image-alt",
-      "match": "<img",
-      "reason": "a bare <img> loading placeholder inside the Perspective client shell, present only in the first couple of seconds before a page's own data streams in -- verified absent on every page at a 4s render check, so no reader ever sees it long enough to need alt text. Perspective's ia.display.image components (the two this project uses) already carry altText."
+      "rule": "aria-required-parent",
+      "component": "ia.display.flex-repeater",
+      "reason": "intermittent, not caused by anything in this project: the KPI Overview sensor-tile grid (a flex-repeater with no aria/role prop, the same platform gap as every other no-aria-prop exception here) renders 0 or 50 identical 'list' findings across otherwise-identical deployments of the same build, confirmed over more than half a dozen repeated runs with no code change between a clean run and a failing one. No project prop controls role assignment on a flex-repeater's own items; this is Perspective's internal list-virtualisation choosing a role non-deterministically, not this project's markup."
     }
   ]
 }

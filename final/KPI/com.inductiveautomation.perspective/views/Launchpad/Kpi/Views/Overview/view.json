@@ -354,7 +354,8 @@
               "style": {
                 "margin": 12,
                 "overflow": "auto",
-                "minHeight": 232
+                "minHeight": 232,
+                "classes": "launchpad/kpi/tile-grid"
               },
               "useDefaultViewHeight": false,
               "useDefaultViewWidth": false,
