@@ -13,11 +13,6 @@
   ],
   "exceptions": [
     {
-      "rule": "image-alt",
-      "match": "class=\"ignition-loading-spinner\"",
-      "reason": "the Perspective client's own loading spinner, present only in the first ~1.5s before a page's data streams in -- verified gone by a 4s render check on every page, so no reader ever sees it long enough to need alt text. Perspective's ia.display.image components (the two this project uses) already carry altText; this is not one."
-    },
-    {
       "rule": "focus-ring-contrast",
       "component": "ia.display.alarm",
       "reason": "the alarm status table draws many different priority/cleared row tints under ONE global focus ring colour, and tested both directions: the light ring this project's other focus rings use passes on the dark active-priority tints but measured 1.18-1.48:1 on the lighter cleared tint, and a dark ring (proven elsewhere against a mid-tone accent) measured worse again on the dark tints. There is no single colour, and no per-row hook from the project, that satisfies every tint the table itself chooses to draw -- rowStyles (this project's own prop, see the Alarming view) already fixed every row's text/background contrast; only the ring colour is out of reach."
