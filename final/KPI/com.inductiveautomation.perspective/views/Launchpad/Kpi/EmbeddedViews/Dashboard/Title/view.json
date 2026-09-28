@@ -1,15 +1,10 @@
 {
   "custom": {},
   "params": {
-    "exit": true,
     "icon": "home",
     "name": "Title"
   },
   "propConfig": {
-    "params.exit": {
-      "paramDirection": "input",
-      "persistent": true
-    },
     "params.icon": {
       "paramDirection": "input",
       "persistent": true

@@ -76,7 +76,7 @@
         },
         "transforms": [
           {
-            "code": "\tfullRange = value.engHigh - value.engLow\n\trangeOffset = 0.1 * fullRange\n\tmidPoint = (value.engHigh + value.engLow)/2.0\n\treturn {\n\t\t 'minValue': value.engLow\n\t\t,'maxValue': value.engHigh\n\t\t,'desiredHigh': midPoint + rangeOffset\n\t\t,'desiredLow': midPoint - rangeOffset\n\t\t,'highAlarm': value.engHigh - rangeOffset\n\t\t,'lowAlarm': value.engLow + rangeOffset\n\t}",
+            "code": "\tfullRange = value.engHigh - value.engLow\n\trangeOffset = 0.1 * fullRange\n\tmidPoint = (value.engHigh + value.engLow)/2.0\n\treturn {\n\t\t'minValue': value.engLow\n\t\t,'maxValue': value.engHigh\n\t\t,'desiredHigh': midPoint + rangeOffset\n\t\t,'desiredLow': midPoint - rangeOffset\n\t\t,'highAlarm': value.engHigh - rangeOffset\n\t\t,'lowAlarm': value.engLow + rangeOffset\n\t}",
             "type": "script"
           }
         ],

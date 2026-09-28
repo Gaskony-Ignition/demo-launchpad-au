@@ -7,15 +7,6 @@
     "params.add": {
       "paramDirection": "input",
       "persistent": true
-    },
-    "params.feature": {
-      "paramDirection": "input"
-    },
-    "params.tier1": {
-      "paramDirection": "input"
-    },
-    "params.tier2": {
-      "paramDirection": "input"
     }
   },
   "props": {

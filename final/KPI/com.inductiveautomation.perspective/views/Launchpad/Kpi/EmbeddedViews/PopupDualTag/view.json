@@ -170,7 +170,7 @@
               "config": {
                 "struct": {
                   "documentation": "{view.custom.documentation}",
-                  "tagName": "{view.custom.tagName}"
+                  "tagName": "{view.custom.tagNames}"
                 },
                 "waitOnAll": true
               },
@@ -224,7 +224,7 @@
               "config": {
                 "struct": {
                   "documentation": "{view.custom.documentation}",
-                  "tagName": "{view.custom.tagName}"
+                  "tagName": "{view.custom.tagNames}"
                 },
                 "waitOnAll": true
               },
@@ -261,7 +261,7 @@
               "config": {
                 "struct": {
                   "documentation": "{view.custom.documentation}",
-                  "tagName": "{view.custom.tagName}"
+                  "tagName": "{view.custom.tagNames}"
                 },
                 "waitOnAll": true
               },
@@ -513,7 +513,7 @@
               "config": {
                 "struct": {
                   "documentation": "{view.custom.documentation}",
-                  "tagName": "{view.custom.tagName}"
+                  "tagName": "{view.custom.tagNames}"
                 },
                 "waitOnAll": true
               },
@@ -532,7 +532,7 @@
               "config": {
                 "struct": {
                   "documentation": "{view.custom.documentation}",
-                  "tagName": "{view.custom.tagName}"
+                  "tagName": "{view.custom.tagNames}"
                 },
                 "waitOnAll": true
               },

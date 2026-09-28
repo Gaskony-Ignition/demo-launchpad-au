@@ -1,11 +1,7 @@
 {
   "custom": {},
   "params": {},
-  "propConfig": {
-    "params.key": {
-      "paramDirection": "input"
-    }
-  },
+  "propConfig": {},
   "props": {
     "defaultSize": {
       "height": 64

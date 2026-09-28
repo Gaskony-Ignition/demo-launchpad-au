@@ -500,7 +500,7 @@
         },
         "transforms": [
           {
-            "code": "\tpyData = system.dataset.toPyDataSet(value.data)\n\theaders = [\"Timestamp\", \"Availability\", \"Performance\", \"Quality\", \"OEE\"]\n\tdata = []\n\t# The last row is the interval currently in progress, and plotting a part-\n\t# finished hour drags the line down for no real reason -- so drop it, but\n\t# ONLY in Realtime. In Historical mode every row is a completed interval\n\t# and the last one belongs on the chart, so the mode has to be read from\n\t# the session (view.custom.timeRange is not a property of this view).\n\trows = pyData.getRowCount()\n\tif value.mode == 'Realtime' and rows > 0:\n\t\trows -= 1\n\tfor r in range(rows):\n\t\tdata.append([pyData.getValueAt(r, \"time_stamp\"), pyData.getValueAt(r, \"oee_a\"),\n\t\t             pyData.getValueAt(r, \"oee_p\"), pyData.getValueAt(r, \"oee_q\"),\n\t\t             pyData.getValueAt(r, \"oee\")])\n\treturn system.dataset.toDataSet(headers, data)",
+            "code": "\tpyData = system.dataset.toPyDataSet(value.data)\n\theaders = [\"Timestamp\", \"Availability\", \"Performance\", \"Quality\", \"OEE\"]\n\tdata = []\n\t# The last row is the interval currently in progress, and plotting a part-\n\t# finished hour drags the line down for no real reason -- so drop it, but\n\t# ONLY in Realtime. In Historical mode every row is a completed interval\n\t# and the last one belongs on the chart, so the mode has to be read from\n\t# the session (view.custom.timeRange is not a property of this view).\n\trows = pyData.getRowCount()\n\tif value.mode == 'Realtime' and rows > 0:\n\t\trows -= 1\n\tfor r in range(rows):\n\t\tdata.append([pyData.getValueAt(r, \"time_stamp\"), pyData.getValueAt(r, \"oee_a\"),\n\t\t\t\t\tpyData.getValueAt(r, \"oee_p\"), pyData.getValueAt(r, \"oee_q\"),\n\t\t\t\t\tpyData.getValueAt(r, \"oee\")])\n\treturn system.dataset.toDataSet(headers, data)",
             "type": "script"
           }
         ],
@@ -519,7 +519,7 @@
         },
         "transforms": [
           {
-            "code": "\tpyData = system.dataset.toPyDataSet(value.data)\n\theaders = [\"Timestamp\", \"Rejects\", \"Target\", \"Production\"]\n\tdata = []\n\t# The last row is the interval currently in progress, and plotting a part-\n\t# finished hour drags the line down for no real reason -- so drop it, but\n\t# ONLY in Realtime. In Historical mode every row is a completed interval\n\t# and the last one belongs on the chart, so the mode has to be read from\n\t# the session (view.custom.timeRange is not a property of this view).\n\trows = pyData.getRowCount()\n\tif value.mode == 'Realtime' and rows > 0:\n\t\trows -= 1\n\tfor r in range(rows):\n\t\tdata.append([pyData.getValueAt(r, \"time_stamp\"), pyData.getValueAt(r, \"reject_count\"),\n\t\t             pyData.getValueAt(r, \"target_rate\") * 60, pyData.getValueAt(r, \"production_count\")])\n\treturn system.dataset.toDataSet(headers, data)",
+            "code": "\tpyData = system.dataset.toPyDataSet(value.data)\n\theaders = [\"Timestamp\", \"Rejects\", \"Target\", \"Production\"]\n\tdata = []\n\t# The last row is the interval currently in progress, and plotting a part-\n\t# finished hour drags the line down for no real reason -- so drop it, but\n\t# ONLY in Realtime. In Historical mode every row is a completed interval\n\t# and the last one belongs on the chart, so the mode has to be read from\n\t# the session (view.custom.timeRange is not a property of this view).\n\trows = pyData.getRowCount()\n\tif value.mode == 'Realtime' and rows > 0:\n\t\trows -= 1\n\tfor r in range(rows):\n\t\tdata.append([pyData.getValueAt(r, \"time_stamp\"), pyData.getValueAt(r, \"reject_count\"),\n\t\t\t\t\tpyData.getValueAt(r, \"target_rate\") * 60, pyData.getValueAt(r, \"production_count\")])\n\treturn system.dataset.toDataSet(headers, data)",
             "type": "script"
           }
         ],
@@ -727,7 +727,7 @@
                                   },
                                   "transforms": [
                                     {
-                                      "code": "\tpyData = system.dataset.toPyDataSet(value)\n\tinstances = []\n\t\n\t\n\t\n\tfor r in range(7):\n\t\tif r < pyData.getRowCount():\n\t\t\tstartDate = pyData.getValueAt(r, \"hour_timestamp\")\n\t\t\tlabel = system.date.format(startDate, \"dd/MM/yyyy HH:mm\")\n\t\t\n\t\t\tinstances.append({\n\t\t\t  \"instanceStyle\": {\n\t\t\t    \"classes\": \"\"\n\t\t\t  },\n\t\t\t  \"instancePosition\": {},\n\t\t\t  \"production\": pyData.getValueAt(r, \"hour_production_count\"),\n\t\t\t  \"label\": label,\n\t\t\t  \"target\": pyData.getValueAt(r, \"target_hour\")\n\t\t\t})\n\t\t\n\treturn instances",
+                                      "code": "\tpyData = system.dataset.toPyDataSet(value)\n\tinstances = []\n\t\n\t\n\t\n\tfor r in range(7):\n\t\tif r < pyData.getRowCount():\n\t\t\tstartDate = pyData.getValueAt(r, \"hour_timestamp\")\n\t\t\tlabel = system.date.format(startDate, \"dd/MM/yyyy HH:mm\")\n\t\t\n\t\t\tinstances.append({\n\t\t\t\"instanceStyle\": {\n\t\t\t\t\"classes\": \"\"\n\t\t\t},\n\t\t\t\"instancePosition\": {},\n\t\t\t\"production\": pyData.getValueAt(r, \"hour_production_count\"),\n\t\t\t\"label\": label,\n\t\t\t\"target\": pyData.getValueAt(r, \"target_hour\")\n\t\t\t})\n\t\t\n\treturn instances",
                                       "type": "script"
                                     }
                                   ],
@@ -1121,7 +1121,7 @@
                               },
                               "transforms": [
                                 {
-                                  "code": "\tpyData = system.dataset.toPyDataSet(value)\n\tinstances = []\n\t\n\t\n\t\n\tfor r in range(8):\n\t\tif r < pyData.getRowCount():\n\t\t\tstartDate = pyData.getValueAt(r, \"hour_timestamp\")\n\t\t\tlabel = system.date.format(startDate, \"dd/MM/yyyy HH:mm\")\n\t\t\n\t\t\tinstances.append({\n\t\t\t  \"instanceStyle\": {\n\t\t\t    \"classes\": \"\"\n\t\t\t  },\n\t\t\t  \"instancePosition\": {},\n\t\t\t  \"production\": pyData.getValueAt(r, \"hour_production_count\"),\n\t\t\t  \"label\": label,\n\t\t\t  \"target\": pyData.getValueAt(r, \"target_hour\")\n\t\t\t})\n\t\t\n\treturn instances",
+                                  "code": "\tpyData = system.dataset.toPyDataSet(value)\n\tinstances = []\n\t\n\t\n\t\n\tfor r in range(8):\n\t\tif r < pyData.getRowCount():\n\t\t\tstartDate = pyData.getValueAt(r, \"hour_timestamp\")\n\t\t\tlabel = system.date.format(startDate, \"dd/MM/yyyy HH:mm\")\n\t\t\n\t\t\tinstances.append({\n\t\t\t\"instanceStyle\": {\n\t\t\t\t\"classes\": \"\"\n\t\t\t},\n\t\t\t\"instancePosition\": {},\n\t\t\t\"production\": pyData.getValueAt(r, \"hour_production_count\"),\n\t\t\t\"label\": label,\n\t\t\t\"target\": pyData.getValueAt(r, \"target_hour\")\n\t\t\t})\n\t\t\n\treturn instances",
                                   "type": "script"
                                 }
                               ],
