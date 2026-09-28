@@ -102,7 +102,6 @@ def getTargetRateDataset(targetRateName,targetRate):
 def getTargetProductionCount(targetRateHistory):
 	#target production count = run time * target rate
 
-	rowIndex = targetRateHistory.rowCount - 1
 	targetProductionCount = 0
 	for row in range(targetRateHistory.rowCount):
 
@@ -151,10 +150,6 @@ def resetDemoTags():
 		#running state
 		tagWritePaths.append("%s/Plc/State"%(linePath))
 		tagWriteValues.append(1)
-	
-		now = system.date.now()
-		dayStartTime = system.date.setTime(now, 0, 0, 0)
-		hourStartTime = system.date.setTime(now, system.date.getHour24(now), 0, 0)
 
 		# "reset" means the period's production reads zero from here, and production is
 		# the expression Plc/Outfeed - StartCounter -- so the reset value is wherever the
@@ -202,7 +197,7 @@ def resetDemoTags():
 		#reset target rate history
 		targetRateHistory = launchpad.oee.getTargetRateDataset("Default", 15)
 		tagWritePaths.append("%s/DayOee/TargetRateHistory" %(linePath))
- 		tagWritePaths.append("%s/ShiftOee/TargetRateHistory" %(linePath))
+		tagWritePaths.append("%s/ShiftOee/TargetRateHistory" %(linePath))
 		tagWritePaths.append("%s/HourOee/TargetRateHistory" %(linePath))
 		tagWriteValues.extend([targetRateHistory, targetRateHistory, targetRateHistory])
 
@@ -211,7 +206,6 @@ def resetDemoTags():
 		
 def initDemoTags():
 	#initialize lines in demo folder
-	logger = system.util.getLogger("launchpad.oee.initOeeDemo")
 	import math
 	for i in range(1,8): 
 		linePath = "[Launchpad]OEE/Demo/Line %s" %(i)
@@ -323,21 +317,20 @@ def initDemoTags():
 		
 		#set target rate history
 		targetRateHistory = launchpad.oee.getTargetRateDataset("default", 15)
-		targetRateHeaders = ["RateName","RateValue", "SecondsElapsed", "SecondsRunning",  "SecondsFaulted", "SecondsIdle" ]
-		
+
 		dayTargetRateHistory = system.dataset.setValue(targetRateHistory, 0, "SecondsElapsed", system.date.secondsBetween(dayStartTime,now))  
 		dayTargetRateHistory = system.dataset.setValue(dayTargetRateHistory, 0, "SecondsRunning", dayRunTime)  
 		dayTargetRateHistory = system.dataset.setValue(dayTargetRateHistory, 0, "SecondsFaulted", dayDownTime)  
 		dayTargetRateHistory = system.dataset.setValue(dayTargetRateHistory, 0, "SecondsIdle", 0)  
 		tagWritePaths.append("%s/DayOee/TargetRateHistory" %(linePath))
- 		
- 		# no shift is current on a gateway whose roster was written seconds ago
- 		shiftElapsed = system.date.secondsBetween(shiftStartTime, now) if shiftStartTime else 0
- 		shiftTargetRateHistory = system.dataset.setValue(targetRateHistory, 0, "SecondsElapsed", shiftElapsed)
+ 
+		# no shift is current on a gateway whose roster was written seconds ago
+		shiftElapsed = system.date.secondsBetween(shiftStartTime, now) if shiftStartTime else 0
+		shiftTargetRateHistory = system.dataset.setValue(targetRateHistory, 0, "SecondsElapsed", shiftElapsed)
 		shiftTargetRateHistory = system.dataset.setValue(shiftTargetRateHistory, 0, "SecondsRunning", shiftRunTime)  
 		shiftTargetRateHistory = system.dataset.setValue(shiftTargetRateHistory, 0, "SecondsFaulted", shiftDownTime)  
 		shiftTargetRateHistory = system.dataset.setValue(shiftTargetRateHistory, 0, "SecondsIdle", 0)  
- 		tagWritePaths.append("%s/ShiftOee/TargetRateHistory" %(linePath))
+		tagWritePaths.append("%s/ShiftOee/TargetRateHistory" %(linePath))
 		
 		hourTargetRateHistory = system.dataset.setValue(targetRateHistory, 0, "SecondsElapsed", system.date.secondsBetween(hourStartTime,now))  
 		hourTargetRateHistory = system.dataset.setValue(hourTargetRateHistory, 0, "SecondsRunning", hourRunTime)  
@@ -429,17 +422,15 @@ def recordHourEnd(lineName,  lineValue, hourStartTime):
 	params.append(lineValue["Plc"]["ProductionCounter"]) #raw_production_count
 	params.append(lineValue["Plc"]["RejectCounter"]) #raw_reject_count
 	
-	targetRate = lineValue["Config"]["TargetRate"]
 	runSeconds = lineValue["HourOee"]["RunSeconds"]
 	duration = lineValue["HourOee"]["Duration"]
+	oee_u = lineValue["HourOee"]["U"]
 	#adjust for  last second
-	if idleSeconds <= 5:		
+	if idleSeconds <= 5:
 		runSeconds = min(runSeconds + idleSeconds,duration)
-		idleSeconds = 0	
+		idleSeconds = 0
 		oee_u =1
-		
-	hourProductionCount = lineValue["HourOee"]["ProductionCount"]
-	
+
 	ooe_a  = 1.0*runSeconds/secondsElapsed
 	if runSeconds >0:
 		ooe_p =  lineValue["HourOee"]["P"]
@@ -476,8 +467,7 @@ def recordHourEnd(lineName,  lineValue, hourStartTime):
 
 def recordShiftRateChange(shift,  lineName,  lineBasePath, newTargetRate, newTargetRateName):
 	#record target rate changes in both database and OEE tags
-	logger = system.util.getLogger("launchpad.oee.recordShiftRateChange")
-	
+
 	#add new row to the target rate history for the shift
 	tagReadPaths= ["%s/%s/ShiftOee/TargetRateHistory" %(lineBasePath,lineName)]
 	tagValues = system.tag.readBlocking(tagReadPaths)
@@ -499,10 +489,9 @@ def recordShiftRateChange(shift,  lineName,  lineBasePath, newTargetRate, newTar
 
 def recordHourRateChange(hourTimestamp,  lineName, lineBasePath, newTargetRate, newTargetRateName):
 	#record target rate changes in both database and OEE tags
-	logger = system.util.getLogger("launchpad.oee.recordShiftRateChange")
-	
-		
-	#add new row to the target rate history for the day and hour 
+
+
+	#add new row to the target rate history for the day and hour
 	tagReadPaths= ["%s/%s/DayOee/TargetRateHistory" %(lineBasePath,lineName)]
 	tagValues = system.tag.readBlocking(tagReadPaths)
 	targetRateHistory = tagValues[0].value
@@ -644,68 +633,6 @@ def makeHistory(lineName, tx=None):
 	#generate history for line
 	from random import randrange
 
-	sql = """ INSERT INTO ex_launchpad_oee_shift (
-	
-	    utc_timestamp,
-	    stat_timestamp,
-	    shift,
-	    line_name,
-	    tag_folder,
-	    shift_start,
-	    shift_end,
-	    shift_seconds_elapsed,
-	    shift_running_seconds,
-	    shift_down_seconds,
-	    shift_idle_seconds,
-	    start_production_count,
-	    raw_production_count,
-	    shift_production_count,
-	    target_production_count,
-	    start_reject_count,
-	    raw_reject_count,
-	    shift_reject_count,
-	    outfeed_factor,
-	    reject_factor,
-	    target_rate,
-	    rate_name,
-	    shift_oee_a,
-	    shift_oee_p,
-	    shift_oee_q,
-	    shift_oee,
-	    shift_rates,
-	    shift_timestamps
-	) VALUES (
-	
-	    ?,  -- utc_timestamp
-	    ?,  -- stat_timestamp
-	    ?,  -- shift
-	    ?,  -- line_name
-	    ?,  -- tag_folder
-	    ?,  -- shift_start
-	    ?,  -- shift_end
-	    ?,  -- shift_seconds_elapsed
-	    ?,  -- shift_running_seconds
-	    ?,  -- shift_down_seconds
-	    ?,  -- shift_idle_seconds
-	    ?,  -- start_production_count
-	    ?,  -- raw_production_count
-	    ?,  -- shift_production_count
-	    ?,  -- target_production_count
-	    ?,  -- start_reject_count
-	    ?,  -- raw_reject_count
-	    ?,  -- shift_reject_count
-	    ?,  -- outfeed_factor
-	    ?,  -- reject_factor
-	    ?,  -- target_rate
-	    ?,  -- rate_name
-	    ?,  -- shift_oee_a
-	    ?,  -- shift_oee_p
-	    ?,  -- shift_oee_q
-	    ?,  -- shift_oee
-	    ?,  -- shift_rates (TEXT - expected to be a JSON string)
-	    ?   -- shift_timestamps (TEXT - expected to be a JSON string)
-	)"""  
-	
 	now = system.date.now()
 	startProductionCount = 100
 	startRejectCount = 10
@@ -721,7 +648,7 @@ def makeHistory(lineName, tx=None):
 			elif shift == 2:
 				startTime = system.date.setTime(shiftDay, 6, 0, 0)
 				stopTime = system.date.setTime(shiftDay, 14, 0, 0)
-			elif shift == 3:
+			else:
 				startTime = system.date.setTime(shiftDay, 14, 0, 0)
 				stopTime = system.date.setTime(shiftDay, 22, 0, 0)
 			targetRate = 15
@@ -769,41 +696,6 @@ def makeHourlyHistory(lineName, tx=None):
 	#generaate hourly history
 	from random import randrange
 	tagFolder = BASE_TAG_FOLDER
-  	sql = """ INSERT INTO ex_launchpad_oee_hour (
-	
-	  utc_timestamp ,
-	  stat_timestamp ,
-	  shift ,
-	  day_timestamp,
-	  hour_timestamp ,
-	  hour_of_day ,
-	  line_name ,
-	  tag_folder,	
-	  hour_seconds_elapsed ,
-	  hour_seconds_running ,
-	  hour_down_seconds,
-	  hour_idle_seconds,
-	  start_production_count ,
-	  raw_production_count ,
-	  hour_production_count ,
-	  target_production_count,
-	  start_reject_count ,
-	  raw_reject_count ,
-	  hour_reject_count , 
-	  
-	  outfeed_factor ,
-	  reject_factor ,
-	  target_rate ,
-	  rate_name ,        
-	  hour_oee_a ,
-	  hour_oee_p ,
-	  hour_oee_q ,
-	  hour_oee_u ,
-	  hour_oee,
-	  hour_rates,
-	  hour_timestamps   
-	) VALUES """
-	
 	now = system.date.now()
 	
 	startProductionCount = 100

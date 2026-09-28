@@ -362,7 +362,7 @@
       "dom": {
         "onClick": {
           "config": {
-            "script": "\tviewPath = 'Launchpad/Kpi/EmbeddedViews/PopupDualTag'\n\ttags = self.view.custom.tags\n\tif len(tags) == 0:\n\t\tpath1 = ''\n\t\tpath2 = ''\n\telif len(tags) == 1:\n\t\tpath1 = tags[0]['path']\n\t\tpath2 = ''\n\telif len(tags) == 2:\n\t\tpath1 = tags[0]['path']\n\t\tpath2 = tags[1]['path']\n\t\n\tviewParams = {'path1': path1, 'path2': path2, 'historyProvider': self.session.custom.launchpad.historyProvider}\n\tpopupTitle = self.view.params.title\n\tlaunchpad.util.popup(self, viewPath, viewParams, popupTitle)"
+            "script": "\tviewPath = 'Launchpad/Kpi/EmbeddedViews/PopupDualTag'\n\ttags = self.view.custom.tags\n\tif len(tags) == 0:\n\t\tpath1 = ''\n\t\tpath2 = ''\n\telif len(tags) == 1:\n\t\tpath1 = tags[0]['path']\n\t\tpath2 = ''\n\telse:\n\t\tpath1 = tags[0]['path']\n\t\tpath2 = tags[1]['path']\n\t\n\tviewParams = {'path1': path1, 'path2': path2, 'historyProvider': self.session.custom.launchpad.historyProvider}\n\tpopupTitle = self.view.params.title\n\tlaunchpad.util.popup(self, viewPath, viewParams, popupTitle)"
           },
           "scope": "G",
           "type": "script"
@@ -371,7 +371,7 @@
           "type": "script",
           "scope": "G",
           "config": {
-            "script": "\tif event.key in ('Enter', ' '):\n\t\tviewPath = 'Launchpad/Kpi/EmbeddedViews/PopupDualTag'\n\t\ttags = self.view.custom.tags\n\t\tif len(tags) == 0:\n\t\t\tpath1 = ''\n\t\t\tpath2 = ''\n\t\telif len(tags) == 1:\n\t\t\tpath1 = tags[0]['path']\n\t\t\tpath2 = ''\n\t\telif len(tags) == 2:\n\t\t\tpath1 = tags[0]['path']\n\t\t\tpath2 = tags[1]['path']\n\t\t\n\t\tviewParams = {'path1': path1, 'path2': path2, 'historyProvider': self.session.custom.launchpad.historyProvider}\n\t\tpopupTitle = self.view.params.title\n\t\tlaunchpad.util.popup(self, viewPath, viewParams, popupTitle)"
+            "script": "\tif event.key in ('Enter', ' '):\n\t\tviewPath = 'Launchpad/Kpi/EmbeddedViews/PopupDualTag'\n\t\ttags = self.view.custom.tags\n\t\tif len(tags) == 0:\n\t\t\tpath1 = ''\n\t\t\tpath2 = ''\n\t\telif len(tags) == 1:\n\t\t\tpath1 = tags[0]['path']\n\t\t\tpath2 = ''\n\t\telse:\n\t\t\tpath1 = tags[0]['path']\n\t\t\tpath2 = tags[1]['path']\n\t\t\n\t\tviewParams = {'path1': path1, 'path2': path2, 'historyProvider': self.session.custom.launchpad.historyProvider}\n\t\tpopupTitle = self.view.params.title\n\t\tlaunchpad.util.popup(self, viewPath, viewParams, popupTitle)"
           }
         }
       }

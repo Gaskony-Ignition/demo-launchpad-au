@@ -504,7 +504,7 @@
         },
         "transforms": [
           {
-            "code": "\t# Always true when in historical mode, except if there is no data to show\n \tif value.mode == \"Historical\":\n \t\tif value.averages == None:\n \t\t\treturn False\n \t\telif len(value.averages) < 1:\n \t\t\treturn False\n \t\t\t\n \t\telse:\n \t\t\treturn True\n \t# current shift is not 0, the it's currently in a scheduled shift\n \telif value.schedule.CurrentShift > 0 or value.interval == \"Day\":\n \t\treturn True\n \t\n \t# if no shifts are scheduled, return true for day/hour view (but not shift)\n \telif value.schedule[1].ShiftEnabled == False and value.schedule[2].ShiftEnabled == False and value.schedule[3].ShiftEnabled == False and value.interval != \"Shift\":\n \t\treturn True\n \t\n \telse:\n \t\treturn False",
+            "code": "\t# Always true when in historical mode, except if there is no data to show\n\tif value.mode == \"Historical\":\n\t\tif value.averages == None:\n\t\t\treturn False\n\t\telif len(value.averages) < 1:\n\t\t\treturn False\n\t\t\t\n\t\telse:\n\t\t\treturn True\n\t# current shift is not 0, the it's currently in a scheduled shift\n\telif value.schedule.CurrentShift > 0 or value.interval == \"Day\":\n\t\treturn True\n\t\n\t# if no shifts are scheduled, return true for day/hour view (but not shift)\n\telif value.schedule[1].ShiftEnabled == False and value.schedule[2].ShiftEnabled == False and value.schedule[3].ShiftEnabled == False and value.interval != \"Shift\":\n\t\treturn True\n\t\n\telse:\n\t\treturn False",
             "type": "script"
           }
         ],
@@ -1928,7 +1928,7 @@
               },
               "transforms": [
                 {
-                  "code": "\tmessages = [\"Not Scheduled\", \"No History Data\"]\n\t\n\tpos = 0\n\t\n\t# if historical mode but no data, show \"no history data\"\n \tif value.mode == \"Historical\":\n \t\tif value.averages == None:\n \t\t\tpos = 1\n \t\telif len(value.averages) < 1:\n \t\t\tpos = 1\n\t\n\treturn messages[pos]",
+                  "code": "\tmessages = [\"Not Scheduled\", \"No History Data\"]\n\t\n\tpos = 0\n\t\n\t# if historical mode but no data, show \"no history data\"\n\tif value.mode == \"Historical\":\n\t\tif value.averages == None:\n\t\t\tpos = 1\n\t\telif len(value.averages) < 1:\n\t\t\tpos = 1\n\t\n\treturn messages[pos]",
                   "type": "script"
                 }
               ],

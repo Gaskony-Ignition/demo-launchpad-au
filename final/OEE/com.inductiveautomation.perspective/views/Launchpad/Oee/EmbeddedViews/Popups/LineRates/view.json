@@ -243,7 +243,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\toptions = []\n\tfor row in range(value.rowCount):\n\t\toption = {\n\t\t  \"value\": value.getValueAt(row,\"rate_name\"),\n\t\t  \"label\": \"%s: %s %s /%s\" %(value.getValueAt(row,\"rate_name\"), value.getValueAt(row,\"target_rate\") ,value.getValueAt(row,\"uom\"), value.getValueAt(row,\"interval\"))\n\t\t}\n\t\toptions.append(option)\n\treturn options",
+                      "code": "\toptions = []\n\tfor row in range(value.rowCount):\n\t\toption = {\n\t\t\"value\": value.getValueAt(row,\"rate_name\"),\n\t\t\"label\": \"%s: %s %s /%s\" %(value.getValueAt(row,\"rate_name\"), value.getValueAt(row,\"target_rate\") ,value.getValueAt(row,\"uom\"), value.getValueAt(row,\"interval\"))\n\t\t}\n\t\toptions.append(option)\n\treturn options",
                       "type": "script"
                     }
                   ],

@@ -1,0 +1,12 @@
+{
+  "exceptions": [
+    {"file": "Configuration/Widget Edit/view.json", "rule": "UnusedCustomPropertiesRule", "match": "params.id:",
+     "reason": "launchpad.dashboard.editWidget(self), run from this view's Save button, reads self.view.params.id (dashboard/code.py:443) to find which widget in session.custom.launchpad.dashboard.objects.edit.widgets to update"},
+    {"file": "Configuration/Widget Edit Wrapper/view.json", "rule": "UnusedCustomPropertiesRule", "match": "params.configuring:",
+     "reason": "drives its own onChange handler, which opens the Widget Edit popup when toggled true; the linter only checks for reads of view.params.X, not onChange triggers on the param itself"},
+    {"file": "Configuration/Widget Edit Wrapper/view.json", "rule": "UnusedCustomPropertiesRule", "match": "params.widgetId:",
+     "reason": "launchpad.dashboard.code.py passes this in each widget instance's viewParams (lines 113, 214) and reads it back as row.viewParams.widgetId (line 421) when saving the edited dashboard - live state for the controller script, not something the view itself reads"},
+    {"file": "Configuration/Widget Edit Wrapper/view.json", "rule": "UnusedCustomPropertiesRule", "match": "params.widgetName:",
+     "reason": "same as widgetId - passed in by dashboard/code.py (lines 113, 214) and read back as row.viewParams.widgetName (line 421) when saving the edited dashboard"}
+  ]
+}

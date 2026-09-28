@@ -927,9 +927,7 @@
     },
     "tagFolder": "[Launchpad]OEE/Demo"
   },
-  "params": {
-    "dashboard": ""
-  },
+  "params": {},
   "propConfig": {
     "custom.dailyData": {
       "binding": {
@@ -1019,19 +1017,6 @@
         "type": "expr"
       },
       "persistent": true
-    },
-    "params.dashboard": {
-      "paramDirection": "input",
-      "persistent": true
-    },
-    "params.feature": {
-      "paramDirection": "input"
-    },
-    "params.tier1": {
-      "paramDirection": "input"
-    },
-    "params.tier2": {
-      "paramDirection": "input"
     }
   },
   "props": {

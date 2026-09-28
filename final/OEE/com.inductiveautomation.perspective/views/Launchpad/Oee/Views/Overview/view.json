@@ -30,7 +30,7 @@
         },
         "transforms": [
           {
-            "code": "\tinstances = []\n\tfor row in value:\n\t\tinstance = {\n\t\t  \"format\": \"#0.0%\",\n\t\t  \"high\": 1,\n\t\t  \"low\": 0,\n\t\t  \"title\": row.line_name,\n\t\t  \"units\": \"\",\n\t\t  \"value\": row.down_minutes/row.minutes_elapsed\n\t\t \n\t\t}\n\t\tinstances.append(instance)\n\n\treturn instances",
+            "code": "\tinstances = []\n\tfor row in value:\n\t\tinstance = {\n\t\t\"format\": \"#0.0%\",\n\t\t\"high\": 1,\n\t\t\"low\": 0,\n\t\t\"title\": row.line_name,\n\t\t\"units\": \"\",\n\t\t\"value\": row.down_minutes/row.minutes_elapsed\n\t\t\n\t\t}\n\t\tinstances.append(instance)\n\n\treturn instances",
             "type": "script"
           }
         ],
@@ -60,7 +60,7 @@
         },
         "transforms": [
           {
-            "code": "\tinstances = []\n\tfor row in value:\n\t\tinstance = {\n\t\t  \"format\": \"#0.0%\",\n\t\t  \"high\": 1,\n\t\t  \"low\": 0,\n\t\t  \"title\": row.line_name,\n\t\t  \"units\": \"\",\n\t\t  \"value\": row.oee\n\t\t}\n\t\tinstances.append(instance)\n\n\treturn instances",
+            "code": "\tinstances = []\n\tfor row in value:\n\t\tinstance = {\n\t\t\"format\": \"#0.0%\",\n\t\t\"high\": 1,\n\t\t\"low\": 0,\n\t\t\"title\": row.line_name,\n\t\t\"units\": \"\",\n\t\t\"value\": row.oee\n\t\t}\n\t\tinstances.append(instance)\n\n\treturn instances",
             "type": "script"
           }
         ],
@@ -208,7 +208,7 @@
                           },
                           "transforms": [
                             {
-                              "code": "\tif value[\"mode\"] == \"Realtime\":\n\t\tparams ={\n\t  \t\"folderPath\": value[\"folderPath\"],\n\t  \t\"title\": \"OEE\",\n\t  \t\"property\": \"%sOee/O\" %(value[\"interval\"])\n\t\t}\n\telse:\n\t\tparams = {\"title\": \"OEE\", \"instances\":value[\"instances\"]}\n\treturn params\n\n",
+                              "code": "\tif value[\"mode\"] == \"Realtime\":\n\t\tparams ={\n\t\t\"folderPath\": value[\"folderPath\"],\n\t\t\"title\": \"OEE\",\n\t\t\"property\": \"%sOee/O\" %(value[\"interval\"])\n\t\t}\n\telse:\n\t\tparams = {\"title\": \"OEE\", \"instances\":value[\"instances\"]}\n\treturn params\n\n",
                               "type": "script"
                             }
                           ],
@@ -269,7 +269,7 @@
                           },
                           "transforms": [
                             {
-                              "code": "\tif value[\"mode\"] == \"Realtime\":\n\t\tparams ={\n\t  \t\"folderPath\": value[\"folderPath\"],\n\t  \t\"title\": \"Downtime\",\n\t  \t\"property\": \"%sOee/D\" %(value[\"interval\"])\n\t\t}\n\telse:\n\t\tparams = {\"title\": \"Downtime\", \"instances\":value[\"instances\"] }\n\treturn params\n\n",
+                              "code": "\tif value[\"mode\"] == \"Realtime\":\n\t\tparams ={\n\t\t\"folderPath\": value[\"folderPath\"],\n\t\t\"title\": \"Downtime\",\n\t\t\"property\": \"%sOee/D\" %(value[\"interval\"])\n\t\t}\n\telse:\n\t\tparams = {\"title\": \"Downtime\", \"instances\":value[\"instances\"] }\n\treturn params\n\n",
                               "type": "script"
                             }
                           ],
@@ -366,7 +366,7 @@
                           },
                           "transforms": [
                             {
-                              "code": "\tinstances = []\n\t\n\tfor item in value.oeeConfig.lines:\n\t\tinstances.append({\n\t\t  \"instanceStyle\": {\n\t\t    \"classes\": \"\"\n\t\t  },\n\t\t  \"instancePosition\": {},\n\t\t  \"path\": value.oeeConfig.lineTagFolder + \"/\" + item,\n\t\t  \"interval\": value.interval,\n\t\t  \"mode\": value.mode,\n\t\t  \"startTime\": value.startTime,\n\t\t  \"stopTime\": value.stopTime\n\t\t})\n\t\t\n\treturn instances",
+                              "code": "\tinstances = []\n\t\n\tfor item in value.oeeConfig.lines:\n\t\tinstances.append({\n\t\t\"instanceStyle\": {\n\t\t\t\"classes\": \"\"\n\t\t},\n\t\t\"instancePosition\": {},\n\t\t\"path\": value.oeeConfig.lineTagFolder + \"/\" + item,\n\t\t\"interval\": value.interval,\n\t\t\"mode\": value.mode,\n\t\t\"startTime\": value.startTime,\n\t\t\"stopTime\": value.stopTime\n\t\t})\n\t\t\n\treturn instances",
                               "type": "script"
                             }
                           ],
@@ -534,7 +534,7 @@
                           },
                           "transforms": [
                             {
-                              "code": "\tif value[\"mode\"] == \"Realtime\":\n\t\tparams ={\n\t  \t\"folderPath\": value[\"folderPath\"],\n\t  \t\"title\": \"\",\n\t  \t\"property\": \"%sOee/O\" %(value[\"interval\"])\n\t\t}\n\telse:\n\t\tparams = {\"title\": \"\", \"instances\":value[\"instances\"]}\n\treturn params\n\n",
+                              "code": "\tif value[\"mode\"] == \"Realtime\":\n\t\tparams ={\n\t\t\"folderPath\": value[\"folderPath\"],\n\t\t\"title\": \"\",\n\t\t\"property\": \"%sOee/O\" %(value[\"interval\"])\n\t\t}\n\telse:\n\t\tparams = {\"title\": \"\", \"instances\":value[\"instances\"]}\n\treturn params\n\n",
                               "type": "script"
                             }
                           ],
@@ -595,7 +595,7 @@
                           },
                           "transforms": [
                             {
-                              "code": "\tif value[\"mode\"] == \"Realtime\":\n\t\tparams ={\n\t  \t\"folderPath\": value[\"folderPath\"],\n\t  \t\"title\": \"\",\n\t  \t\"property\": \"%sOee/D\" %(value[\"interval\"])\n\t\t}\n\telse:\n\t\tparams = {\"title\": \"\", \"instances\":value[\"instances\"] }\n\treturn params\n\n",
+                              "code": "\tif value[\"mode\"] == \"Realtime\":\n\t\tparams ={\n\t\t\"folderPath\": value[\"folderPath\"],\n\t\t\"title\": \"\",\n\t\t\"property\": \"%sOee/D\" %(value[\"interval\"])\n\t\t}\n\telse:\n\t\tparams = {\"title\": \"\", \"instances\":value[\"instances\"] }\n\treturn params\n\n",
                               "type": "script"
                             }
                           ],
@@ -719,7 +719,7 @@
                       },
                       "transforms": [
                         {
-                          "code": "\tinstances = []\n\t\n\tfor item in value.oeeConfig.lines:\n\t\tinstances.append({\n\t\t  \"instanceStyle\": {\n\t\t    \"classes\": \"\"\n\t\t  },\n\t\t  \"instancePosition\": {},\n\t\t  \"path\": value.oeeConfig.lineTagFolder + \"/\" + item,\n\t\t  \"interval\": value.interval,\n\t\t  \"mode\": value.mode,\n\t\t  \"startTime\": value.startTime,\n\t\t  \"stopTime\": value.stopTime\n\t\t})\n\t\t\n\treturn instances",
+                          "code": "\tinstances = []\n\t\n\tfor item in value.oeeConfig.lines:\n\t\tinstances.append({\n\t\t\"instanceStyle\": {\n\t\t\t\"classes\": \"\"\n\t\t},\n\t\t\"instancePosition\": {},\n\t\t\"path\": value.oeeConfig.lineTagFolder + \"/\" + item,\n\t\t\"interval\": value.interval,\n\t\t\"mode\": value.mode,\n\t\t\"startTime\": value.startTime,\n\t\t\"stopTime\": value.stopTime\n\t\t})\n\t\t\n\treturn instances",
                           "type": "script"
                         }
                       ],

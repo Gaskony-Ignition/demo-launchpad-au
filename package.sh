@@ -50,6 +50,21 @@ if [[ " $* " != *" --skip-a11y-check "* ]]; then
         echo "a11y-gate.sh not found above $_repo; gate skipped" >&2
     fi
 fi
+# Lint gate (ign-lint over every view.json, pylint over every script-library
+# code.py). Blocking; bypass deliberately with --skip-lint-check.
+if [[ " $* " != *" --skip-lint-check "* ]]; then
+    _repo=$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)
+    _lintgate=""; _d="$_repo"
+    while [ "$_d" != / ]; do
+        [ -x "$_d/modules/lint-gate.sh" ] && { _lintgate="$_d/modules/lint-gate.sh"; break; }
+        _d=$(dirname "$_d")
+    done
+    if [ -n "$_lintgate" ]; then
+        "$_lintgate" "$_repo" || { echo "lint gate failed: fix the errors above, or record a reasoned exception in lint.json, or pass --skip-lint-check" >&2; exit 1; }
+    else
+        echo "lint-gate.sh not found above $_repo; gate skipped" >&2
+    fi
+fi
 # Layout gate (laptop-first: 1366x640, no page scroll). Blocking; bypass
 # deliberately with --skip-layout-check. Checks the SAME already-deployed
 # gateway the a11y gate does - deploy before packaging, not the other way
@@ -66,11 +81,11 @@ if [[ " $* " != *" --skip-layout-check "* ]]; then
             || { echo "layout gate failed: give the overflowing card(s) a floor, move content to its own screen/popup, or pass --skip-layout-check" >&2; exit 1; }
     done
 fi
-# Strip --skip-readme-check/--skip-a11y-check/--skip-layout-check (already
-# consumed by the gates above) so this script's own argument parsing --
+# Strip --skip-readme-check/--skip-a11y-check/--skip-lint-check/--skip-layout-check
+# (already consumed by the gates above) so this script's own argument parsing --
 # which rejects unrecognised args -- never sees it.
 _pkgargs=(); for _a in "$@"; do
-    [[ "$_a" == "--skip-readme-check" || "$_a" == "--skip-a11y-check" || "$_a" == "--skip-layout-check" ]] || _pkgargs+=("$_a")
+    [[ "$_a" == "--skip-readme-check" || "$_a" == "--skip-a11y-check" || "$_a" == "--skip-lint-check" || "$_a" == "--skip-layout-check" ]] || _pkgargs+=("$_a")
 done
 set -- "${_pkgargs[@]}"
 

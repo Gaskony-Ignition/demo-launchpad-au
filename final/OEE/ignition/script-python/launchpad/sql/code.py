@@ -15,7 +15,6 @@ def convertToDate(dateString, dateFormat):
 	
 def keyHasValue(key, dict):
 	valid = 1
-	msg = ""
 	if key in dict.keys():
 		if not dict[key]:
 			valid = 0
@@ -30,7 +29,7 @@ def runDatabaseDelete(tableName, databaseName, idValue,idField):
 	
 	sql =  "DELETE FROM  %s WHERE %s = ? " %(tableName, idField)
 	logger.info("runDatabaseDelete.  %s  %s" %(sql, idValue))
-	newId = system.db.runPrepUpdate(sql,[idValue], databaseName, getKey = 1)
+	system.db.runPrepUpdate(sql,[idValue], databaseName, getKey = 1)
 	return 1
 
 def runDatabaseSelect(tableName, databaseName, fields, keys):
@@ -61,8 +60,8 @@ def runDatabaseSelect(tableName, databaseName, fields, keys):
 		data = system.db.runPrepQuery(sql, params, databaseName)
 	else:
 		data = []
-	print sql
-	print data
+	print(sql)
+	print(data)
 	
 	return data
 	
@@ -92,7 +91,6 @@ def runDatabaseUpdate(tableName, databaseName, dict, keys):
 	#build a sql update statement and then run on the given table name on the given database connection
 	#dict: dictionary with field name - value pairs
 	#keys: dictionary with primary key field names and values
-	logger = system.util.getLogger("launchpad.oee.sql-actions")
 	fields = ""
 	params = []
 	whereString = ""
