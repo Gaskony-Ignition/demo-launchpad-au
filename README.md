@@ -3,6 +3,8 @@
 Two Ignition 8.3 Perspective demo projects: **OEE** across seven simulated production
 lines, and a plant **KPI** overview with a drag-and-drop dashboard.
 
+> **Not an Inductive Automation product, and not supported by Inductive Automation.** Personal work, largely built with AI tools and tested for one purpose on one gateway. Take the ideas; fork and review it before it goes near production. [NOTICE.md](NOTICE.md) says more.
+
 ## Why this exists
 
 The Inductive Automation *Launchpad* Exchange resources are built around US units and
