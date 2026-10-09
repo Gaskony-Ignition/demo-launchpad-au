@@ -1,18 +1,11 @@
 // Find the Ignition toolkit that these dev scripts borrow Playwright and the
-// gateway credentials from.
-//
-// The toolkit's own docs call it /claude, which on this machine is a symlink to
-// /Home-Claude that does not always resolve -- a require() through it fails with
-// "Cannot find module", which reads exactly like Playwright not being installed.
-// Look under both, and let the environment override for a machine that keeps it
-// somewhere else again.
+// gateway credentials from. IGNITION_TOOLKIT must point at its checkout.
 const path = require('path');
 
-const ROOTS = [
-  process.env.IGNITION_TOOLKIT,
-  '/Home-Claude/ignition-claude-toolkit',
-  '/claude/ignition-claude-toolkit',
-].filter(Boolean);
+if (!process.env.IGNITION_TOOLKIT) {
+  throw new Error('IGNITION_TOOLKIT is not set: point it at the ignition-claude-toolkit checkout');
+}
+const ROOTS = [process.env.IGNITION_TOOLKIT];
 
 const PLAYWRIGHT = [].concat(
   ...ROOTS.map((r) => [

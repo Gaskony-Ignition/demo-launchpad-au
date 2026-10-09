@@ -264,8 +264,8 @@ for PROJ in OEE KPI; do
     rm -rf "$STAGE/ignition/global-props"
   fi
 
-  # A release artefact carries its version in the FILENAME as well (Nigel,
-  # 26/08/2026) -- a bare downloaded zip is unidentifiable. Dev builds stay
+  # A release artefact carries its version in the FILENAME as well
+  # (26/08/2026) -- a bare downloaded zip is unidentifiable. Dev builds stay
   # unversioned.
   ZIP="$DIST/$PROJ${VERSION:+-$VERSION}.zip"
   ( cd "$STAGE" && zip -qr "$ZIP" . )

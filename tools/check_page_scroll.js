@@ -3,7 +3,7 @@
 //   node tools/check_page_scroll.js http://localhost:8988 KPI / /trending /alarming
 //   node tools/check_page_scroll.js --gateway module-testing KPI / /trending
 //
-// A page scrollbar is a defect here, not a preference (Nigel, standing rule):
+// A page scrollbar is a defect here, not a preference (house rule):
 // on an operations screen the thing you need is as likely to be below the fold
 // as above it, and nothing on the page says there is a below-the-fold. Cards
 // and tables scroll INSIDE themselves; the page does not.
@@ -48,8 +48,10 @@ const GW_NAME = arg('gateway', '');
 // Same credentials file and KEY=VALUE format a11y-check.js reads (the scan
 // skill's convention) -- read directly rather than importing across skills.
 function credentialsUrl(name) {
-  const cfg = path.join('/Home-Claude/ignition-claude-toolkit/plugins/ignition/config.local.json');
-  let file = process.env.IGNITION_SCAN_CREDS;
+  const tk = process.env.IGNITION_TOOLKIT;
+  if (!tk) throw new Error('IGNITION_TOOLKIT is not set: point it at the ignition-claude-toolkit checkout');
+  const cfg = path.join(tk, 'plugins/ignition/config.local.json');
+  let file = process.env.IGNITION_SCAN_CREDS || process.env.IGNITION_GATEWAYS_ENV;
   try { file = file || JSON.parse(fs.readFileSync(cfg, 'utf8')).scan_credentials_file; } catch (e) { /* none */ }
   const kv = {};
   for (const line of (file && fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : '').split('\n')) {

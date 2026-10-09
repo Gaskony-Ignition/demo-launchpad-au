@@ -35,7 +35,7 @@ OPCUA_MODULE = "core/com.inductiveautomation.opcua"
 
 # Each project gets its OWN SQLite database, named after the project, so a
 # glance at the gateway's connection list says which project a database belongs
-# to (Nigel, 28/08/2026). They used to share one called "Examples", which told
+# to (28/08/2026). They used to share one called "Examples", which told
 # a user nothing and tied the two projects together for no reason -- OEE keeps
 # its own SQL tables and KPI keeps tag history, and neither reads the other's.
 #
