@@ -38,11 +38,11 @@ import zlib
 
 
 def _blob(b64):
-    return zlib.decompress(base64.b64decode(b64))
+\treturn zlib.decompress(base64.b64decode(b64))
 
 
 def _json(b64):
-    return json.loads(_blob(b64))
+\treturn json.loads(_blob(b64))
 
 '''
 
@@ -57,14 +57,14 @@ def pack_bytes(data):
 
 
 def wrap(b64, width=96):
-    return "\n".join('    "%s"' % b64[i:i + width] for i in range(0, len(b64), width))
+    return "\n".join('\t"%s"' % b64[i:i + width] for i in range(0, len(b64), width))
 
 
-def emit(name, b64, accessor, kind="json"):
+def emit(name, b64, accessor, doc, kind="json"):
     return (
         "_%s = (\n%s\n)\n\n\n"
-        "def %s():\n    return _%s(_%s)\n\n\n"
-        % (name, wrap(b64), accessor, kind, name)
+        "def %s():\n\t\"\"\"%s\"\"\"\n\treturn _%s(_%s)\n\n\n"
+        % (name, wrap(b64), accessor, doc, kind, name)
     )
 
 
@@ -125,10 +125,14 @@ def main():
     instructions = open(CFG + "/device/Launchpad/instructions.csv", "rb").read()
 
     common = HEADER
-    common += emit("PROVIDER", pack(provider), "tagProvider")
-    common += emit("HISTORIAN", pack(historian), "historian")
-    common += emit("DEVICE", pack(device), "device")
-    common += emit("INSTRUCTIONS", pack_bytes(instructions), "instructions", kind="blob")
+    common += emit("PROVIDER", pack(provider), "tagProvider",
+                   "Return the Launchpad tag provider's config resource as a dict.")
+    common += emit("HISTORIAN", pack(historian), "historian",
+                   "Return the demo historian provider's config resource as a dict.")
+    common += emit("DEVICE", pack(device), "device",
+                   "Return the simulator device's config resource as a dict.")
+    common += emit("INSTRUCTIONS", pack_bytes(instructions), "instructions",
+                   "Return the simulator programme (instructions.csv) as bytes.", kind="blob")
 
     projects = {
         # Deliberately NOT tag-definition/launchpad/unary-resource.json: that resource
@@ -145,7 +149,8 @@ def main():
     for proj, blobs in projects.items():
         body = common
         for name, obj, accessor in blobs:
-            body += emit(name, pack(obj), accessor)
+            body += emit(name, pack(obj), accessor,
+                         "Return the tag config resources as {path under config/resources: file text}.")
         dest = "%s/final/%s/ignition/script-python/launchpad/payload" % (ROOT, proj)
         os.makedirs(dest, exist_ok=True)
         with open(dest + "/code.py", "w") as fh:
