@@ -80,7 +80,7 @@
     "children": [
       {
         "meta": {
-          "name": "Label"
+          "name": "Title"
         },
         "position": {
           "basis": "30px",
@@ -128,7 +128,7 @@
       },
       {
         "meta": {
-          "name": "FlexRepeater"
+          "name": "Bars"
         },
         "position": {
           "basis": "154px",

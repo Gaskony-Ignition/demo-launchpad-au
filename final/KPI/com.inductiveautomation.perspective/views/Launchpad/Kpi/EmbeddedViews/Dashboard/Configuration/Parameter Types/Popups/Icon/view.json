@@ -22,7 +22,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\tsystem.perspective.sendMessage(messageType=\"icon-selected\", payload={\"icon\":self.view.params.icon})"
+                "script": "\tsystem.perspective.sendMessage(messageType=\"iconSelected\", payload={\"icon\":self.view.params.icon})"
               },
               "scope": "G",
               "type": "script"
@@ -31,13 +31,13 @@
               "type": "script",
               "scope": "G",
               "config": {
-                "script": "\tif event.key in ('Enter', ' '):\n\t\tsystem.perspective.sendMessage(messageType=\"icon-selected\", payload={\"icon\":self.view.params.icon})"
+                "script": "\tif event.key in ('Enter', ' '):\n\t\tsystem.perspective.sendMessage(messageType=\"iconSelected\", payload={\"icon\":self.view.params.icon})"
               }
             }
           }
         },
         "meta": {
-          "name": "Icon",
+          "name": "Preview",
           "tabIndex": 0,
           "tooltip": {
             "enabled": true,

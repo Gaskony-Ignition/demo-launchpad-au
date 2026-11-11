@@ -1,5 +1,9 @@
 {
-  "custom": {},
+  "custom": {
+    "selection": [
+      "0/0"
+    ]
+  },
   "params": {
     "id": "",
     "mode": "realtime"
@@ -51,7 +55,7 @@
           }
         },
         "meta": {
-          "name": "Tree"
+          "name": "Tags"
         },
         "position": {
           "grow": 1
@@ -73,6 +77,15 @@
                 }
               ],
               "type": "expr-struct"
+            }
+          },
+          "props.selection": {
+            "binding": {
+              "config": {
+                "bidirectional": true,
+                "path": "view.custom.selection"
+              },
+              "type": "property"
             }
           }
         },
@@ -127,7 +140,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\tid \u003d self.view.params.id\n\tpath \u003d self.getSibling(\"Tree\").props.selectionData[0].value.get(\u0027tag\u0027)\n\t\n\tif path \u003d\u003d None:\n\t\t# Must be a folder selected.\n\t\tpath \u003d self.getSibling(\"Tree\").props.selectionData[0].value.get(\u0027folder\u0027)\n\t\n\tsystem.perspective.sendMessage(messageType\u003d\"tag-selection\", payload\u003d{\"id\":id, \"path\":path})\n\tsystem.perspective.closePopup(id\u003d\"tag-tree\")"
+                "script": "\tid \u003d self.view.params.id\n\tpath \u003d self.getSibling(\"Tags\").props.selectionData[0].value.get(\u0027tag\u0027)\n\t\n\tif path \u003d\u003d None:\n\t\t# Must be a folder selected.\n\t\tpath \u003d self.getSibling(\"Tags\").props.selectionData[0].value.get(\u0027folder\u0027)\n\t\n\tsystem.perspective.sendMessage(messageType\u003d\"tagSelection\", payload\u003d{\"id\":id, \"path\":path})\n\tsystem.perspective.closePopup(id\u003d\"tag-tree\")"
               },
               "scope": "G",
               "type": "script"
@@ -145,7 +158,7 @@
           "props.enabled": {
             "binding": {
               "config": {
-                "path": "../Tree.props.selection"
+                "path": "view.custom.selection"
               },
               "transforms": [
                 {

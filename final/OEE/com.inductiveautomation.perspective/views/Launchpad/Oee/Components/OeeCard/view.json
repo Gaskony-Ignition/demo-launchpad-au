@@ -726,7 +726,7 @@
               }
             ],
             "meta": {
-              "name": "FlexContainer"
+              "name": "LineInfo"
             },
             "position": {
               "grow": 1
@@ -858,7 +858,7 @@
             "children": [
               {
                 "meta": {
-                  "name": "Label"
+                  "name": "OeeLabel"
                 },
                 "position": {
                   "basis": "18px",
@@ -1306,7 +1306,7 @@
                 "children": [
                   {
                     "meta": {
-                      "name": "Label"
+                      "name": "AvailabilityLabel"
                     },
                     "position": {
                       "basis": "30px"
@@ -1373,7 +1373,7 @@
                 "children": [
                   {
                     "meta": {
-                      "name": "Label"
+                      "name": "UtilisationLabel"
                     },
                     "position": {
                       "basis": "30px"
@@ -1465,7 +1465,7 @@
                 "children": [
                   {
                     "meta": {
-                      "name": "Label"
+                      "name": "UnitsLabel"
                     },
                     "position": {
                       "basis": "30px",
@@ -1534,7 +1534,7 @@
                 "children": [
                   {
                     "meta": {
-                      "name": "Label"
+                      "name": "RateLabel"
                     },
                     "position": {
                       "basis": "30px",
@@ -1888,7 +1888,7 @@
       },
       {
         "meta": {
-          "name": "Label"
+          "name": "UnavailableMessage"
         },
         "position": {
           "grow": 1

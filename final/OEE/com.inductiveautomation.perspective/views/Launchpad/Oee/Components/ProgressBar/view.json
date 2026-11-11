@@ -148,7 +148,7 @@
     "children": [
       {
         "meta": {
-          "name": "Label"
+          "name": "Title"
         },
         "position": {
           "basis": "100px",

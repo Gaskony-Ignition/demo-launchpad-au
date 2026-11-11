@@ -154,7 +154,7 @@
                   }
                 },
                 "meta": {
-                  "name": "Dropdown"
+                  "name": "AggModeSelect"
                 },
                 "position": {
                   "basis": "155px",
@@ -279,7 +279,7 @@
       },
       {
         "meta": {
-          "name": "TimeSeriesChart"
+          "name": "HistoryChart"
         },
         "position": {
           "grow": 1

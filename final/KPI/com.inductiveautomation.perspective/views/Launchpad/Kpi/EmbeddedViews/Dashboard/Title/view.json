@@ -24,7 +24,7 @@
     "children": [
       {
         "meta": {
-          "name": "Icon"
+          "name": "DashboardIcon"
         },
         "position": {
           "basis": "24px",
@@ -52,7 +52,7 @@
       {
         "meta": {
           "hasDelegate": true,
-          "name": "Label"
+          "name": "DashboardName"
         },
         "position": {
           "grow": 1

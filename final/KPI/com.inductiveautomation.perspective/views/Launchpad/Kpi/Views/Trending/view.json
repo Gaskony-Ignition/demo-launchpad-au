@@ -12,7 +12,7 @@
     "children": [
       {
         "meta": {
-          "name": "PowerChart"
+          "name": "Trend"
         },
         "position": {
           "grow": 1

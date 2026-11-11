@@ -1,5 +1,7 @@
 {
-  "custom": {},
+  "custom": {
+    "rateSelection": []
+  },
   "params": {},
   "props": {
     "defaultSize": {
@@ -31,7 +33,7 @@
               "component": {
                 "onActionPerformed": {
                   "config": {
-                    "script": "\tsystem.perspective.sendMessage(\"launchpad-oee-table-reset\", scope=\"page\")\n\tsystem.perspective.sendMessage(\"launchpad-oee-rate-mode\", payload = {\"mode\": \"add\"} , scope=\"page\")\n\t\n\t\n"
+                    "script": "\tsystem.perspective.sendMessage(\"launchpadOeeTableReset\", scope=\"page\")\n\tsystem.perspective.sendMessage(\"launchpadOeeRateMode\", payload = {\"mode\": \"add\"} , scope=\"page\")\n\t\n\t\n"
                   },
                   "scope": "G",
                   "type": "script"
@@ -77,7 +79,7 @@
       },
       {
         "meta": {
-          "name": "Table"
+          "name": "RateTable"
         },
         "position": {
           "grow": 1
@@ -89,6 +91,12 @@
                 "path": "parent.custom.data"
               },
               "type": "property"
+            }
+          },
+          "props.selection.data": {
+            "onChange": {
+              "enabled": null,
+              "script": "\tself.view.custom.rateSelection = currentValue.value if currentValue else []"
             }
           }
         },
@@ -499,7 +507,7 @@
           "extensionFunctions": null,
           "messageHandlers": [
             {
-              "messageType": "launchpad-oee-table-reset",
+              "messageType": "launchpadOeeTableReset",
               "pageScope": true,
               "script": "\tself.props.selection.selectedRow = -1\n\tself.props.selection.selectedColumn = -1\n\tself.props.selection.selectedRow = None\n\tself.props.selection.selectedColumn = None",
               "sessionScope": false,
@@ -523,7 +531,7 @@
               "props.text": {
                 "binding": {
                   "config": {
-                    "path": ".../Table.props.selection.data"
+                    "path": "view.custom.rateSelection"
                   },
                   "transforms": [
                     {
@@ -580,13 +588,13 @@
                       "config": {
                         "struct": {
                           "addMode": "{..../AddEdit.custom.addMode}",
-                          "selectionData": "{..../Table.props.selection.data}"
+                          "selectionData": "{..../RateTable.props.selection.data}"
                         },
                         "waitOnAll": true
                       },
                       "transforms": [
                         {
-                          "code": "\tif value[\"addMode\"]:\n\t\treturn \"new_rate_name\"\n\telse:\n\t\treturn self.parent.parent.parent.getChild(\"Table\").props.selection.data[0].rate_name",
+                          "code": "\tif value[\"addMode\"]:\n\t\treturn \"new_rate_name\"\n\telse:\n\t\treturn self.parent.parent.parent.getChild(\"RateTable\").props.selection.data[0].rate_name",
                           "type": "script"
                         }
                       ],
@@ -613,7 +621,7 @@
           },
           {
             "meta": {
-              "name": "Label"
+              "name": "RateLabel"
             },
             "position": {
               "basis": "25px",
@@ -645,7 +653,7 @@
             "children": [
               {
                 "meta": {
-                  "name": "NumericEntryField"
+                  "name": "RateValue"
                 },
                 "position": {
                   "basis": "150px"
@@ -656,7 +664,7 @@
                       "config": {
                         "struct": {
                           "addMode": "{..../AddEdit.custom.addMode}",
-                          "selectionData": "{..../Table.props.selection.data}"
+                          "selectionData": "{..../RateTable.props.selection.data}"
                         },
                         "waitOnAll": true
                       },
@@ -694,7 +702,7 @@
                       "config": {
                         "struct": {
                           "addMode": "{..../AddEdit.custom.addMode}",
-                          "selectionData": "{..../Table.props.selection.data}"
+                          "selectionData": "{..../RateTable.props.selection.data}"
                         },
                         "waitOnAll": true
                       },
@@ -729,7 +737,7 @@
                       "config": {
                         "struct": {
                           "addMode": "{..../AddEdit.custom.addMode}",
-                          "selectionData": "{..../Table.props.selection.data}"
+                          "selectionData": "{..../RateTable.props.selection.data}"
                         },
                         "waitOnAll": true
                       },
@@ -818,7 +826,7 @@
                   "component": {
                     "onActionPerformed": {
                       "config": {
-                        "script": "\tsystem.perspective.sendMessage(\"launchpad-oee-refresh-rates-table\", scope=\"page\")\t\n\tsystem.perspective.sendMessage(\"launchpad-oee-table-reset\", scope=\"page\")\n\tif self.parent.parent.parent.getChild(\"AddEdit\").custom.addMode:\n\t\tsystem.perspective.sendMessage(\"launchpad-oee-rate-mode\", payload = {\"mode\": \"\"} , scope=\"page\")"
+                        "script": "\tsystem.perspective.sendMessage(\"launchpadOeeRefreshRatesTable\", scope=\"page\")\t\n\tsystem.perspective.sendMessage(\"launchpadOeeTableReset\", scope=\"page\")\n\tif self.parent.parent.parent.getChild(\"AddEdit\").custom.addMode:\n\t\tsystem.perspective.sendMessage(\"launchpadOeeRateMode\", payload = {\"mode\": \"\"} , scope=\"page\")"
                       },
                       "scope": "G",
                       "type": "script"
@@ -855,7 +863,7 @@
                   "component": {
                     "onActionPerformed": {
                       "config": {
-                        "script": "\t#add or edit record\n\ttableName = \"ex_launchpad_oee_rate\"\n\tdatabaseName = launchpad.oee.db()\n\trate_name = self.parent.parent.getChild(\"NameEntry\").getChild(\"TextEntry\").props.text\n\tinterval = self.parent.parent.getChild(\"RateEntry\").getChild(\"Interval\").props.value\n\tuom = self.parent.parent.getChild(\"RateEntry\").getChild(\"UnitsEntry\").props.text\n\ttarget_rate = self.parent.parent.getChild(\"RateEntry\").getChild(\"NumericEntryField\").props.value\n\t\n\tif self.parent.parent.parent.getChild(\"AddEdit\").custom.updateMode:\n\t\t#update record\n\t\tdata = {\"rate_name\": rate_name , \"uom\": uom, \"target_rate\": target_rate, \"interval\": interval}\n\t\tkey_rate_name = self.parent.parent.parent.getChild(\"Table\").props.selection.data[0].rate_name\n\t\tkeys = {\"rate_name\": key_rate_name }\n\t\tlaunchpad.sql.runDatabaseUpdate(tableName, databaseName, data, keys)\n\telse:\n\t\t#add record\n\t\tdata = {\"rate_name\": rate_name , \"uom\": uom, \"target_rate\": target_rate, \"interval\": interval}\n\t\tlaunchpad.sql.runDatabaseInsert(tableName, databaseName, data)\n\tsystem.perspective.sendMessage(\"launchpad-oee-rate-mode\", payload = {\"mode\": \"\"} , scope=\"page\")\n\tsystem.perspective.sendMessage(\"launchpad-oee-refresh-rates-table\", scope=\"page\")\t\n\tsystem.perspective.sendMessage(\"launchpad-oee-refresh-rates\", scope=\"page\")\n\t\n\t\t\n\t\t"
+                        "script": "\t#add or edit record\n\ttableName = \"ex_launchpad_oee_rate\"\n\tdatabaseName = launchpad.oee.db()\n\trate_name = self.parent.parent.getChild(\"NameEntry\").getChild(\"TextEntry\").props.text\n\tinterval = self.parent.parent.getChild(\"RateEntry\").getChild(\"Interval\").props.value\n\tuom = self.parent.parent.getChild(\"RateEntry\").getChild(\"UnitsEntry\").props.text\n\ttarget_rate = self.parent.parent.getChild(\"RateEntry\").getChild(\"RateValue\").props.value\n\t\n\tif self.parent.parent.parent.getChild(\"AddEdit\").custom.updateMode:\n\t\t#update record\n\t\tdata = {\"rate_name\": rate_name , \"uom\": uom, \"target_rate\": target_rate, \"interval\": interval}\n\t\tkey_rate_name = self.parent.parent.parent.getChild(\"RateTable\").props.selection.data[0].rate_name\n\t\tkeys = {\"rate_name\": key_rate_name }\n\t\tlaunchpad.sql.runDatabaseUpdate(tableName, databaseName, data, keys)\n\telse:\n\t\t#add record\n\t\tdata = {\"rate_name\": rate_name , \"uom\": uom, \"target_rate\": target_rate, \"interval\": interval}\n\t\tlaunchpad.sql.runDatabaseInsert(tableName, databaseName, data)\n\tsystem.perspective.sendMessage(\"launchpadOeeRateMode\", payload = {\"mode\": \"\"} , scope=\"page\")\n\tsystem.perspective.sendMessage(\"launchpadOeeRefreshRatesTable\", scope=\"page\")\t\n\tsystem.perspective.sendMessage(\"launchpadOeeRefreshRates\", scope=\"page\")\n\t\n\t\t\n\t\t"
                       },
                       "scope": "G",
                       "type": "script"
@@ -909,7 +917,7 @@
                 "children": [
                   {
                     "meta": {
-                      "name": "Label"
+                      "name": "Question"
                     },
                     "position": {
                       "basis": "184px"
@@ -954,7 +962,7 @@
                       "component": {
                         "onActionPerformed": {
                           "config": {
-                            "script": "\t\n\ttableName = \"ex_launchpad_oee_rate\"\n\n\tkey_rate_name = self.parent.parent.parent.parent.getChild(\"Table\").props.selection.data[0].rate_name\n\tdatabaseName = launchpad.oee.db()\n\tlaunchpad.sql.runDatabaseDelete(tableName, databaseName, idValue=key_rate_name, idField=\"rate_name\")\n\t\n\tsystem.perspective.sendMessage(\"launchpad-oee-refresh-rates-table\", scope=\"page\")\t\n\tsystem.perspective.sendMessage(\"launchpad-oee-refresh-rates\", scope=\"page\")\n\tself.parent.parent.parent.getChild(\"Actions\").custom.deleteMode = False\n\tsystem.perspective.sendMessage(\"launchpad-oee-table-reset\", scope=\"page\")\n\tsystem.perspective.sendMessage(\"launchpad-oee-rate-mode\", payload = {\"mode\": \"\"} , scope=\"page\")"
+                            "script": "\t\n\ttableName = \"ex_launchpad_oee_rate\"\n\n\tkey_rate_name = self.parent.parent.parent.parent.getChild(\"RateTable\").props.selection.data[0].rate_name\n\tdatabaseName = launchpad.oee.db()\n\tlaunchpad.sql.runDatabaseDelete(tableName, databaseName, idValue=key_rate_name, idField=\"rate_name\")\n\t\n\tsystem.perspective.sendMessage(\"launchpadOeeRefreshRatesTable\", scope=\"page\")\t\n\tsystem.perspective.sendMessage(\"launchpadOeeRefreshRates\", scope=\"page\")\n\tself.parent.parent.parent.getChild(\"Actions\").custom.deleteMode = False\n\tsystem.perspective.sendMessage(\"launchpadOeeTableReset\", scope=\"page\")\n\tsystem.perspective.sendMessage(\"launchpadOeeRateMode\", payload = {\"mode\": \"\"} , scope=\"page\")"
                           },
                           "scope": "G",
                           "type": "script"
@@ -1038,7 +1046,7 @@
           "custom.updateMode": {
             "binding": {
               "config": {
-                "expression": "len({../Table.props.selection.data})>0"
+                "expression": "len({../RateTable.props.selection.data})>0"
               },
               "type": "expr"
             }
@@ -1063,7 +1071,7 @@
           "extensionFunctions": null,
           "messageHandlers": [
             {
-              "messageType": "launchpad-oee-rate-mode",
+              "messageType": "launchpadOeeRateMode",
               "pageScope": true,
               "script": "\t# set update or add mode \n\tmode = payload[\"mode\"]\n\tself.print(\"mode set\")\n\tif mode == \"add\":\n\t\tself.custom.addMode = True\n\t\tself.custom.updateMode = False\n\telif mode == \"update\":\n\t\tself.custom.addMode = False\n\t\tself.custom.updateMode = True\n\telse:\n\t\tself.custom.addMode = False\n\t\tself.custom.updateMode = False\t\n\t\t",
               "sessionScope": false,
@@ -1118,7 +1126,7 @@
       "extensionFunctions": null,
       "messageHandlers": [
         {
-          "messageType": "launchpad-oee-refresh-rates-table",
+          "messageType": "launchpadOeeRefreshRatesTable",
           "pageScope": true,
           "script": "\n\t# refresh rates\n\tself.refreshBinding(\"custom.data\")",
           "sessionScope": false,

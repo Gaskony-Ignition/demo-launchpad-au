@@ -474,7 +474,7 @@
             "children": [
               {
                 "meta": {
-                  "name": "Label"
+                  "name": "AvailabilityLabel"
                 },
                 "position": {
                   "basis": "50px",
@@ -543,7 +543,7 @@
             "children": [
               {
                 "meta": {
-                  "name": "Label"
+                  "name": "PerformanceLabel"
                 },
                 "position": {
                   "basis": "50px",
@@ -612,7 +612,7 @@
             "children": [
               {
                 "meta": {
-                  "name": "Label"
+                  "name": "QualityLabel"
                 },
                 "position": {
                   "basis": "50px",
@@ -706,7 +706,7 @@
       },
       {
         "meta": {
-          "name": "Label"
+          "name": "NoHistory"
         },
         "position": {
           "basis": "500px",

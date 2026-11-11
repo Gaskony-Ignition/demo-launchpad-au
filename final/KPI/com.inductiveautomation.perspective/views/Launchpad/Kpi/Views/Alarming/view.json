@@ -10,7 +10,7 @@
     "children": [
       {
         "meta": {
-          "name": "AlarmStatusTable"
+          "name": "Alarms"
         },
         "position": {
           "basis": "400px",

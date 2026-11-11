@@ -109,7 +109,7 @@
               "extensionFunctions": null,
               "messageHandlers": [
                 {
-                  "messageType": "icon-selection",
+                  "messageType": "iconSelection",
                   "pageScope": true,
                   "script": "\tid = self.view.custom.id\n\tif id == payload[\"id\"]:\n\t\ticon = payload[\"icon\"]\n\t\tself.props.text = icon",
                   "sessionScope": false,
@@ -133,7 +133,7 @@
                     "title": "Choose Icon",
                     "type": "open",
                     "viewParams": {
-                      "icon": "{/root/FlexContainer/Field.props.text}",
+                      "icon": "{/root/Row/Field.props.text}",
                       "id": "{view.custom.id}"
                     },
                     "viewPath": "Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Parameter Types/Popups/Icon Picker",
@@ -146,7 +146,7 @@
                   "type": "script",
                   "scope": "G",
                   "config": {
-                    "script": "\tif event.key in ('Enter', ' '):\n\t\ticon = self.view.getChild('root').getChild('FlexContainer').getChild('Field').props.text\n\t\tsystem.perspective.openPopup('icon-picker', 'Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Parameter Types/Popups/Icon Picker',\n\t\t\tparams={'icon': icon, 'id': self.view.custom.id}, title='Choose Icon',\n\t\t\tmodal=True, draggable=False, resizable=True, showCloseIcon=True, overlayDismiss=True)"
+                    "script": "\tif event.key in ('Enter', ' '):\n\t\ticon = self.view.getChild('root').getChild('Row').getChild('Field').props.text\n\t\tsystem.perspective.openPopup('icon-picker', 'Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Parameter Types/Popups/Icon Picker',\n\t\t\tparams={'icon': icon, 'id': self.view.custom.id}, title='Choose Icon',\n\t\t\tmodal=True, draggable=False, resizable=True, showCloseIcon=True, overlayDismiss=True)"
                   }
                 }
               }
@@ -174,7 +174,7 @@
           }
         ],
         "meta": {
-          "name": "FlexContainer"
+          "name": "Row"
         },
         "position": {
           "basis": "32px",

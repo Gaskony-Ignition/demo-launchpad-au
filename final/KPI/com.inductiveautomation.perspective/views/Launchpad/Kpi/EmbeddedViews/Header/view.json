@@ -573,7 +573,7 @@
           },
           {
             "meta": {
-              "name": "Label"
+              "name": "ProjectTitle"
             },
             "position": {
               "basis": "150px",

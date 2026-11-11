@@ -104,7 +104,7 @@
         "children": [
           {
             "meta": {
-              "name": "Label"
+              "name": "DateLabel"
             },
             "position": {
               "basis": "250px",
@@ -243,7 +243,7 @@
           }
         ],
         "meta": {
-          "name": "FlexContainer"
+          "name": "Bar"
         },
         "position": {
           "basis": "15px",

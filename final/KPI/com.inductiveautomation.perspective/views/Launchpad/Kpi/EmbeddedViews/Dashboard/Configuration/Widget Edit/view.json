@@ -31,7 +31,7 @@
         "children": [
           {
             "meta": {
-              "name": "Label"
+              "name": "NameLabel"
             },
             "position": {
               "shrink": 0

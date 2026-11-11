@@ -128,7 +128,7 @@
       },
       {
         "meta": {
-          "name": "PowerChart"
+          "name": "HistoryChart"
         },
         "position": {
           "basis": "560px",
@@ -332,7 +332,7 @@
       },
       {
         "meta": {
-          "name": "Table"
+          "name": "HistoryTable"
         },
         "position": {
           "basis": "230px",

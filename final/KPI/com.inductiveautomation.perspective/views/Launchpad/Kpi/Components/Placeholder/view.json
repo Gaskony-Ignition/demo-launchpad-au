@@ -6,7 +6,7 @@
     "children": [
       {
         "meta": {
-          "name": "Label"
+          "name": "Message"
         },
         "position": {
           "basis": "40px",
@@ -22,7 +22,7 @@
       },
       {
         "meta": {
-          "name": "Icon"
+          "name": "ConstructionIcon"
         },
         "position": {
           "basis": "400px",

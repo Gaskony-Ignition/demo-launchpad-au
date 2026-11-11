@@ -31,7 +31,7 @@
         "children": [
           {
             "meta": {
-              "name": "Icon"
+              "name": "MessageIcon"
             },
             "position": {
               "basis": "48px",
@@ -64,7 +64,7 @@
           },
           {
             "meta": {
-              "name": "Label"
+              "name": "MessageText"
             },
             "position": {
               "grow": 1

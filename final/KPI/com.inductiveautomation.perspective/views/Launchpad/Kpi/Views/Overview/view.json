@@ -15,7 +15,7 @@
             "children": [
               {
                 "meta": {
-                  "name": "Icon"
+                  "name": "LocationIcon"
                 },
                 "position": {
                   "basis": "30px"
@@ -195,7 +195,7 @@
           },
           {
             "meta": {
-              "name": "FlexRepeater"
+              "name": "Sparklines"
             },
             "position": {
               "shrink": 1

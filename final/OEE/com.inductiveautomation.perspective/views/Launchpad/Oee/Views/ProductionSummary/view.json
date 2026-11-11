@@ -11594,7 +11594,7 @@
           }
         ],
         "meta": {
-          "name": "BreakpointContainer"
+          "name": "Layout"
         },
         "position": {
           "grow": 1

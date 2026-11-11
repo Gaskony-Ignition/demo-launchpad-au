@@ -110,7 +110,7 @@
     "children": [
       {
         "meta": {
-          "name": "SimpleGauge"
+          "name": "Gauge"
         },
         "position": {
           "basis": "200px",
@@ -213,7 +213,7 @@
       },
       {
         "meta": {
-          "name": "Label"
+          "name": "Title"
         },
         "position": {
           "grow": 1

@@ -32,7 +32,7 @@
             "children": [
               {
                 "meta": {
-                  "name": "Label"
+                  "name": "DatabaseLabel"
                 },
                 "position": {
                   "basis": "90px",
@@ -117,7 +117,7 @@
             "children": [
               {
                 "meta": {
-                  "name": "Label"
+                  "name": "FolderLabel"
                 },
                 "position": {
                   "basis": "90px",
@@ -220,7 +220,7 @@
             "children": [
               {
                 "meta": {
-                  "name": "Label"
+                  "name": "TargetLabel"
                 },
                 "position": {
                   "basis": "100px",
@@ -236,7 +236,7 @@
               },
               {
                 "meta": {
-                  "name": "Slider"
+                  "name": "TargetSlider"
                 },
                 "position": {
                   "basis": "300px"
@@ -263,7 +263,7 @@
               },
               {
                 "meta": {
-                  "name": "LedDisplay"
+                  "name": "TargetDisplay"
                 },
                 "position": {
                   "basis": "50px",

@@ -21,7 +21,7 @@
         "children": [
           {
             "meta": {
-              "name": "Label"
+              "name": "Title"
             },
             "position": {
               "grow": 1
@@ -36,7 +36,7 @@
               "dom": {
                 "onClick": {
                   "config": {
-                    "script": "\n\tif self.parent.parent.getChild(\"TextArea\").props.enabled:\n\t\tself.parent.parent.getChild(\"TextArea\").props.enabled = False\n\telse:\n\t\tself.parent.parent.getChild(\"TextArea\").props.enabled = True"
+                    "script": "\n\tif self.parent.parent.getChild(\"Notes\").props.enabled:\n\t\tself.parent.parent.getChild(\"Notes\").props.enabled = False\n\telse:\n\t\tself.parent.parent.getChild(\"Notes\").props.enabled = True"
                   },
                   "scope": "G",
                   "type": "script"
@@ -45,13 +45,13 @@
                   "type": "script",
                   "scope": "G",
                   "config": {
-                    "script": "\tif event.key in ('Enter', ' '):\n\t\n\t\tif self.parent.parent.getChild(\"TextArea\").props.enabled:\n\t\t\tself.parent.parent.getChild(\"TextArea\").props.enabled = False\n\t\telse:\n\t\t\tself.parent.parent.getChild(\"TextArea\").props.enabled = True"
+                    "script": "\tif event.key in ('Enter', ' '):\n\t\n\t\tif self.parent.parent.getChild(\"Notes\").props.enabled:\n\t\t\tself.parent.parent.getChild(\"Notes\").props.enabled = False\n\t\telse:\n\t\t\tself.parent.parent.getChild(\"Notes\").props.enabled = True"
                   }
                 }
               }
             },
             "meta": {
-              "name": "Icon",
+              "name": "EditIcon",
               "tooltip": {
                 "enabled": true,
                 "text": "Toggle editing of the note"
@@ -85,7 +85,7 @@
       },
       {
         "meta": {
-          "name": "TextArea"
+          "name": "Notes"
         },
         "position": {
           "grow": 1,

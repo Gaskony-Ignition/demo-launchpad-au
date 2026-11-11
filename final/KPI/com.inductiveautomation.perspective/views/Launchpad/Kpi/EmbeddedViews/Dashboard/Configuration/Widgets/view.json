@@ -11,7 +11,7 @@
       {
         "meta": {
           "domId": "launchpadEditDashboard",
-          "name": "Dashboard"
+          "name": "WidgetGrid"
         },
         "position": {
           "basis": "400px",

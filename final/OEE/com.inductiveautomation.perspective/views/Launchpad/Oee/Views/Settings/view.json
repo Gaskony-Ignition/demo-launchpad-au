@@ -313,7 +313,7 @@
             "children": [
               {
                 "meta": {
-                  "name": "Label"
+                  "name": "ThemeLabel"
                 },
                 "position": {
                   "basis": "60px",

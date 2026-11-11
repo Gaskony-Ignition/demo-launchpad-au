@@ -560,7 +560,7 @@
                   },
                   {
                     "meta": {
-                      "name": "Dropdown"
+                      "name": "PeriodSelect"
                     },
                     "position": {
                       "basis": "150px",
@@ -741,7 +741,7 @@
                       },
                       {
                         "meta": {
-                          "name": "Dropdown"
+                          "name": "IntervalSelect"
                         },
                         "position": {
                           "basis": "100px",
@@ -806,7 +806,7 @@
                       },
                       {
                         "meta": {
-                          "name": "Dropdown"
+                          "name": "AggModeSelect"
                         },
                         "position": {
                           "basis": "155px",
@@ -979,7 +979,7 @@
           }
         },
         "meta": {
-          "name": "XyChart",
+          "name": "HistoryChart",
           "tabIndex": 0
         },
         "position": {

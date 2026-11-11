@@ -168,7 +168,7 @@
     "children": [
       {
         "meta": {
-          "name": "Label"
+          "name": "Title"
         },
         "position": {
           "shrink": 0

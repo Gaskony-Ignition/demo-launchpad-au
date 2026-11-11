@@ -13,7 +13,7 @@
         "children": [
           {
             "meta": {
-              "name": "Icon"
+              "name": "DashboardIcon"
             },
             "position": {
               "basis": "24px"
@@ -69,7 +69,7 @@
               }
             },
             "meta": {
-              "name": "Dropdown"
+              "name": "DashboardSelect"
             },
             "position": {
               "basis": "190px",

@@ -153,7 +153,7 @@
     "children": [
       {
         "meta": {
-          "name": "Label"
+          "name": "Title"
         },
         "position": {
           "basis": "32px",
@@ -264,7 +264,7 @@
           }
         ],
         "meta": {
-          "name": "FlexContainer"
+          "name": "Bars"
         },
         "position": {
           "grow": 1

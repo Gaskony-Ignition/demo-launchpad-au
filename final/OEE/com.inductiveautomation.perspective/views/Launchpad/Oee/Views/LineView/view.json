@@ -699,7 +699,7 @@
                         "children": [
                           {
                             "meta": {
-                              "name": "Label"
+                              "name": "Title"
                             },
                             "position": {
                               "basis": "32px"
@@ -776,7 +776,7 @@
                         "children": [
                           {
                             "meta": {
-                              "name": "Label"
+                              "name": "Title"
                             },
                             "position": {
                               "basis": "32px"
@@ -791,7 +791,7 @@
                           },
                           {
                             "meta": {
-                              "name": "TimeSeriesChart"
+                              "name": "OeeChart"
                             },
                             "position": {
                               "grow": 1
@@ -881,7 +881,7 @@
                         "children": [
                           {
                             "meta": {
-                              "name": "Label"
+                              "name": "Title"
                             },
                             "position": {
                               "basis": "32px"
@@ -896,7 +896,7 @@
                           },
                           {
                             "meta": {
-                              "name": "TimeSeriesChart"
+                              "name": "ProductionChart"
                             },
                             "position": {
                               "grow": 1
@@ -1092,7 +1092,7 @@
                     "children": [
                       {
                         "meta": {
-                          "name": "Label"
+                          "name": "Title"
                         },
                         "position": {
                           "basis": "32px",
@@ -1157,7 +1157,7 @@
                     "children": [
                       {
                         "meta": {
-                          "name": "Label"
+                          "name": "Title"
                         },
                         "position": {
                           "basis": "32px"
@@ -1172,7 +1172,7 @@
                       },
                       {
                         "meta": {
-                          "name": "TimeSeriesChart"
+                          "name": "OeeChart"
                         },
                         "position": {
                           "grow": 1
@@ -1264,7 +1264,7 @@
                     "children": [
                       {
                         "meta": {
-                          "name": "Label"
+                          "name": "Title"
                         },
                         "position": {
                           "basis": "32px"
@@ -1279,7 +1279,7 @@
                       },
                       {
                         "meta": {
-                          "name": "TimeSeriesChart"
+                          "name": "ProductionChart"
                         },
                         "position": {
                           "grow": 1
@@ -1390,7 +1390,7 @@
           }
         ],
         "meta": {
-          "name": "BreakpointContainer"
+          "name": "Layout"
         },
         "position": {
           "grow": 1

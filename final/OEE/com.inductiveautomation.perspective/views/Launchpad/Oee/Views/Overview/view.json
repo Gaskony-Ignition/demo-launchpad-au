@@ -102,7 +102,7 @@
                     "children": [
                       {
                         "meta": {
-                          "name": "Icon"
+                          "name": "LocationIcon"
                         },
                         "position": {
                           "basis": "30px"
@@ -428,7 +428,7 @@
                 "children": [
                   {
                     "meta": {
-                      "name": "Icon"
+                      "name": "LocationIcon"
                     },
                     "position": {
                       "basis": "20px"
@@ -658,7 +658,7 @@
                   }
                 ],
                 "meta": {
-                  "name": "TabContainer"
+                  "name": "Tabs"
                 },
                 "position": {
                   "basis": "200px",
@@ -760,7 +760,7 @@
           }
         ],
         "meta": {
-          "name": "BreakpointContainer"
+          "name": "Layout"
         },
         "position": {
           "grow": 1

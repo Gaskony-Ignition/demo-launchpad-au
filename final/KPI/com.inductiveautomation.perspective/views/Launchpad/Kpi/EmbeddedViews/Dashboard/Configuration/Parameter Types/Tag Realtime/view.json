@@ -83,7 +83,7 @@
               "extensionFunctions": null,
               "messageHandlers": [
                 {
-                  "messageType": "tag-selection",
+                  "messageType": "tagSelection",
                   "pageScope": true,
                   "script": "\tid = self.view.custom.id\n\tif id == payload[\"id\"]:\n\t\tpath = payload[\"path\"]\n\t\tself.props.text = path",
                   "sessionScope": false,
@@ -148,7 +148,7 @@
           }
         ],
         "meta": {
-          "name": "FlexContainer"
+          "name": "Row"
         },
         "position": {
           "basis": "32px",

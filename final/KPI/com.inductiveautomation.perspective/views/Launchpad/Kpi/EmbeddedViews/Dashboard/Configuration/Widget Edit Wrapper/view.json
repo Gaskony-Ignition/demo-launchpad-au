@@ -58,7 +58,7 @@
     "children": [
       {
         "meta": {
-          "name": "EmbeddedView"
+          "name": "Widget"
         },
         "position": {
           "grow": 1

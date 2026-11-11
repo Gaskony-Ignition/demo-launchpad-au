@@ -68,7 +68,7 @@
     "children": [
       {
         "meta": {
-          "name": "Label"
+          "name": "Title"
         },
         "position": {
           "basis": "32px",
@@ -85,7 +85,7 @@
       },
       {
         "meta": {
-          "name": "Dropdown"
+          "name": "LineSelect"
         },
         "position": {
           "basis": "32px",
@@ -434,7 +434,7 @@
           }
         ],
         "meta": {
-          "name": "FlexContainer"
+          "name": "Kpis"
         },
         "position": {
           "basis": "342px",

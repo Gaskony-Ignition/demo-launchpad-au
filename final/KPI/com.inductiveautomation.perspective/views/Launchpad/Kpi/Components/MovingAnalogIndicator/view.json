@@ -113,7 +113,7 @@
     "children": [
       {
         "meta": {
-          "name": "Label"
+          "name": "Title"
         },
         "position": {
           "basis": "32px"
@@ -137,7 +137,7 @@
       },
       {
         "meta": {
-          "name": "MovingAnalogIndicator"
+          "name": "Indicator"
         },
         "position": {
           "basis": "223px",

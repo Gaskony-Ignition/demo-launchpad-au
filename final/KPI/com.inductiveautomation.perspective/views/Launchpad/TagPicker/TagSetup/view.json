@@ -6,7 +6,7 @@
     "children": [
       {
         "meta": {
-          "name": "TagBrowseTree"
+          "name": "Tags"
         },
         "position": {
           "basis": "400px"

@@ -165,7 +165,7 @@
         "children": [
           {
             "meta": {
-              "name": "Label"
+              "name": "RateLabel"
             },
             "position": {
               "basis": "95px"
@@ -298,7 +298,7 @@
               "extensionFunctions": null,
               "messageHandlers": [
                 {
-                  "messageType": "launchpad-oee-refresh-rates",
+                  "messageType": "launchpadOeeRefreshRates",
                   "pageScope": true,
                   "script": "\t# refresh rat dropdown\n\tself.refreshBinding(\"custom.data\")\n\n\t",
                   "sessionScope": false,

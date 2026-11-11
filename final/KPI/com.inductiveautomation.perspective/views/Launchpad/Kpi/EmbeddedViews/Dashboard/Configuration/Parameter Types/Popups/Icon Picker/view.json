@@ -26,7 +26,7 @@
         "children": [
           {
             "meta": {
-              "name": "Label"
+              "name": "SearchLabel"
             },
             "position": {
               "shrink": 0
@@ -42,7 +42,7 @@
           },
           {
             "meta": {
-              "name": "TextField"
+              "name": "SearchText"
             },
             "position": {
               "grow": 1
@@ -133,7 +133,7 @@
           "extensionFunctions": null,
           "messageHandlers": [
             {
-              "messageType": "color-clicked",
+              "messageType": "colorClicked",
               "pageScope": true,
               "script": "\tcolor = payload[\"color\"]\n\tself.view.params.color = color",
               "sessionScope": false,
@@ -225,7 +225,7 @@
           },
           {
             "meta": {
-              "name": "Label"
+              "name": "PageNumber"
             },
             "position": {
               "shrink": 0
@@ -346,7 +346,7 @@
         "children": [
           {
             "meta": {
-              "name": "Label"
+              "name": "IconLabel"
             },
             "position": {
               "shrink": 0
@@ -362,7 +362,7 @@
           },
           {
             "meta": {
-              "name": "TextField"
+              "name": "IconName"
             },
             "position": {
               "grow": 1
@@ -387,7 +387,7 @@
           },
           {
             "meta": {
-              "name": "Icon"
+              "name": "Preview"
             },
             "position": {
               "basis": "30px",
@@ -397,7 +397,7 @@
               "props.path": {
                 "binding": {
                   "config": {
-                    "expression": "\"material/\" + {../TextField.props.text}"
+                    "expression": "\"material/\" + {../IconName.props.text}"
                   },
                   "type": "expr"
                 }
@@ -432,7 +432,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\tid = self.view.params.id\n\ticon = self.view.params.icon\n\tsystem.perspective.sendMessage(messageType=\"icon-selection\", payload={\"id\":id, \"icon\":icon})\n\tsystem.perspective.closePopup(id=\"icon-picker\")"
+                "script": "\tid = self.view.params.id\n\ticon = self.view.params.icon\n\tsystem.perspective.sendMessage(messageType=\"iconSelection\", payload={\"id\":id, \"icon\":icon})\n\tsystem.perspective.closePopup(id=\"icon-picker\")"
               },
               "scope": "G",
               "type": "script"
@@ -503,7 +503,7 @@
           "config": {
             "struct": {
               "icons": "{this.custom.icons}",
-              "search": "{./SearchContainer/TextField.props.text}"
+              "search": "{./SearchContainer/SearchText.props.text}"
             },
             "waitOnAll": true
           },
@@ -539,7 +539,7 @@
       "extensionFunctions": null,
       "messageHandlers": [
         {
-          "messageType": "icon-selected",
+          "messageType": "iconSelected",
           "pageScope": true,
           "script": "\tself.view.params.icon = payload[\"icon\"]",
           "sessionScope": false,
