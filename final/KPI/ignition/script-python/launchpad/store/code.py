@@ -1,33 +1,7 @@
 """
-launchpad.store - the KPI dashboards, with or without a database.
-
-The dashboard builder is a relational application: six tables, four of them
-joined together to answer one question, and rows created with auto-increment
-ids. On a standard gateway that is SQL through named queries. Ignition Edge has
-no database connectivity of any kind - not a slower one, an absent one, and a
-named query cannot run there at all - so the same six tables are kept as JSON in
-the gateway's own data directory and the same eleven questions are answered
-here.
-
-Every function below IS its named query on a gateway that has one: it runs the
-resource, so there is one copy of that SQL and it is the copy that shipped.
-Only the no-database path is a second implementation, and it returns the same
-columns in the same order under the same names, because a table bound to
-column 7 does not check what column 7 is called.
-
-## What is stored where
-
-    data/launchpad-kpi/<table>.json      one file per table, whole
-
-Not partitioned, unlike the OEE store: these tables are tens of rows, not
-thousands, and every question joins across all of them.
-
-## Ids
-
-SQLite hands out auto-increment ids and the dashboard code depends on getting
-one back (`getKey=True`) to attach widgets to a dashboard it has just made.
-`_nextId` is that, over the rows the file holds - MAX + 1, which is what
-AUTOINCREMENT does once rows exist and what a fresh table does from its seed.
+Dashboard store: runs the named queries on a gateway with a database, else answers from JSON files.
+The file path (Edge has no database) returns the same columns in the same order as the query.
+Tables are whole files under data/launchpad-kpi/; new ids are MAX + 1.
 """
 
 from java.lang import System as JSystem
@@ -47,9 +21,7 @@ WIDGET_PARAMETER_TYPES = "ex_lp_widget_parameter_types"
 TABLES = (DASHBOARDS, DASHBOARD_WIDGETS, DASHBOARD_WIDGET_PARAMETERS,
           WIDGETS, WIDGET_PARAMETERS, WIDGET_PARAMETER_TYPES)
 
-# One writer at a time: the dashboard editor saves a dashboard, its widgets and
-# their parameters in a run of calls, and a second session saving at the same
-# moment would otherwise lose whichever finished first.
+# One writer at a time: the editor saves a dashboard, widgets and parameters in a run of calls.
 _LOCK = ReentrantLock()
 
 
@@ -58,12 +30,8 @@ def _noDatabase():
 
 
 def root():
-	"""Where the file store lives.
-
-	The gateway runs with its installation directory as the working directory
-	on every platform and in the official container image, and no scripting
-	function returns it, so this is the portable way to ask.
-	"""
+	"""Return the file store directory."""
+	# user.dir is the gateway install directory; no scripting function returns it.
 	return JSystem.getProperty("user.dir") + "/data/launchpad-kpi"
 
 
@@ -112,13 +80,7 @@ def ready():
 
 
 def ensure():
-	"""Make the store exist, seeded exactly as the SQL schema seeds itself.
-
-	Creates nothing on a gateway with a database - that is
-	launchpad.init.initDashboard's job, and its CREATE TABLE script carries the
-	same rows. Never overwrites: the dashboards table gains rows as people
-	build dashboards, and this runs on every setup.
-	"""
+	"""Seed empty tables from SEED; no-op on a gateway with a database."""
 	if not _noDatabase():
 		return u"tables are the database's"
 	from java.io import File
@@ -126,11 +88,7 @@ def ensure():
 	made = []
 	_LOCK.lock()
 	try:
-		# The seeded dashboards carry tag-history parameters, and a history path
-		# names the historian provider, the driver (this gateway's system name)
-		# and the tag provider - all three of which differ per gateway, and all
-		# three of which differ again on Edge. The SQL script substitutes the
-		# same placeholder for the same reason.
+		# The history path names the historian, driver and tag provider, which differ per gateway.
 		prefix = launchpad.init.historyPrefix()
 		for table in TABLES:
 			if _read(table):
@@ -149,11 +107,6 @@ def ensure():
 	if not made:
 		return u"file store already seeded at %s" % root()
 	return u"file store seeded at %s: %s" % (root(), ", ".join(made))
-
-
-# ---------------------------------------------------------------------------
-# the eleven questions the dashboard code asks
-# ---------------------------------------------------------------------------
 
 
 def _named(path, params, getKey=False):
@@ -175,13 +128,12 @@ DASHBOARD_COLUMNS = ["id", "name", "url", "icon", "username", "grid",
 
 
 def dashboards():
-	"""Every dashboard. Launchpad/Dashboard/Get."""
+	"""Return every dashboard. Named query: Launchpad/Dashboard/Get."""
 	if not _noDatabase():
 		return _named("Launchpad/Dashboard/Get", {})
 	rows = []
 	for d in _read(DASHBOARDS):
-		# COALESCE(d.icon, '') - a dashboard saved without one must not put a
-		# null into a column the editor binds to a text field.
+		# COALESCE(d.icon, ''): the editor binds this column to a text field.
 		rows.append([d.get("id"), d.get("name"), d.get("url"),
 		             d.get("icon") or "", d.get("username"), d.get("grid"),
 		             d.get("cell_size"), d.get("grid_rows"),
@@ -198,16 +150,7 @@ WIDGET_GET_COLUMNS = [
 
 
 def dashboardWidgets(dashboardId):
-	"""One dashboard's widgets and their parameters.
-	Launchpad/Dashboard/Widget/Get.
-
-	The join that matters: a widget's parameters come from the WIDGET TYPE, and
-	the value is the dashboard's own override where it has one and the type's
-	default where it does not - which is the COALESCE in the query. A LEFT JOIN
-	on the parameters means a widget type with no parameters still returns its
-	row, and dropping that would make such a widget vanish from a dashboard it
-	is on.
-	"""
+	"""Return one dashboard's widgets and parameters. Named query: Launchpad/Dashboard/Widget/Get."""
 	if not _noDatabase():
 		return _named("Launchpad/Dashboard/Widget/Get",
 		              {"dashboard": dashboardId})
@@ -226,8 +169,7 @@ def dashboardWidgets(dashboardId):
 	for dw in mine:
 		w = widgets.get(dw.get("widget_id"))
 		if w is None:
-			# an inner JOIN in the query: a widget row pointing at a type that
-			# no longer exists is not shown at all
+			# inner JOIN in the query: a widget whose type is gone is dropped
 			continue
 		mineParams = [p for p in params if p.get("widget_id") == dw.get("widget_id")]
 		mineParams.sort(key=lambda p: (unicode(p.get("parameter") or ""),
@@ -260,8 +202,7 @@ INSTALLED_WIDGET_COLUMNS = [
 
 
 def installedWidgets():
-	"""Every widget type and its parameters, for the palette.
-	Launchpad/Dashboard/Widget/Installed Widgets."""
+	"""Return every widget type and its parameters, for the palette. Named query: Launchpad/Dashboard/Widget/Installed Widgets."""
 	if not _noDatabase():
 		return _named("Launchpad/Dashboard/Widget/Installed Widgets", {})
 
@@ -289,7 +230,7 @@ def installedWidgets():
 
 
 def maxDashboardId():
-	"""COALESCE(MAX(id), 0). Launchpad/Dashboard/Get URL."""
+	"""Return the highest dashboard id, 0 if none. Named query: Launchpad/Dashboard/Get URL."""
 	if not _noDatabase():
 		return _named("Launchpad/Dashboard/Get URL", {})
 	best = 0
@@ -299,7 +240,7 @@ def maxDashboardId():
 
 
 def dashboardIdForUrl(url):
-	"""The dashboard using this url, or None. Launchpad/Dashboard/Check URL."""
+	"""Return the dashboard using this url, or None. Named query: Launchpad/Dashboard/Check URL."""
 	if not _noDatabase():
 		return _named("Launchpad/Dashboard/Check URL", {"url": url})
 	for d in _read(DASHBOARDS):
@@ -309,7 +250,7 @@ def dashboardIdForUrl(url):
 
 
 def lastModified(dashboardId):
-	"""Launchpad/Dashboard/Last Modified."""
+	"""Return the dashboard's last_modified. Named query: Launchpad/Dashboard/Last Modified."""
 	if not _noDatabase():
 		return _named("Launchpad/Dashboard/Last Modified", {"id": dashboardId})
 	for d in _read(DASHBOARDS):
@@ -319,14 +260,14 @@ def lastModified(dashboardId):
 
 
 def dbCheck():
-	"""Can the store answer at all? Launchpad/Dashboard/DB Check."""
+	"""Return whether the store can answer at all. Named query: Launchpad/Dashboard/DB Check."""
 	if not _noDatabase():
 		return _named("Launchpad/Dashboard/DB Check", {})
 	return 1 if ready() else None
 
 
 def addDashboard(fields):
-	"""Create a dashboard and return its new id. Launchpad/Dashboard/Add."""
+	"""Create a dashboard and return its new id. Named query: Launchpad/Dashboard/Add."""
 	if not _noDatabase():
 		return _named("Launchpad/Dashboard/Add", fields, getKey=True)
 	_LOCK.lock()
@@ -343,7 +284,7 @@ def addDashboard(fields):
 
 
 def editDashboard(fields):
-	"""Launchpad/Dashboard/Edit. `fields` carries the id."""
+	"""Update a dashboard from `fields` (carries the id); return 1 if found, else 0. Named query: Launchpad/Dashboard/Edit."""
 	if not _noDatabase():
 		return _named("Launchpad/Dashboard/Edit", fields)
 	_LOCK.lock()
@@ -361,13 +302,7 @@ def editDashboard(fields):
 
 
 def deleteDashboard(dashboardId):
-	"""Launchpad/Dashboard/Delete.
-
-	The schema declares ON DELETE CASCADE from widgets to dashboards, so the
-	file store has to do by hand what the database does by declaration - and
-	the widgets' own parameter overrides with them, or the next dashboard to be
-	handed a recycled widget id inherits somebody else's settings.
-	"""
+	"""Delete a dashboard, its widgets and their parameter overrides (the cascade the database does itself)."""
 	if not _noDatabase():
 		return _named("Launchpad/Dashboard/Delete", {"id": dashboardId})
 	_LOCK.lock()
@@ -388,8 +323,7 @@ def deleteDashboard(dashboardId):
 
 
 def addWidget(fields):
-	"""Put a widget on a dashboard, returning its new id.
-	Launchpad/Dashboard/Widget/Add."""
+	"""Add a widget to a dashboard and return its new id. Named query: Launchpad/Dashboard/Widget/Add."""
 	if not _noDatabase():
 		return _named("Launchpad/Dashboard/Widget/Add", fields, getKey=True)
 	_LOCK.lock()
@@ -405,7 +339,7 @@ def addWidget(fields):
 
 
 def editWidget(fields):
-	"""Launchpad/Dashboard/Widget/Edit."""
+	"""Update a widget from `fields` (carries the id); return 1 if found, else 0. Named query: Launchpad/Dashboard/Widget/Edit."""
 	if not _noDatabase():
 		return _named("Launchpad/Dashboard/Widget/Edit", fields)
 	_LOCK.lock()
@@ -422,7 +356,7 @@ def editWidget(fields):
 
 
 def deleteWidget(widgetId):
-	"""Launchpad/Dashboard/Widget/Delete, and its parameter overrides."""
+	"""Delete a widget and its parameter overrides. Named query: Launchpad/Dashboard/Widget/Delete."""
 	if not _noDatabase():
 		return _named("Launchpad/Dashboard/Widget/Delete", {"id": widgetId})
 	_LOCK.lock()
@@ -438,13 +372,7 @@ def deleteWidget(widgetId):
 
 
 def setWidgetParameter(widgetId, parameterId, value, add):
-	"""Launchpad/Dashboard/Widget/Parameter/Add or .../Edit.
-
-	`add` is the caller's own idea of which it is doing. The file store does
-	not need to be told - it writes the override either way - but honouring the
-	distinction keeps the two implementations doing the same thing, including
-	when the caller is wrong about it.
-	"""
+	"""Set a widget's parameter override; `add` picks the Add or Edit named query (the file store upserts either way)."""
 	params = {"widget_id": widgetId, "parameter_id": parameterId,
 	          "parameter_value": value}
 	if not _noDatabase():
@@ -467,14 +395,7 @@ def setWidgetParameter(widgetId, parameterId, value, add):
 		_LOCK.unlock()
 
 
-# ---------------------------------------------------------------------------
-# the seed
-# ---------------------------------------------------------------------------
-# GENERATED from the CREATE TABLE script in launchpad.init.initDashboard by
-# tools/kpi_seed.py, which package.sh runs as a check. Do not edit by hand: the
-# SQL script is the authority, and a second copy that drifts is a gateway whose
-# widget palette is missing whatever was added to the other one.
-
+# Generated from the CREATE TABLE script in launchpad.init.initDashboard by tools/kpi_seed.py; edit the SQL, not this.
 SEED = {
 	"ex_lp_dashboard_widget_parameters": [
 		{"id": 26, "dashboard_widget_id": 22, "parameter_id": 12, "parameter_value": '{HIST}dailyproduction'},

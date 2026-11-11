@@ -1,26 +1,7 @@
-"""Build this gateway from nothing, from a button in the running session.
+"""Gateway builder behind the Setup button: database, tag provider, historian, device, tags, seeding.
 
-Everything a fresh gateway needs that is not the project itself: the database
-connection, the tag provider, the historian, the simulator device and its programme,
-the gateway scripting project, the tags, and then the seeding. All of it is reachable
-from gateway scope, so none of it needs a Designer, an SSH session or a curl loop.
-
-Two entry points:
-
-    run(progress=None, force=False)   build everything that is missing
-    check()                           report what is and is not in place, change nothing
-
-Both are idempotent. `run` creates only what is absent unless `force` is set; `check`
-writes nothing at all. The WebDev endpoint and the Setup button both call these, so
-there is one implementation and not two that drift.
-
-A note on the database. Each project ships its own SQLite file -- ${data}/OEE.db and
-${data}/KPI.db -- on purpose:
-the schema is SQLite DDL, and a self-contained demo should not need a database server.
-A SQLite connection needs no credentials, which is why setup can create it outright
-rather than asking. If you want the demo on Postgres or MSSQL you need portable DDL
-first -- pointing it at an existing connection is not enough, and the failure would be
-a half-built schema rather than a clean error.
+run(progress=None, force=False) builds what is missing; check() reports and changes nothing. Both are idempotent.
+Each project uses its own SQLite file (${data}/OEE.db, ${data}/KPI.db); the schema is SQLite DDL, so it cannot target Postgres or MSSQL.
 """
 import json
 import os
@@ -33,37 +14,9 @@ CORE = "core/ignition"
 HISTORIAN_MODULE = "core/com.inductiveautomation.historian"
 OPCUA_MODULE = "core/com.inductiveautomation.opcua"
 
-# Each project gets its OWN SQLite database, named after the project, so a
-# glance at the gateway's connection list says which project a database belongs
-# to (28/08/2026). They used to share one called "Examples", which told
-# a user nothing and tied the two projects together for no reason -- OEE keeps
-# its own SQL tables and KPI keeps tag history, and neither reads the other's.
-#
-# HISTORY_DATABASE is KPI's, always. The tag historian is ONE gateway provider
-# called "launchpad" and can point at only one database, all 61 historised tags
-# are KPI's, and OEE has none at all -- so the historian belongs to KPI and OEE
-# does not create or touch it. Having each project point the shared provider at
-# its own database would mean whichever installed last silently broke the
-# other's history.
+# The tag historian is one gateway provider with one database, and every historised tag is KPI's, so OEE never creates it.
 HISTORY_DATABASE = "KPI"
 
-# The SQLite URL, and both parameters are load-bearing rather than tuning.
-#
-# journal_mode=WAL: this application writes CONTINUOUSLY while sessions read --
-# the simulator's gateway timer writes the OEE tables and the historian writes
-# its partition, both while Perspective pages query them for every chart on
-# screen. Under SQLite's default rollback journal a writer blocks every reader
-# for the length of the write, so the symptom is a chart that stalls in front of
-# whoever you are demonstrating to. WAL lets readers carry on against the last
-# committed state. It is a property of the FILE, not the connection, so setting
-# it here converts an existing database file the first time it connects.
-#
-# busy_timeout=30000: the one case WAL does not cover is two writers, and this
-# has two (the OEE timer and the historian). Without it the loser of that race
-# fails immediately with SQLITE_BUSY rather than waiting its turn.
-#
-# Verified on a blank gateway 28/08/2026: without these, PRAGMA journal_mode on
-# the created file reads `delete`.
 def _dbName():
 	"""This project's own database: "OEE" or "KPI"."""
 	return "OEE" if _isOee() else "KPI"
@@ -71,21 +24,14 @@ def _dbName():
 
 def _connectURL(name=None):
 	"""The SQLite URL for a database of this name."""
+	# WAL stops writers blocking readers; busy_timeout makes the second writer wait instead of failing with SQLITE_BUSY.
 	return ("jdbc:sqlite:${data}/%s.db?journal_mode=WAL&busy_timeout=30000"
 	        % (name or _dbName()))
 PROVIDER = "launchpad"
 HISTORIAN = "launchpad"
 DEVICE = "Launchpad"
 def scriptingProjectWanted():
-	"""The project the gateway's scripting setting should name.
-
-    THIS project, asked at runtime, not the literal "OEE". The project name is
-    a gateway setting on Edge - the Edge build lands in a project called Edge -
-    and on any gateway an importer is free to name it something else. A literal
-    here reports "the OEE project is not installed" on a gateway that is
-    running it, and then every UDT event script resolves nothing and every OEE
-    figure sits at zero with nothing in the log to say why.
-    """
+	"""Return the running project's name (Edge names its project Edge, so not a literal "OEE")."""
 	try:
 		return system.project.getProjectName()
 	except:
@@ -93,13 +39,7 @@ def scriptingProjectWanted():
 
 
 def _isOee():
-	"""Which of the two projects this copy is running in.
-
-    This file is byte-identical in OEE and in KPI on purpose -- two copies of a
-    gateway builder drift, and the half that drifts is the half nobody runs. The
-    project-specific parts are the seeding steps and the tag probe, and both are
-    decided here rather than by maintaining two files.
-    """
+	"""True when this copy runs in the OEE project; the file is identical in OEE and KPI."""
 	return hasattr(launchpad, "oee")
 
 
@@ -112,17 +52,11 @@ def _db():
 
 
 def _probeTag():
-	"""A tag that only exists once this project's tags are imported.
-
-    Distinguishes "tags present" from "provider exists but empty", which look
-    identical if you only browse the provider root.
-    """
+	"""A tag that exists only once this project's tags are imported."""
 	if _isOee():
 		return "[%s]OEE/Demo/Line 1/Enabled" % PROVIDER
 	return "[%s]KPI/Lines/Line1/ProductionRate" % PROVIDER
 
-
-# --------------------------------------------------------------- small helpers
 
 def _emit(progress, message):
 	LOG.info(message)
@@ -134,16 +68,7 @@ def _emit(progress, message):
 
 
 class _Report:
-	"""Builds the running transcript the Setup button shows while it works.
-
-    The button used to replace its label with the current step, which gives a user
-    two things they cannot act on: no idea what has already succeeded, and no idea
-    whether a step that is taking a while is working or wedged. On a bare gateway one
-    step waits up to 90 seconds and said nothing at all for the whole of it, so the
-    honest reading of the screen was "it has stopped". Every step now leaves a line
-    behind with its result on it, and anything that waits says what it is waiting for
-    and for how long.
-    """
+	"""Running transcript shown by the Setup button: one line per step with its result."""
 
 	def __init__(self, progress):
 		self.progress = progress
@@ -161,14 +86,17 @@ class _Report:
 				pass
 
 	def start(self, message):
+		"""Show message as the step in progress."""
 		self.current = message
 		LOG.info(message)
 		self._flush("... %s" % message)
 
 	def waiting(self, message, seconds):
+		"""Show how long the current wait has lasted."""
 		self._flush("... %s (%ds)" % (message, seconds))
 
 	def done(self, outcome):
+		"""Record the current step as done with its outcome."""
 		if self.current:
 			self.lines.append("[ok]   %s%s" % (self.current,
 			    (" - %s" % outcome) if outcome else ""))
@@ -176,16 +104,19 @@ class _Report:
 		self._flush()
 
 	def failed(self, why):
+		"""Record the current step as failed."""
 		if self.current:
 			self.lines.append("[FAIL] %s - %s" % (self.current, why))
 			self.current = None
 		self._flush()
 
 	def note(self, message):
+		"""Add an indented note line."""
 		self.lines.append("       %s" % message)
 		self._flush()
 
 	def finish(self, ok, summaryLine):
+		"""Add the closing line and return the full transcript."""
 		self.lines.append("")
 		self.lines.append("SETUP COMPLETE - %s" % summaryLine if ok
 		                  else "SETUP FINISHED WITH ERRORS - %s" % summaryLine)
@@ -224,18 +155,7 @@ def _short(outcome):
 
 
 def _explain(tb):
-	"""Turn a Jython traceback into something the person reading it can act on.
-
-    The raw last line of a Jython traceback is frequently useless to a user -- the
-    one that sent this function into existence was
-
-        AttributeError: 'com.inductiveautomation.ignition.common.script.Scr' object
-        has no attribute 'payload'
-
-    which is Ignition's way of saying a project script resource did not load. Nothing
-    about that tells you to re-import the project, and it was displayed with no
-    indication of which step had produced it.
-    """
+	"""Turn a Jython traceback into a message the user can act on."""
 	last = tb.strip().split("\n")[-1]
 	if "no attribute 'payload'" in last:
 		return ("the launchpad.payload script resource did not load. "
@@ -294,12 +214,8 @@ def _resourceJson(files, description):
 
 
 def _configResource(module, kind, name, config, description, extra=None):
-	"""Write a gateway config resource. Returns the directory it landed in.
-
-    `extra` is a list of (filename, content, binary) for resources that carry more
-    than config.json -- the simulator device carries its programme alongside it, and
-    a resource.json that does not list every file makes the gateway ignore the lot.
-    """
+	"""Write a gateway config resource and return its directory; `extra` is (filename, content, binary) tuples."""
+	# resource.json must list every file or the gateway ignores the lot.
 	d = os.path.join(_abs(RESOURCES), module, kind, name)
 	if not os.path.exists(d):
 		os.makedirs(d)
@@ -313,36 +229,19 @@ def _configResource(module, kind, name, config, description, extra=None):
 
 
 def _configScan():
-	"""Register config resources written above.
-
-    This is NOT the project scan. The gateway has two identically labelled "Scan File
-    System" buttons and running the wrong one does nothing at all, silently -- so this
-    goes through the configuration manager, not system.project.requestScan().
-    """
+	"""Register config resources by asking the configuration manager to scan."""
+	# Not system.project.requestScan(): the gateway has two "Scan File System" buttons and the wrong one does nothing.
 	from com.inductiveautomation.ignition.gateway import IgnitionGateway
 	cm = IgnitionGateway.get().getConfigurationManager()
 	before = str(cm.getScanInformation())
 	cm.requestScan()
-	# requestScan is ASYNCHRONOUS. Anything that depends on the scan having finished
-	# -- restarting the tag provider, reading a tag that was just written -- acts on
-	# the state from before the scan unless it waits for the reading to move. That is
-	# the whole reason the second project's tags appeared to need a human to press
-	# Scan File System: the scan was fine, the code just did not wait for it.
-	# (scanSynchronous is not the synchronous form of this; it takes a Runnable to
-	# run under the scan lock.)
+	# requestScan is asynchronous; wait for the scan information to change before relying on its result.
 	_waitFor(lambda: str(cm.getScanInformation()) != before, 90, 1)
 	return True
 
 
 def _waitFor(test, seconds=60, interval=2, report=None, what=None):
-	"""Poll until `test()` is true. Returns whether it became true.
-
-    A fixed sleep is the usual way this is written and it is wrong in both directions:
-    too short on a loaded gateway, and needlessly slow on a quick one.
-
-    Pass `report` and `what` for anything a user is waiting on. A wait that prints
-    nothing is indistinguishable from a hang, and this one can last 90 seconds.
-    """
+	"""Poll test() until true or `seconds` elapse; return whether it became true."""
 	from java.lang import Thread
 	waited = 0
 	while waited < seconds:
@@ -361,17 +260,8 @@ def _waitFor(test, seconds=60, interval=2, report=None, what=None):
 		return False
 
 
-# --------------------------------------------------------------- state probes
-
 def databaseReady(name=None):
-	"""Whether the connection exists AND answers. Existing but faulted reads as no.
-
-    On a gateway with no database MODULE - Ignition Edge - the honest answer is
-    "ready", because there is nothing to make ready: launchpad.store keeps the
-    OEE records in the gateway's own data directory instead, and every screen
-    reads them through the same functions. A row that goes red for running on
-    Edge invites someone to fix a thing that is not broken.
-    """
+	"""True if the connection answers; always True without a database module (Edge), where launchpad.store takes over."""
 	if not launchpad.edition.hasDatabase():
 		return True
 	try:
@@ -382,23 +272,14 @@ def databaseReady(name=None):
 
 
 def providerReady():
-	"""Whether the tag provider exists.
-
-    Not a browse: system.tag.browse against a provider that does not exist returns an
-    empty result rather than raising, so a browse-based probe reports every bare
-    gateway as healthy. The config resource on disk is the thing that actually
-    determines whether the provider is there.
-    """
+	"""True if the tag provider's config resource exists on disk."""
+	# Not a browse: browsing a missing provider returns empty instead of raising.
 	return os.path.exists(os.path.join(
 	    _abs(RESOURCES), CORE, "tag-provider", PROVIDER))
 
 
 def expectedLines():
-	"""How many demo lines this build ships, read from the payload it installs.
-
-    Not a constant: the number is already stated once, in the tag definitions, and a
-    second statement of it here is a thing to forget when a line is added.
-    """
+	"""Return the number of demo lines in the shipped tag payload (0 for KPI)."""
 	if not _isOee():
 		return 0
 	try:
@@ -412,13 +293,8 @@ def expectedLines():
 
 
 def linesBrowsable():
-	"""How many line instances the tag system will actually hand back right now.
-
-    A UDT instance is not browsable the instant its file lands: the scan works
-    through the tree, and a browse taken mid-scan returns however many have been
-    built so far. Every seeding step below iterates this list, so a browse taken one
-    second early seeds a subset -- and says nothing about it.
-    """
+	"""Return how many line instances the tag system browses right now."""
+	# A browse taken mid-scan returns a partial list.
 	try:
 		return len(_lib().getLineNames(_lib().BASE_TAG_FOLDER))
 	except:
@@ -426,11 +302,13 @@ def linesBrowsable():
 
 
 def linesReady():
+	"""True once every shipped line is browsable."""
 	want = expectedLines()
 	return want > 0 and linesBrowsable() >= want
 
 
 def tagsPresent():
+	"""True if the probe tag exists."""
 	try:
 		return bool(system.tag.exists(_probeTag()))
 	except:
@@ -438,20 +316,11 @@ def tagsPresent():
 
 
 def tagReading():
-	"""Whether the probe tag has a good value, not merely a definition.
-
-    Imported tags exist immediately; they only carry values once the device is
-    running and the scan class has ticked. The difference matters because a seeder
-    that centres its generated band on the live value silently skips every tag that
-    reads null -- reporting success while writing nothing.
-    """
+	"""Return whether the probe tag has a good value, not just a definition."""
 	try:
 		paths = [_probeTag()]
 		if _isOee():
-			# Enabled being good says the tags installed; it says nothing about whether
-			# the demo is actually running. A null production counter stops the
-			# simulator script dead for every line while every other probe here stays
-			# green -- so the counter is part of the probe, not just the definition.
+			# A null production counter stops the simulator script while every other probe stays green.
 			paths.append("[%s]OEE/Demo/Line 1/Plc/ProductionCounter" % PROVIDER)
 		vals = system.tag.readBlocking(paths)
 		qv = vals[0]
@@ -469,13 +338,7 @@ def tagReading():
 
 
 def historianReady():
-	"""Is there a tag historian to record into?
-
-    Edge has exactly one, made by the platform, and it is NOT a
-    historian-provider config resource - there is no such resource on Edge at
-    all, so looking for one on disk answers "no" forever. What it has instead
-    is a name in its own settings, and a provider already running under it.
-    """
+	"""True if a tag historian exists: Edge's own, else the historian-provider config resource."""
 	if launchpad.edition.isEdge():
 		return bool(launchpad.edition.historian())
 	return os.path.exists(os.path.join(
@@ -483,12 +346,7 @@ def historianReady():
 
 
 def deviceState():
-	"""The simulator's connection state, or None if the gateway has no such device.
-
-    "Exists" is not the same as "connected": a device that is present but faulted
-    leaves every OPC tag stale, which reads downstream as an empty historian rather
-    than as a device problem.
-    """
+	"""Return the simulator's connection state, or None if the device is absent."""
 	try:
 		devices = system.device.listDevices()
 		for row in range(devices.getRowCount()):
@@ -500,8 +358,8 @@ def deviceState():
 
 
 def deviceReady():
-	# a simulator reports Running, a real driver reports Connected -- both are healthy,
-	# and only Connected would report every working simulator as broken
+	"""True if the simulator is up."""
+	# A simulator reports Running, a real driver Connected.
 	return deviceState() in ("Connected", "Running")
 
 
@@ -515,15 +373,9 @@ def scriptingProject():
 
 
 def tablesPresent():
-	"""Whether this project's own tables exist.
-
-    tableExists goes through the gateway's metadata provider, so it answers for any
-    connection type -- a "SELECT FROM sqlite_master" probe throws on Postgres and
-    reports a healthy gateway as broken.
-    """
+	"""True if this project's own tables exist (the file store's readiness on Edge)."""
 	if not launchpad.edition.hasDatabase():
-		# No tables, by design. The store answers for itself - it is the thing
-		# that knows what "ready to be written to" means without a schema.
+		# No tables by design: the store reports its own readiness.
 		return launchpad.store.ready()
 	try:
 		from com.inductiveautomation.ignition.gateway import IgnitionGateway
@@ -537,23 +389,10 @@ def tablesPresent():
 
 
 def drawableHistory():
-	"""OEE hour rows that predate the hour in progress. None if it cannot be read.
-
-    The live engine opens a row per line for the current hour as soon as it starts
-    running, so a gateway with no demo history at all still counts seven rows and
-    looks current to any probe that just counts. That is not a subtle distinction:
-    it is the difference between a Line View with a full day of trend on it and one
-    with nothing, and it defeated both the seeder's "is it already current" guard and
-    the check that was supposed to notice. Everything the charts and the summary
-    tables draw is older than the hour in progress, so count that instead.
-    """
+	"""Return OEE hour rows older than the hour in progress (KPI: history rows), or None if unreadable."""
+	# The live engine opens a row for the current hour, so only older rows count as drawable.
 	if not _isOee():
-		# Same trap on the KPI side, and waiting for the historian to settle before
-		# seeding is what exposed it: by then the historian has recorded a couple of
-		# live samples of its own, so "rows exist" went true and setup skipped the
-		# backfill entirely -- reporting "already current (2 rows)" on a gateway with
-		# no seeded history at all. A properly seeded window holds one sample per tag
-		# every fifteen minutes, so it cannot have fewer rows than there are tags.
+		# A seeded window holds a sample per tag, so fewer rows than tags means it is not seeded.
 		rows = historyRows(24)
 		try:
 			tags = launchpad.init.registeredTagCount()
@@ -566,9 +405,7 @@ def drawableHistory():
 		now = system.date.now()
 		hourStart = system.date.setTime(now, system.date.getHour24(now), 0, 0)
 		if not launchpad.edition.hasDatabase():
-			# The same question of the file store: hour rows older than the
-			# hour in progress. Asking the store rather than counting files -
-			# the count that matters is rows, and a day file holds many.
+			# Ask the store for rows; a day file holds many.
 			return launchpad.store.hourlyStats(
 			    "", launchpad.oee.BASE_TAG_FOLDER,
 			    system.date.addDays(hourStart, -400),
@@ -581,15 +418,8 @@ def drawableHistory():
 
 
 def historyRows(withinHours=24):
-	"""How many history rows land inside the last `withinHours`.
-
-    Counting against a BOUND date rather than reading MAX() back and converting it:
-    the timestamp columns come back from the driver as whatever it feels like (the
-    OEE hour table declares utc_timestamp INTEGER and the generator writes Dates into
-    it), so any probe that parses a returned timestamp reports a healthy gateway as
-    empty. Binding a Date into the comparison is the same path the named queries use
-    at read time, and it is the thing that actually has to work.
-    """
+	"""Return how many history rows fall in the last `withinHours`, or None if unreadable."""
+	# Binds a Date rather than parsing a returned timestamp, whose type varies by driver.
 	try:
 		since = system.date.addHours(system.date.now(), -withinHours)
 		if _isOee():
@@ -601,10 +431,7 @@ def historyRows(withinHours=24):
 			    "SELECT COUNT(*) FROM ex_launchpad_oee_hour WHERE hour_timestamp >= ?",
 			    [since], database=_db())
 		if not launchpad.edition.hasDatabase():
-			# No partition tables to count - the historian is internal. Ask it
-			# instead, over the tags this project records. Every one of them is
-			# sampled on the same schedule, so counting them all is the same
-			# question the SQL count asks and not a slower way to guess.
+			# The historian is internal here, so ask it instead of counting partition tables.
 			return launchpad.init.historyRowsSince(since)
 		drvIds = launchpad.init._driverIds()[1]
 		total = 0
@@ -619,15 +446,14 @@ def historyRows(withinHours=24):
 
 
 def shiftsEnabled():
-	"""A roster that covers the day is what stops Performance dividing by zero."""
+	"""True if line 1's first shift is enabled (KPI: always True); without a roster Performance divides by zero."""
 	try:
 		if not _isOee():
 			return True  # the roster belongs to OEE; KPI has no shifts of its own
 		lines = launchpad.oee.getLineNames("[%s]OEE/Demo" % PROVIDER)
 		if not lines:
 			return False
-		# ShiftEnabled, not Enabled: the line itself has an Enabled tag, and reading
-		# that one instead reports a roster that was never written as healthy
+		# ShiftEnabled, not Enabled: the line's own Enabled tag would report an unwritten roster as healthy.
 		paths = ["[%s]OEE/Demo/%s/Schedule/1/ShiftEnabled" % (PROVIDER, lines[0])]
 		qv = system.tag.readBlocking(paths)[0]
 		return bool(qv.quality.isGood() and qv.value)
@@ -635,18 +461,9 @@ def shiftsEnabled():
 		return False
 
 
-# --------------------------------------------------------------- build steps
-
 def existingDatabase():
-	"""What a connection already under this project's name actually is.
-
-    Returns "absent", "ours" for the SQLite one these projects are written against,
-    or the translator name of whatever else is sitting under that name.
-
-    A connection that cannot be read counts as NOT ours. Refusing costs a person one
-    message telling them exactly what to look at; guessing wrong costs them a
-    half-created schema in a database they chose.
-    """
+	"""Return "absent", "ours" (SQLite), "unreadable" or the translator name of another connection under this name."""
+	# An unreadable connection counts as not ours: refusing is cheaper than building a schema in someone else's database.
 	p = os.path.join(_abs(RESOURCES), CORE, "database-connection", _dbName(),
 	                 "config.json")
 	if not os.path.exists(p):
@@ -659,48 +476,21 @@ def existingDatabase():
 
 
 def ensureDatabase(force=False):
-	"""Create the SQLite connection the projects are written against.
-
-    No credentials are involved, which is the whole reason this can be automated: a
-    Postgres or MSSQL connection would need a password nobody can supply from here.
-
-    Nothing here needs a connection to exist first -- on a gateway with no database
-    connections at all this is what makes the first one.
-    """
+	"""Create the SQLite connection (no credentials needed), or repair its URL on an older release's connection."""
 	if not launchpad.edition.hasDatabase():
-		# Every other return here is a short word for what the step did, and
-		# this one did nothing on purpose.
 		return "not needed on this edition"
 	kind = existingDatabase()
 	if kind not in ("absent", "ours"):
-		# databaseReady only asks whether the name answers SELECT 1, so a gateway
-		# that already has a connection under this name pointing at Postgres reads as
-		# ready and every later step would run SQLite DDL against it -- half-building
-		# a schema in somebody else's database instead of stopping. The README has
-		# always said this does not happen; this is what makes that true.
-		# Kept short on purpose: _explain truncates a step's message at 180
-		# characters, and the half that matters is the instruction, not the reason.
+		# A same-named non-SQLite connection also answers SELECT 1; stop rather than run SQLite DDL against it.
 		raise Exception(
 		    "a connection called '%s' already exists here and is %s, not SQLite. "
 		    "This schema is SQLite DDL. Rename or remove it, then press Set up again"
 		    % (_dbName(), kind))
 	if kind == "ours" and databaseReady(_dbName()) and not force:
-		# A connection made by an older release is SQLite and answers SELECT 1, so
-		# it reads as fine -- but it carries the parameterless URL and the file is
-		# still on the rollback journal. Returning "already connected" there would
-		# leave the stall in place on exactly the gateways that have been running
-		# longest.
+		# An older release's URL lacks the WAL parameters, so a working connection can still need repair.
 		if existingConnectURL() == _connectURL():
 			return "already connected"
-		# Repair the URL and NOTHING else. This connection is almost certainly the
-		# one this project created, but "almost certainly" is not a licence to
-		# rewrite a resource wholesale: a config.json written from the dict below
-		# would also reset every pool and eviction setting, so anyone who had tuned
-		# poolMaxActive on a busy gateway would lose it silently to an upgrade they
-		# asked for on other grounds. The create path already refuses to overwrite
-		# a connection it does not recognise; a repair path has no business being
-		# more invasive than the create path it is repairing. Patch the one key
-		# that is wrong and leave the rest of the file exactly as found.
+		# Patch connectURL only; rewriting the file would reset pool settings someone may have tuned.
 		existing = _readConfig(CORE, "database-connection", _dbName())
 		if existing is not None:
 			existing["connectURL"] = _connectURL()
@@ -708,8 +498,7 @@ def ensureDatabase(force=False):
 			                "SQLite database for the Launchpad OEE + KPI example "
 			                "resources")
 			return "updated"
-		# Unreadable config.json: fall through and write a known-good one rather
-		# than leaving a connection nobody can repair.
+		# Unreadable config.json: write a known-good one.
 	_configResource(CORE, "database-connection", _dbName(), {
 	    "connectURL": _connectURL(),
 	    "connectionProps": "", "connectionResetParams": "",
@@ -727,10 +516,7 @@ def ensureDatabase(force=False):
 
 
 def _readConfig(module, kind, name):
-	"""A config resource's config.json as a dict, or None if absent/unreadable.
-
-    Used to change one key of an existing resource without rewriting the others.
-    """
+	"""Return a resource's config.json as a dict, or None if absent or unreadable."""
 	p = os.path.join(_abs(RESOURCES), module, kind, name, "config.json")
 	if not os.path.exists(p):
 		return None
@@ -741,10 +527,7 @@ def _readConfig(module, kind, name):
 
 
 def existingConnectURL():
-	"""The connectURL of this project's connection as it stands, or "" if there is
-    no readable one. Used to tell an up-to-date connection from an older
-    release's, which are otherwise indistinguishable -- both are SQLite and both
-    answer SELECT 1."""
+	"""Return this project's connection URL as installed, or "" if there is no readable one."""
 	p = os.path.join(_abs(RESOURCES), CORE, "database-connection", _dbName(),
 	                 "config.json")
 	if not os.path.exists(p):
@@ -759,12 +542,8 @@ EDGE_VISUALIZATION = "PERSPECTIVE"
 
 
 def _edgeSystemProperties():
-	"""Edge's own settings resource, or None off Edge.
-
-    A singleton - its directory holds config.json directly, with no name
-    segment - so it is found by enumerating the type rather than by asking for
-    a name this project would have to guess.
-    """
+	"""Return Edge's settings resource, or None off Edge."""
+	# A singleton with no name segment, so find it by enumerating the type.
 	try:
 		found = list(system.config.getResources(
 		    moduleId="ignition", typeId="edge-system-properties"))
@@ -774,6 +553,7 @@ def _edgeSystemProperties():
 
 
 def edgeVisualizationReady():
+	"""True if Edge's visualization is Perspective (always True off Edge)."""
 	res = _edgeSystemProperties()
 	if res is None:
 		return not launchpad.edition.isEdge()
@@ -785,18 +565,8 @@ def edgeVisualizationReady():
 
 
 def ensureEdgeVisualization(force=False):
-	"""Point Edge's Visualization Module at Perspective.
-
-    Edge ships set to VISION, and until this is PERSPECTIVE **no Perspective
-    session opens at all** - the browser gets "Sessions Exceeded", which reads
-    as a licensing problem and is not one. So it is the first step, and on Edge
-    the install is run through this endpoint rather than from the Settings
-    screen, because that screen cannot be reached until it has run.
-
-    It is a gateway setting rather than a project one, but it is an ordinary
-    config resource and system.config can write it live - no restart, no
-    config-resource editing by hand.
-    """
+	"""Point Edge's Visualization Module at Perspective, live via system.config."""
+	# Edge ships on VISION, and until this is PERSPECTIVE no Perspective session opens ("Sessions Exceeded").
 	if not launchpad.edition.isEdge():
 		return "not an Edge gateway"
 	res = _edgeSystemProperties()
@@ -816,11 +586,9 @@ def ensureEdgeVisualization(force=False):
 
 
 def ensureTagProvider(force=False):
+	"""Create the tag provider; on Edge only check that the one it owns exists."""
 	if launchpad.edition.isEdge():
-		# Edge permits exactly ONE realtime provider, the platform makes it,
-		# and a second is refused at startup - so the Edge build is built for
-		# the name Edge already uses and there is nothing to create. If it is
-		# missing, a human has renamed it and only a human can put it back.
+		# Edge permits one realtime provider, made by the platform, so there is nothing to create.
 		if providerReady():
 			return "using '%s', which Edge owns" % PROVIDER
 		raise Exception(
@@ -838,11 +606,9 @@ def ensureTagProvider(force=False):
 
 
 def ensureHistorian(force=False):
+	"""Create the tag historian; on Edge use the one the platform owns."""
 	if launchpad.edition.isEdge():
-		# Edge permits exactly one historian, the platform makes it, and it is
-		# not a config resource - so there is nothing to write and a `force`
-		# has nothing to force. The demo historises into whatever Edge calls
-		# its own.
+		# Edge's historian is not a config resource, so there is nothing to write or force.
 		return "using %s, which Edge owns" % launchpad.edition.historian()
 	if historianReady() and not force:
 		return "already present"
@@ -854,11 +620,8 @@ def ensureHistorian(force=False):
 
 
 def ensureDevice(force=False):
-	"""The programmable simulator, including its programme.
-
-    Without the programme every KPI tag reads stale -- the device exists, the tags
-    resolve, and nothing ever changes, which looks like a broken historian.
-    """
+	"""Create the programmable simulator device with its programme."""
+	# Without the programme the device exists but every KPI tag reads stale.
 	if deviceReady() and not force:
 		return "already present"
 	_configResource(OPCUA_MODULE, "device", DEVICE,
@@ -869,45 +632,16 @@ def ensureDevice(force=False):
 
 
 def deviceInstructions():
-	"""The simulator's programme, addressed to THIS gateway's tag provider.
-
-    The programme names every node the device serves, and each tag's opcItemPath
-    names it back - so the two have to agree. They do not agree by themselves on
-    a build whose provider was substituted: the tags point at [edge]KPI/... and
-    the programme still serves [Launchpad]KPI/..., every OPC subscription comes
-    back Bad_NodeIdUnknown, and every KPI tag reads None for ever. Nothing says
-    so: the device is Running, the tags exist, and the historian records
-    nothing because there is nothing to record.
-
-    Same reason as payloadFiles: the programme is a compressed blob, so a
-    build-time substitution cannot reach inside it.
-    """
-	# As it turns out, nothing: the programme's browse paths are bare
-	# ("KPI/Lines/Line3/CoilTemperature"), and the device name they are served
-	# under comes from the device, not from here. Kept as the one place that
-	# would have to change if that stopped being true, and because the reason
-	# it does not need to is exactly the reason the tags DO - see payloadFiles.
+	"""Return the simulator's programme."""
+	# Its browse paths are bare, so unlike the tag payload it needs no provider rewrite.
 	return launchpad.payload.instructions()
 
 
 def ensureScriptingProject(force=False):
-	"""Point the gateway's scripting project at OEE.
-
-    The OEE UDT event scripts call launchpad.oee.* and resolve it from this
-    setting. Until it is right nothing computes, every OEE figure sits at zero, and
-    the gateway logs nothing to say why -- it is the single most confusing way for
-    this resource to be broken.
-
-    Two things it will not do. It will not point the gateway at OEE when OEE is not
-    installed -- KPI has no tag-scope scripts and does not need this at all. And it
-    will not take the setting off another project: this is a gateway-wide setting, so
-    on a gateway that already uses it for something else, silently claiming it would
-    break that other project's tag events. Both cases are reported, not performed.
-    """
+	"""Point the gateway scripting project at this one (OEE only); never take it off another project."""
+	# The OEE UDT event scripts resolve launchpad.oee from this setting; unset, every OEE figure is zero with nothing in the log.
 	if not _isOee():
-		# KPI has no tag-scope scripts and does not need this at all - and
-		# claiming a gateway-wide setting it does not use would take it off
-		# whatever does.
+		# KPI has no tag-scope scripts, and this is a gateway-wide setting.
 		return "not needed - this is the KPI project"
 	if scriptingProject() == scriptingProjectWanted() and not force:
 		return "already %s" % scriptingProjectWanted()
@@ -924,8 +658,7 @@ def ensureScriptingProject(force=False):
 	cfg = system.util.jsonDecode(_read(cfgPath))
 	cfg["gatewayScriptingProject"] = scriptingProjectWanted()
 	_write(cfgPath, system.util.jsonEncode(cfg))
-	# rewrite the sibling resource.json in place: it carries attributes we did not
-	# write and must not lose, and a stale signature makes the scan skip the file
+	# Rewrite resource.json in place to keep its other attributes; a stale signature makes the scan skip the file.
 	resPath = os.path.join(d, "resource.json")
 	if os.path.exists(resPath):
 		res = system.util.jsonDecode(_read(resPath))
@@ -938,19 +671,9 @@ def ensureScriptingProject(force=False):
 
 
 def ensureTags(force=False):
-	"""Install the tags as gateway config resources, then scan them in.
-
-    Deliberately NOT system.tag.configure. The runtime API looks tidier and cost a
-    day: configuring a subtree at the provider root takes the provider's other
-    subtrees with it, so installing KPI's tags silently removed OEE's -- on disk the
-    definitions were still there, at runtime every path read Bad_NotFound. Writing
-    the resource files and running a config scan is what the shell installer has
-    always done, and it composes: each project installs only its own paths.
-
-    UDT types come along in the same tree, under tag-type-definition rather than
-    tag-definition, which is what puts them in the type namespace instead of leaving
-    a tag folder literally called _types_ and every instance typeless.
-    """
+	"""Install the tags as gateway config resources, then scan them in."""
+	# Not system.tag.configure: configuring a subtree at the provider root removes the provider's other subtrees.
+	# UDT types go under tag-type-definition so they land in the type namespace.
 	if tagsPresent() and not force:
 		return "already present"
 	base = os.path.join(_abs(RESOURCES), CORE)
@@ -962,12 +685,7 @@ def ensureTags(force=False):
 			os.makedirs(parent)
 		_write(dest, text)
 		written += 1
-	# Scan, then wait, then scan again if needed. requestScan does pick these up --
-	# verified with a throwaway nested tag folder -- but it is asynchronous and a
-	# request made while the gateway is still working through the previous scan does
-	# nothing at all. That is exactly the second project's situation: its setup runs
-	# moments after the first one's, so a single fire-and-hope scan is the difference
-	# between "tags imported" and "tags sitting on disk reading Bad_NotFound".
+	# requestScan is asynchronous and does nothing while the previous scan is running, so scan, wait, retry.
 	for attempt in range(6):
 		_configScan()
 		if _waitFor(tagsPresent, 20, 2):
@@ -976,32 +694,15 @@ def ensureTags(force=False):
 	return "installed %d resources" % written
 
 
-# The provider name the tag payload was built against. It is baked into the
-# payload's own resource PATHS (tag-definition/launchpad/...) and into the tag
-# paths inside them, and the payload is a compressed blob - so unlike everything
-# else in this project it cannot be substituted at build time, because a sed
-# cannot reach inside it. It is rewritten here on the way out instead.
+# The provider name baked into the compressed tag payload; payloadFiles rewrites it, since a build-time sed cannot reach inside.
 PAYLOAD_PROVIDER = "launchpad"
 
-# ...and the historian the tag definitions name. On Edge there is no historian
-# called this: the platform owns the only one there is. A tag left pointing at
-# a historian that does not exist records nothing, and a scripted history write
-# for it is refused with "Failed to normalize N data points" - which names
-# neither the tag nor the historian and reads like a data problem.
+# A tag naming a historian that does not exist records nothing, and scripted writes fail with "Failed to normalize N data points".
 PAYLOAD_HISTORIAN = "launchpad"
 
 
 def payloadFiles():
-	"""The tag resources this build installs, addressed to THIS gateway.
-
-    Identical to launchpad.payload.tagFiles() unless the provider has been
-    renamed - which the Edge build does, because Edge permits one realtime
-    provider and the platform names it. Both the resource PATH and the tag
-    paths INSIDE it carry the old name and both are rewritten, because the ones
-    that are missed do not fail: a tag resource written under a provider that
-    does not exist is simply never scanned in, and every binding to it reads
-    Bad_NotFound with the setup report still green.
-    """
+	"""Return the tag resources this build installs, with provider and historian names rewritten for this gateway."""
 	files = launchpad.payload.tagFiles()
 	if (PROVIDER == PAYLOAD_PROVIDER
 	        and launchpad.edition.historian() == PAYLOAD_HISTORIAN):
@@ -1012,19 +713,8 @@ def payloadFiles():
 		# <kind>/<provider>/rest...
 		if len(parts) > 1 and parts[1] == PAYLOAD_PROVIDER:
 			parts[1] = PROVIDER
-		# `[Launchpad]` means TWO different things in this payload and only one
-		# of them is the tag provider:
-		#
-		#   "[Launchpad]KPI/AmbientTemperature"            a tag path
-		#   "ns=1;s=[Launchpad]KPI/AmbientTemperature"     an OPC item path,
-		#                                                  where the brackets
-		#                                                  hold the DEVICE name
-		#
-		# The device is called Launchpad on every edition - nothing renames it -
-		# so rewriting the second form points every KPI tag at a device that
-		# does not exist. Every subscription then comes back Bad_NodeIdUnknown
-		# and every tag reads None for ever, while the device sits Running and
-		# the tags all exist. Protect it, rewrite, put it back.
+		# "ns=1;s=[Launchpad]..." is an OPC item path whose brackets name the device, which is never renamed;
+		# protect it with a sentinel while the tag paths are rewritten.
 		SENTINEL = "\x00opc\x00"
 		opc = "ns=1;s=[%s]" % PAYLOAD_PROVIDER.capitalize()
 		text = text.replace(opc, SENTINEL)
@@ -1043,21 +733,8 @@ def payloadFiles():
 
 
 def staleTagResources():
-	"""Which installed tag resources differ from the ones this build ships.
-
-    The simulator's counter script lives in a tag definition, and `run` will not
-    reinstall tags -- installing them over a live subscription leaves the previous
-    definition's script subscribed as well, so the counter runs twice per tick. The
-    consequence is easy to miss and was: a fix to that script cannot reach a gateway
-    that already has the tags, and every other probe here still reports the gateway
-    healthy. A demo shipped running a third above its own target rate with a green
-    setup report and a green check.
-
-    Comparing the files on disk against what this build would write catches any
-    drift, not just a version bump, and needs nothing added to the tag schema. A
-    gateway installed from an earlier package shows every file as differing; one
-    installed from this build shows none.
-    """
+	"""Return installed tag files that differ from the ones this build ships."""
+	# run() does not reinstall tags, so a changed tag script cannot reach an existing gateway unless this flags it.
 	base = os.path.join(_abs(RESOURCES), CORE)
 	stale = []
 	for rel, text in payloadFiles().items():
@@ -1092,18 +769,12 @@ def run(progress=None, force=False, history=True, tags=False):
 			reporter.failed(why)
 			LOG.warn("setup step %s failed: %s" % (name, traceback.format_exc()))
 
-	# FIRST, and only on Edge: until the Visualization Module is Perspective no
-	# Perspective session opens at all, so every screen below - including the
-	# one with the Set up button on it - is unreachable.
+	# First, on Edge only: no Perspective session opens until the visualization is Perspective.
 	if launchpad.edition.isEdge():
 		step("edgeVisualization", lambda: ensureEdgeVisualization(force),
 		     "pointing Edge at Perspective")
 	step("database", lambda: ensureDatabase(force), "creating the database connection")
-	# The database is the one step nothing else may run past. Every resource below
-	# names it -- the tag provider's default datasource, the historian's store -- so
-	# carrying on after it fails leaves three resources pointing at whatever WAS
-	# under that name, which for the case ensureDatabase refuses (someone else's
-	# Postgres) is precisely the harm it refuses in order to avoid.
+	# Stop here on failure: every later resource names this database.
 	if report.get("database") == "FAILED":
 		reporter.note("stopping: nothing below can be built without the database")
 		report["ok"] = False
@@ -1111,33 +782,21 @@ def run(progress=None, force=False, history=True, tags=False):
 		return report
 
 	step("tagProvider", lambda: ensureTagProvider(force), "creating the tag provider")
-	# KPI only: the historian is one shared gateway provider pointing at ONE
-	# database, every historised tag is KPI's, and OEE has none -- so OEE
-	# creating it would either point it at a database with no history in it or,
-	# worse, repoint KPI's away from its own. See HISTORY_DATABASE above.
+	# KPI only: the historian points at one database and every historised tag is KPI's.
 	if not _isOee():
 		step("historian", lambda: ensureHistorian(force), "creating the tag historian")
 	step("device", lambda: ensureDevice(force), "creating the simulator device")
 	step("scriptingProject", lambda: ensureScriptingProject(force),
 	     "setting the gateway scripting project")
 
-	# Only scan when something was actually written. A config scan reloads the tag
-	# definitions, which re-fires each interval's Enabled handler, and that handler
-	# restamps StartTime and zeroes the run counters unconditionally -- so scanning
-	# on every press threw away the shift in progress even when every step above had
-	# just reported "already present". That is the whole of what made pressing Set up
-	# a second time destructive; the steps themselves were already idempotent.
-	# "FAILED" is a string that does not start with "already", so the first version of
-	# this counted a failed step as a reason to scan -- and then waited 90 seconds for
-	# a tag provider that could never appear, printing nothing the whole time.
+	# Scan only if something was written: a config scan re-fires each Enabled handler, which resets the shift in progress.
 	written = [name for name in ("database", "tagProvider", "historian", "device",
 	                             "scriptingProject")
 	           if isinstance(report.get(name), str)
 	           and report[name] != "FAILED"
 	           and not report[name].startswith("already")]
 	if report.get("errors"):
-		# nothing below can work without these, and the 90s wait below would only
-		# dress the failure up as a timeout
+		# Later steps need these, and the 90s wait would only disguise the failure.
 		reporter.note("stopping: %d step(s) above failed" % len(report["errors"]))
 		report["ok"] = False
 		report["detail"] = reporter.finish(False, summary(report))
@@ -1160,18 +819,11 @@ def run(progress=None, force=False, history=True, tags=False):
 		report["detail"] = reporter.finish(False, summary(report))
 		return report
 
-	# Tags are NOT reinstalled by a plain force. Installing the resources over
-	# themselves leaves the previous definition's tag event script subscribed as
-	# well as the new one, so the simulator's counter runs twice per tick, then
-	# three times, and the demo produces at a multiple of its target rate until the
-	# gateway restarts. Removing the files first was tried and measured: it does not
-	# drop the old subscription, it adds another. So pressing Setup again is always
-	# safe, and reinstalling tags has to be asked for by name (tags=1) -- after
-	# which the gateway wants a restart.
+	# Reinstalling tags over live ones leaves the old tag script subscribed (the counter runs twice per tick) until restart,
+	# so it needs tags=1.
 	step("tags", lambda: ensureTags(force and tags), "importing the tags")
 	if not tagsPresent():
-		# every seeding step below reads tags. Carrying on produces a page of
-		# confusing downstream failures instead of the one that matters.
+		# Seeding reads tags.
 		report.setdefault("errors", []).append(
 		    "tags are not present - seeding skipped")
 		report["ok"] = False
@@ -1179,13 +831,7 @@ def run(progress=None, force=False, history=True, tags=False):
 		report["detail"] = reporter.finish(False, summary(report))
 		return report
 
-	# Every seeding step below iterates the line list, and the line list comes from a
-	# tag BROWSE. tagsPresent() only asks whether one tag inside one line exists, so
-	# it goes true the moment the first instance is built -- while the scan is still
-	# working through the rest. Seeding then ran against four lines of seven and
-	# reported "36 tags written" and five thousand history rows, both of which read
-	# like success. Wait for the whole set, and if it never arrives say which number
-	# was reached rather than quietly seeding a subset.
+	# tagsPresent goes true at the first instance while the scan is still building the rest; seeding a subset reads as success.
 	want = expectedLines()
 	if want:
 		reporter.start("waiting for all %d lines to be browsable" % want)
@@ -1225,18 +871,14 @@ def _seed(step, report, reporter, history):
 		step("history", lambda: _freshHistory(reporter), "generating demo history")
 	else:
 		report["history"] = "skipped"
-	# Pressing Set up on a gateway that is already running the demo should not throw
-	# it back to zero. A full reset is what a bare gateway needs and what a working
-	# one least wants -- so re-anchor whatever is actually wrong, and keep the reset
-	# for the case it was written for.
+	# Re-anchor a running demo rather than resetting it to zero.
 	if _demoInitialised():
 		step("demoTags", lambda: launchpad.oee.healAnchors(LOG),
 		     "checking the demo counters")
 	else:
 		step("resetDemoTags", launchpad.oee.resetDemoTags,
 		     "zeroing the counters")
-		# initDemoTags reads the current shift start, which the schedule expressions
-		# only publish once they have ticked. Poll for it rather than sleeping 45s.
+		# initDemoTags needs the shift start, which the schedule publishes only once it has ticked.
 		reporter.waiting("waiting for the shift schedule to publish", 0)
 		_waitFor(_shiftStartPublished, 90, report=reporter,
 		         what="waiting for the shift schedule to publish")
@@ -1245,32 +887,11 @@ def _seed(step, report, reporter, history):
 
 
 def _backfillWhenReady(reporter, attempts=16, waitSeconds=15, force=False):
-	"""Seed KPI history, once there is somewhere to put it AND something to put there.
-
-    Two separate things have to be true, and only the first was being waited for.
-
-    A sample can only be written where a history partition already exists, and the
-    historian creates its first one when it first records. On a gateway built from
-    nothing that is a minute away, so an immediate backfill reports "no partition
-    covers the requested window" and seeds nothing.
-
-    The second is subtler and got through: a tag only appears in the historian's tag
-    table once it has recorded its first value, and the backfill seeds the tags it
-    finds there. Run seconds after the tags are installed, it finds almost none --
-    measured on a fresh gateway it found exactly one, a string tag it then correctly
-    skipped, and returned `rows: 0` with no error at all. That is a successful install
-    with two days of missing history behind every KPI chart, and it reported ok.
-
-    So "seeded nothing" is treated as not-ready-yet rather than as success.
-    """
+	"""Seed KPI history once the historian has a partition and has registered this project's tags."""
+	# A zero-row result counts as not ready, not as success.
 	from java.lang import Thread
 
-	# Wait for the historian's tag count to STOP CLIMBING before seeding at all.
-	# Seeding early does not merely under-fill: backfill's own guard then counts the
-	# window as already seeded, so the tags that registered a moment later never get
-	# history and no later run repairs it. Measured on a gateway where KPI's setup
-	# ran first: one tag registered, 192 rows written, reported ok, and the other
-	# fifty-seven tags stayed empty for good.
+	# Seeding before the tag count settles marks the window seeded, so later-registering tags never get history.
 	if not force:
 		seen = -1
 		for settle in range(20):
@@ -1300,9 +921,7 @@ def _backfillWhenReady(reporter, attempts=16, waitSeconds=15, force=False):
 				       "- each one appears when it records its first value"
 				       % result.get("tags", 0))
 		except:
-			# SQLite takes one writer at a time and the historian is recording while
-			# this runs, so a bulk insert can lose the race. Retrying is right; failing
-			# the install over a transient lock is not.
+			# SQLite has one writer at a time and the historian is writing; retry on a lock.
 			why = traceback.format_exc().strip().split("\n")[-1]
 			result = {"error": why}
 		if reporter is not None:
@@ -1313,22 +932,9 @@ def _backfillWhenReady(reporter, attempts=16, waitSeconds=15, force=False):
 
 
 def _freshHistory(reporter, maxAgeHours=3):
-	"""Leave this gateway with history that runs up to now.
-
-    Seeded history is a snapshot, not a subscription: it ends at the moment it was
-    generated. A demo gateway that sat idle for a few days therefore has full, healthy,
-    entirely historical tables -- and every chart and table whose window is "today"
-    draws nothing. Since these projects are nearly always installed on a short-lived
-    trial gateway that gets built, looked at, and thrown away, "seed it once at install
-    and hope" is the wrong bargain: setup re-seeds whenever what is there has gone
-    stale, and then verifies that it worked rather than assuming it.
-    """
+	"""Re-seed history if it stops short of now, then verify rows exist in the last `maxAgeHours`."""
 	existing = historyRows(maxAgeHours)
-	# "rows exist" is not "there is something to draw": on OEE the live engine has
-	# already opened a row per line for the hour in progress, and counting those made
-	# this guard report the history current on a gateway whose tables held nothing
-	# else. Setup then declined to rebuild, check told the user to press Setup, and
-	# pressing it changed nothing -- with the tables empty the whole time.
+	# The live engine opens a row for the current hour; counting those called an empty history current.
 	if existing and drawableHistory():
 		return "already current (%d rows in the last %d hours)" % (existing, maxAgeHours)
 	stale = historyRows(24 * 365)
@@ -1337,8 +943,7 @@ def _freshHistory(reporter, maxAgeHours=3):
 	if _isOee():
 		result = launchpad.oee.seedHistory()
 	else:
-		# force: the existing samples stop where the last run left off and the window
-		# has moved on since, so a non-forced pass leaves the recent end empty
+		# force: the window has moved on, so a non-forced pass leaves the recent end empty.
 		result = _backfillWhenReady(reporter, force=bool(stale))
 	if not historyRows(maxAgeHours):
 		raise Exception("history still has no rows inside the last %d hours after "
@@ -1357,23 +962,8 @@ def _initTables():
 
 
 def _demoInitialised():
-	"""Has this gateway's demo already been seeded and left running?
-
-    Three things, and the third was learned the hard way. A shift start time and
-    a turning simulator counter are not enough: the tags ship WITH a start time,
-    and on a fresh gateway the simulator is already producing by the time setup
-    reaches this step - so both halves read true on a gateway where the interval
-    engine had never anchored at all. Setup then took the "just re-anchor it"
-    path, healAnchors found nothing wrong with a demo that had never started,
-    and every screen read 100% OEE and zero production, on every line, for ever.
-
-    SecondsElapsed is the thing that is only non-zero once the engine has
-    actually ticked, and it stays non-zero for as long as the demo runs - so it
-    says no on a gateway that never started and yes on one that is running.
-    (StartCounter would not: a demo that has just been reset legitimately has
-    zero there, and a guard built on it throws away the demo on the second
-    press of Set up.)
-    """
+	"""True if the demo is seeded and running; SecondsElapsed is non-zero only once the engine has ticked."""
+	# Not StartCounter: it is legitimately zero after a reset.
 	try:
 		v = system.tag.readBlocking([
 		    "[%s]OEE/Demo/Line 1/ShiftOee/StartTime" % PROVIDER,
@@ -1408,9 +998,6 @@ def check():
 	if launchpad.edition.isEdge():
 		probe("edgeVisualization",
 		      lambda: {"is": EDGE_VISUALIZATION, "ok": edgeVisualizationReady()})
-	# _dbName(), not a constant called DATABASE - there has never been one, so
-	# this row reported "FAILED: NameError" on every gateway and every edition,
-	# and did so quietly enough that nothing else noticed.
 	probe("database", lambda: {"name": _dbName(),
 	                           "ok": databaseReady(_dbName())})
 	probe("tagProvider", lambda: {"name": PROVIDER, "ok": providerReady()})
@@ -1438,11 +1025,7 @@ def check():
 
 
 def detail(report):
-	"""One line per item, for a status label with room for more than a verdict.
-
-    The one-line summary answers "is it ready"; this answers "what is missing", which
-    is the question anyone actually has when the answer to the first one is no.
-    """
+	"""Return one line per report item plus the summary, to show what is missing."""
 	lines = []
 	for name in sorted(report.keys()):
 		if name in ("ok", "errors"):
@@ -1475,8 +1058,7 @@ def _tagResourceProbe():
 
 
 def _historyProbe():
-	"""Fresh, stale or absent -- "the tables exist" is not the same as "the charts
-    have anything to draw", and only the second one is what anyone is asking."""
+	"""Report whether history is fresh, stale or absent."""
 	rows = historyRows(24)
 	if rows is None:
 		return {"ok": False, "state": "could not be read"}

@@ -1,35 +1,18 @@
-"""
-launchpad.edition - what this gateway can actually do.
+"""Which edition this gateway is (standard or Ignition Edge) and what it can do.
 
-The demo ships in two builds, standard and Edge, and the difference is not
-cosmetic. Ignition Edge loads no SQL Bridge, no JDBC driver module and no SQL
-historian, so it has NO database connectivity at all - `system.db.*` has
-nothing to run against, and a named-query binding cannot run there either.
-
-Everything that follows from that is a RUNTIME branch decided here, so the two
-zips differ in exactly one thing: the tag provider name, which is substituted
-at build time because a tag path is a literal.
-
-Nothing here raises. A gateway that will not answer is treated as the smaller
-of the two - "no database" - because that path works everywhere.
+Edge has no database connectivity, so the two builds branch at runtime on the checks here.
+Nothing raises: a gateway that will not answer is treated as "no database".
 """
 
 LOG = system.util.getLogger("launchpad.edition")
 
-# The edition of a gateway and the modules it loads cannot change while it is
-# running, and these are asked from view bindings that re-evaluate on a timer,
-# so the answers are cached for the life of the module. A project scan reloads
-# it, which is the only event that could make one stale.
+# Cached: these are asked from timer-driven bindings and cannot change while the gateway runs.
 _CACHE = {}
 
 
 def _hasResourceType(module, typeId):
-	"""Is a config resource type registered on this gateway?
-
-	Catching java.lang.Throwable as well as Exception is deliberate: a Java
-	error raised inside a system call is not an Exception in Jython and would
-	walk straight past an `except Exception`.
-	"""
+	"""Is a config resource type registered on this gateway?"""
+	# Jython's `except Exception` does not catch a Java Error.
 	from java.lang import Throwable as JThrowable
 	key = (module, typeId)
 	if key in _CACHE:
@@ -45,38 +28,19 @@ def _hasResourceType(module, typeId):
 
 
 def isEdge():
-	"""Is this an Ignition Edge gateway?
-
-	Asked of the ONE type only Edge registers: ('ignition',
-	'edge-sync-settings').
-
-	It is NOT 'edge-system-properties' - a standard gateway registers that too,
-	so a detector built on it fires everywhere and every Edge branch runs in
-	the wrong place. Measured by diffing both editions on 8.3.8: 60 registered
-	types on standard, 55 on Edge, and exactly one of them Edge-only.
-	"""
+	"""Is this an Ignition Edge gateway?"""
+	# 'edge-sync-settings' is the only Edge-only type; standard registers 'edge-system-properties' too.
 	return _hasResourceType("ignition", "edge-sync-settings")
 
 
 def hasDatabase():
-	"""Can this gateway hold a database connection at all?
-
-	A question about the PLATFORM, not about whether a connection has been
-	configured. 'database-connection' is one of the types that exist on
-	standard and not on Edge.
-	"""
+	"""Can this gateway hold a database connection at all (platform, not configuration)?"""
 	return _hasResourceType("ignition", "database-connection")
 
 
 def historian():
-	"""The tag historian this gateway stores history in.
-
-	Edge has exactly one, made by the platform and named in its own settings
-	resource (Edge Historian, unless a site renamed it); everywhere else this
-	demo makes its own. There is no historian-provider CONFIG RESOURCE on Edge
-	- the provider is implicit - so the name is read from the Edge settings
-	rather than by enumerating providers, which returns nothing there.
-	"""
+	"""Return the historian name: Edge's own (from its settings), else "launchpad"."""
+	# Edge has no historian config resource, so enumerating providers returns nothing.
 	from java.lang import Throwable as JThrowable
 	if not isEdge():
 		return "launchpad"
@@ -95,7 +59,7 @@ def historian():
 
 
 def describe():
-	"""One line for the Settings screen, and for the status endpoint."""
+	"""Return one line describing the edition, for the Settings screen and status endpoint."""
 	if isEdge():
 		return (u"Ignition Edge - no database on this edition, so the OEE "
 		        u"records are kept in the gateway's own data directory")

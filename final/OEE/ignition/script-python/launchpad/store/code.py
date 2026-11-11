@@ -1,41 +1,6 @@
 """
-launchpad.store - the OEE records, with or without a database.
-
-The demo keeps four tables of its own: an hour rollup, a shift rollup, a
-per-line config and a rate lookup. On a standard gateway they are SQL. On
-Ignition Edge there is no database of any kind, so the same rows are kept as
-JSON in the gateway's own data directory.
-
-Both paths go through the SAME contract - the caller names the table, how to
-find the row, and the columns it is writing, and hands over values in that
-order:
-
-    store.insert(store.HOUR, HOUR_START_COLUMNS, params)
-    store.update(store.HOUR,
-                 [("line_name", store.EQ, name),
-                  ("hour_timestamp", store.EQ, hourStart)],
-                 HOUR_END_COLUMNS, params)
-
-The SQL statement is GENERATED from that contract rather than written beside
-it. Two hand-written column lists that have to stay in step are two lists that
-will not, and the failure is a row written into the wrong columns - which SQL
-accepts without complaint whenever the types happen to line up.
-
-## How the file store is laid out
-
-    data/launchpad-oee/hour/2026-09-10.json     one file per day
-    data/launchpad-oee/shift/2026-09-10.json    one file per day
-    data/launchpad-oee/config.json              small, one file
-    data/launchpad-oee/rate.json                small, one file
-
-Partitioned by day because the writer is a gateway timer that touches only the
-current hour and shift: a single document holding thirty days of seven lines is
-five thousand rows rewritten every tick. A day file is a few hundred rows and
-is the only one a live tick opens. A query over a range opens the files in that
-range and nothing else.
-
-Timestamps are stored as epoch milliseconds. A java.util.Date does not survive
-a JSON round trip, and a formatted string does not survive a timezone.
+launchpad.store - the OEE records, in SQL or, on Edge, as JSON files in the gateway data directory.
+Callers name the table, the match and the columns; the SQL is generated from that.
 """
 
 from java.lang import System as JSystem
@@ -45,7 +10,7 @@ from java.util.concurrent.locks import ReentrantLock
 
 LOG = system.util.getLogger("launchpad.store")
 
-# table id -> (SQL table name, timestamp column that partitions it or None)
+# table id -> (SQL table name, timestamp column that partitions it, or None)
 HOUR = "hour"
 SHIFT = "shift"
 CONFIG = "config"
@@ -58,46 +23,30 @@ TABLES = {
 	RATE: ("ex_launchpad_oee_rate", None),
 }
 
-# One writer at a time. The OEE timer is a single gateway thread, but the seed
-# and the heal run on their own, and two threads rewriting one day file lose
-# whichever finishes first.
+# Two threads rewriting one day file lose whichever finishes first.
 _LOCK = ReentrantLock()
 
-# Set only by the parity gate at the bottom of this module, which needs to ask
-# the file implementation a question on a gateway that has a database.
+# Set only by the parity check, to run the file implementation on a gateway with a database.
 _FORCE_FILE = {"on": False}
 
 
 def sqlName(table):
+	"""Return the SQL table name for a table id."""
 	return TABLES[table][0]
 
 
 def _noDatabase():
-	# _FORCE_FILE is the parity gate holding this to the file implementation on
-	# a gateway that has both; nothing else ever sets it.
 	if _FORCE_FILE["on"]:
 		return True
 	return not launchpad.edition.hasDatabase()
 
 
-# ---------------------------------------------------------------------------
-# the file store
-# ---------------------------------------------------------------------------
-
-
 def root():
-	"""Where the file store lives.
-
-	The gateway runs with its installation directory as the working directory
-	on every platform and in the official container image, and no scripting
-	function returns it, so this is the portable way to ask.
-	"""
+	"""Return the file store directory, under the gateway's working directory."""
 	return JSystem.getProperty("user.dir") + "/data/launchpad-oee"
 
 
-# While a rebuild is staging, every read and write goes to the staging copy
-# instead - see seedBegin. Nothing else changes: the paths are built from this
-# rather than from root().
+# While a rebuild is staging, paths are built from here instead of root().
 _STAGE = {"root": None}
 
 
@@ -112,16 +61,8 @@ def _millis(value):
 
 
 def _encode(row):
-	"""A row as something json can hold, without losing any of it.
-
-	Dates become epoch millis. Java numbers become Python ones FIRST: a
-	BigDecimal or a java.lang.Integer handed straight to jsonEncode does not
-	always come back the same number, and the way that shows up is a rollup
-	whose target count is a quarter short per row and whose total is a whole
-	unit out over a shift. Measured against the SQL implementation by
-	?action=parity, which is exactly the class of difference it exists to
-	catch.
-	"""
+	"""Return the row with dates as epoch millis and Java numbers as Python ones."""
+	# A BigDecimal or Integer passed straight to jsonEncode does not always come back the same.
 	from java.lang import Number as JNumber
 	out = {}
 	for k, v in row.items():
@@ -142,8 +83,7 @@ def _decode(row, dateColumns):
 	return out
 
 
-# Which columns hold a timestamp, per table. Needed on the way back out: JSON
-# gives back a number and every consumer wants the Date it put in.
+# Timestamp columns per table; JSON returns a number where consumers want a Date.
 DATE_COLUMNS = {
 	HOUR: ("utc_timestamp", "day_timestamp", "hour_timestamp"),
 	SHIFT: ("utc_timestamp", "shift_start", "shift_end"),
@@ -179,8 +119,6 @@ def _read(path):
 
 
 def _write(path, rows):
-	# Written whole, every time. These files are hundreds of rows, not
-	# thousands, and a partial write of a day's OEE is worse than a slow one.
 	system.file.writeFile(path, system.util.jsonEncode(rows, 0))
 
 
@@ -195,10 +133,7 @@ def _partitionOf(table, row):
 	return _dayKey(_millis(value))
 
 
-# A match is a list of (column, operator, value). Equality alone was not
-# enough: the shift-end update finds its row with `shift_end is null`, which is
-# the whole point of it - a shift is closed once, and the open one is the row
-# without an end. A key list of column names cannot say that.
+# A match is a list of (column, operator, value); ISNULL finds the open shift row.
 EQ, ISNULL, NOTNULL = "=", "isnull", "notnull"
 
 
@@ -231,15 +166,7 @@ def _whereSql(match):
 
 
 def _searchDays(table, match):
-	"""The day files an update has to look in.
-
-	When the match pins the partitioning timestamp, that is one file. When it
-	does not - the shift-end update matches on shift name and a null end - the
-	open row could be in yesterday's file as easily as today's, so the search
-	runs newest-first over the recent ones. Newest-first matters: the row being
-	closed is the most recent, and stopping at the first hit is what keeps a
-	rate change from rewriting a shift that ended a week ago.
-	"""
+	"""Return the day files to search: one if the match pins the timestamp, else the newest three."""
 	_name, tsColumn = TABLES[table]
 	if tsColumn is None:
 		return [None]
@@ -292,12 +219,7 @@ def _dayFiles(table):
 
 
 def _rowsBetween(table, startMillis, endMillis):
-	"""Every row of a partitioned table whose own timestamp is in the window.
-
-	Only the day files that overlap the window are opened. The bound is
-	inclusive at both ends, which is what BETWEEN means in the query this
-	replaces.
-	"""
+	"""Return rows whose timestamp is in the window, inclusive at both ends."""
 	_name, tsColumn = TABLES[table]
 	first = _dayKey(startMillis)
 	last = _dayKey(endMillis)
@@ -324,17 +246,8 @@ def _allRows(table):
 	return out
 
 
-# ---------------------------------------------------------------------------
-# the write API - one contract, two implementations
-# ---------------------------------------------------------------------------
-
-
 def insert(table, columns, values, tx=None):
-	"""Add a row. `columns` and `values` are positional partners.
-
-	`tx` is passed through to the database so the thirty-day seed stays one
-	transaction; the file store ignores it, having nothing to roll back to.
-	"""
+	"""Add a row; `columns` and `values` are positional. `tx` is used by SQL only."""
 	if len(columns) != len(values):
 		raise ValueError("insert(%s): %d columns and %d values"
 		                 % (table, len(columns), len(values)))
@@ -349,17 +262,7 @@ def insert(table, columns, values, tx=None):
 
 
 def insertMany(table, columns, values, tx=None):
-	"""Add several rows at once from ONE flat list of values.
-
-	`values` is every row's values end to end - 24 hours of 30 columns is a
-	list of 720 - which is the shape the history generator already builds,
-	because it was assembling a multi-row INSERT by repeating the VALUES
-	clause. Keeping the batch matters on SQL: the thirty-day seed is 5,000-odd
-	rows, and one statement per row makes it minutes rather than seconds.
-
-	The file store has no such distinction and appends them one at a time; it
-	is writing one day file per call either way.
-	"""
+	"""Add several rows from one flat list of values, every row's values end to end."""
 	width = len(columns)
 	if width == 0 or len(values) % width:
 		raise ValueError("insertMany(%s): %d values do not divide into rows of "
@@ -380,11 +283,7 @@ def insertMany(table, columns, values, tx=None):
 
 
 def update(table, match, columns, values):
-	"""Change the row `match` finds. No match is a no-op, exactly as in SQL.
-
-	`match` is a list of (column, operator, value) - see EQ / ISNULL / NOTNULL.
-	`columns`/`values` are the SET list and are positional partners.
-	"""
+	"""Change the row `match` finds (a list of (column, op, value)); no match is a no-op."""
 	if len(columns) != len(values):
 		raise ValueError("update(%s): %d columns and %d values"
 		                 % (table, len(columns), len(values)))
@@ -400,14 +299,7 @@ def update(table, match, columns, values):
 
 
 def appendText(table, match, appends):
-	"""Append to comma-separated TEXT columns on the row `match` finds.
-
-	`appends` is {column: value}. Two columns on each rollup row keep the
-	rate changes that happened during it as a comma-separated list, and in SQL
-	that is `col = col || ',' || cast(? as text)`. It is a read-modify-write
-	either way; this is the one operation where the two implementations do not
-	look alike, so it lives here rather than at the call site.
-	"""
+	"""Append each value in `appends` ({column: value}) to a comma-separated TEXT column of the matched row."""
 	if _noDatabase():
 		_LOCK.lock()
 		try:
@@ -430,9 +322,7 @@ def appendText(table, match, appends):
 	where, whereParams = _whereSql(match)
 	sets, params = [], []
 	for column, value in appends.items():
-		# cast on BOTH sides, as the hand-written statements did: the column
-		# is TEXT but a first append onto a numeric-looking value is where a
-		# database decides to do arithmetic instead of concatenation.
+		# Cast both sides: a numeric-looking value can make the database add instead of concatenate.
 		sets.append("%s = cast(%s as text) || ',' || cast(? as text)"
 		            % (column, column))
 		params.append(value)
@@ -482,6 +372,7 @@ def deleteOlderThan(table, column, cutoff):
 
 
 def deleteAll(table, tx=None):
+	"""Delete every row of the table."""
 	if _noDatabase():
 		_LOCK.lock()
 		try:
@@ -503,6 +394,7 @@ def deleteAll(table, tx=None):
 
 
 def count(table, tx=None):
+	"""Return the number of rows in the table."""
 	if _noDatabase():
 		return len(_allRows(table))
 	sql = "SELECT COUNT(*) FROM %s" % sqlName(table)
@@ -511,26 +403,8 @@ def count(table, tx=None):
 	return system.db.runScalarQuery(sql, database=launchpad.oee.db())
 
 
-# ---------------------------------------------------------------------------
-# rebuilding the history atomically
-# ---------------------------------------------------------------------------
-# The thirty-day seed DELETEs both rollups and regenerates them, so a failure
-# part way through - a generator error, a gateway restart - must not be able to
-# leave a gateway with no history and no way back. On a button the install
-# instructions tell every user to press, a failure that destroys data and then
-# invites a retry is the worst possible shape.
-#
-# On SQL that is a transaction. On the file store it is a staging directory
-# swapped in at the end: the live files are untouched until the new set is
-# complete, and a failure leaves them exactly as they were.
-#
-# A live timer tick that lands mid-seed writes into the staging set and is
-# swapped in with it, which is the behaviour we want and is not what the SQL
-# path does - there the tick is simply outside the transaction. Neither loses
-# the tick.
-
 def seedBegin():
-	"""Start an all-or-nothing rebuild. Returns the handle to pass back."""
+	"""Start an all-or-nothing rebuild (SQL transaction or staging directory); return its handle."""
 	if not _noDatabase():
 		return system.db.beginTransaction(database=launchpad.oee.db(),
 		                                  timeout=300000)
@@ -539,8 +413,6 @@ def seedBegin():
 	_deleteTree(File(stage))
 	for sub in ("", "/" + HOUR, "/" + SHIFT):
 		File(stage + sub).mkdirs()
-	# carry the small unpartitioned tables across - the rebuild replaces the
-	# rollups, not the rate lookup or the per-line config
 	for table in (CONFIG, RATE):
 		rows = _read(_path(table))
 		if rows:
@@ -551,6 +423,7 @@ def seedBegin():
 
 
 def seedCommit(handle):
+	"""Make the rebuild live: commit the transaction or swap the staging directory in."""
 	if not _noDatabase():
 		system.db.commitTransaction(handle)
 		return
@@ -562,13 +435,13 @@ def seedCommit(handle):
 	if live.exists() and not live.renameTo(old):
 		raise Exception("could not move the live OEE store aside")
 	if not stage.renameTo(live):
-		# put it back rather than leave the gateway with nothing
 		old.renameTo(live)
 		raise Exception("could not swap the rebuilt OEE store into place")
 	_deleteTree(old)
 
 
 def seedRollback(handle):
+	"""Discard the rebuild and leave the live records untouched."""
 	if not _noDatabase():
 		system.db.rollbackTransaction(handle)
 		return
@@ -578,6 +451,7 @@ def seedRollback(handle):
 
 
 def seedClose(handle):
+	"""Release the rebuild handle after commit or rollback."""
 	if not _noDatabase():
 		system.db.closeTransaction(handle)
 		return
@@ -594,20 +468,13 @@ def _deleteTree(f):
 	f.delete()
 
 
-# The rate lookup the SQL schema seeds with its CREATE TABLE. The file store
-# has no DDL to hang it off, so it is written here - and the demo reads
-# 'default' for every line that has not been given a rate of its own, so an
-# empty rate file is a demo with no target rate anywhere.
+# The SQL schema seeds this row; lines without their own rate read 'default'.
 DEFAULT_RATE = {"rate_name": "default", "uom": "units", "target_rate": 15,
                 "interval": "minute"}
 
 
 def ready():
-	"""Is the store able to hold records yet?
-
-	The question `tablesPresent` asks, answered for a store that has no tables.
-	It is the directories and the default rate, which is what ensure() makes.
-	"""
+	"""Return True if the store can hold records (file store: directories and default rate exist)."""
 	from java.io import File
 	if not _noDatabase():
 		return True
@@ -617,12 +484,7 @@ def ready():
 
 
 def ensure():
-	"""Make the store ready to be written to.
-
-	Creates nothing on SQL - that is launchpad.oee.initTables' job, and its
-	CREATE TABLE seeds the default rate on the way past. On a gateway with no
-	database it makes the directories and writes that same default rate.
-	"""
+	"""Create the file store directories and default rate; does nothing on SQL."""
 	if not _noDatabase():
 		return u"tables are the database's"
 	from java.io import File
@@ -635,32 +497,14 @@ def ensure():
 	return u"file store ready at %s" % root()
 
 
-# ---------------------------------------------------------------------------
-# the read API - every query the screens make
-# ---------------------------------------------------------------------------
-# One function per named query, returning the same columns in the same order
-# under the same names, because a chart bound to column 7 does not check what
-# column 7 is called.
-#
-# On a gateway with a database each of these IS the named query - it runs the
-# resource, so there is one copy of that SQL and it is the copy that shipped.
-# On a gateway without one the same answer is computed from the file store.
-# ?cmd=parity runs both over the same records and compares them.
-
+# Each read function returns its named query's columns in the same order and names.
 
 def _num(v):
 	return 0.0 if v is None else float(v)
 
 
 def rowsAsJson(ds):
-	"""A dataset as a list of dicts.
-
-	The bindings these functions replace came in two flavours: some asked the
-	query for a dataset, some for `returnFormat: json`, which Perspective hands
-	back as an array of objects. A script binding returns whatever the script
-	returns, so the ones that wanted json call this and the rest do not - and
-	the consumers on the other side of them are unchanged.
-	"""
+	"""Return a dataset as a list of dicts keyed by column name."""
 	out = []
 	names = [unicode(ds.getColumnName(c)) for c in range(ds.getColumnCount())]
 	for r in range(ds.getRowCount()):
@@ -681,13 +525,8 @@ def _windowParams(lineName, tagFolder, startTime, stopTime):
 
 
 def _hourRowsInWindow(lineName, tagFolder, startMillis, endMillis, column):
-	"""Hour rows filtered on `column`, which is hour_timestamp or day_timestamp.
-
-	The day files are partitioned by hour_timestamp. A window on day_timestamp
-	therefore has to look one day wider at each end - the midnight an hour
-	belongs to can fall outside the window its own timestamp is in - and then
-	filter exactly.
-	"""
+	"""Return hour rows with `column` (hour_timestamp or day_timestamp) in the window."""
+	# Files are partitioned by hour_timestamp, so a day_timestamp window reads a day wider each side.
 	pad = 86400000 if column == "day_timestamp" else 0
 	rows = _rowsBetween(HOUR, startMillis - pad, endMillis + pad)
 	out = []
@@ -712,7 +551,7 @@ DAILY_STATS_COLUMNS = [
 
 
 def dailyStats(lineName, tagFolder, startTime, stopTime):
-	"""Hour rollups averaged into days, per line. Launchpad/Oee/DailyStats."""
+	"""Return hour rollups averaged into days per line; same as Launchpad/Oee/DailyStats."""
 	if not _noDatabase():
 		return _named("Launchpad/Oee/DailyStats",
 		              _windowParams(lineName, tagFolder, startTime, stopTime))
@@ -754,7 +593,7 @@ HOURLY_STATS_COLUMNS = [
 
 
 def hourlyStats(lineName, tagFolder, startTime, stopTime):
-	"""One row per line per hour. Launchpad/Oee/HourlyStats."""
+	"""Return one row per line per hour; same as named query Launchpad/Oee/HourlyStats."""
 	if not _noDatabase():
 		return _named("Launchpad/Oee/HourlyStats",
 		              _windowParams(lineName, tagFolder, startTime, stopTime))
@@ -793,8 +632,7 @@ HOURLY_AVERAGE_COLUMNS = [
 
 
 def hourlyStatsAverage(lineName, tagFolder, startTime, stopTime):
-	"""One row per line, averaged over the window.
-	Launchpad/Oee/HourlyStatsAverage."""
+	"""Return one row per line averaged over the window; same as Launchpad/Oee/HourlyStatsAverage."""
 	if not _noDatabase():
 		return _named("Launchpad/Oee/HourlyStatsAverage",
 		              _windowParams(lineName, tagFolder, startTime, stopTime))
@@ -835,8 +673,7 @@ SHIFT_STATS_COLUMNS = [
 
 
 def shiftStats(lineName, tagFolder, startTime, stopTime):
-	"""Shift rollups over a window, per line and shift.
-	Launchpad/Oee/ShiftStats."""
+	"""Return shift rollups per line and shift; same as Launchpad/Oee/ShiftStats."""
 	if not _noDatabase():
 		return _named("Launchpad/Oee/ShiftStats",
 		              _windowParams(lineName, tagFolder, startTime, stopTime))
@@ -877,12 +714,8 @@ TOP_PRODUCTION_COLUMNS = ["hour_timestamp", "hour_production_count",
 
 
 def topProduction(lineName, startTime, endTime):
-	"""The line's hours, best first. Launchpad/Oee/TopProduction.
-
-	"Best" is the SQL's own ordering: the shortfall against target as a
-	fraction of target, ascending. Note it does NOT filter on tag_folder -
-	neither does the query - so the parameters here are the query's.
-	"""
+	"""Return the line's hours ordered by smallest shortfall against target; same as Launchpad/Oee/TopProduction."""
+	# Does not filter on tag_folder, matching the query.
 	if not _noDatabase():
 		return _named("Launchpad/Oee/TopProduction",
 		              {"lineName": lineName, "startTime": startTime,
@@ -908,7 +741,7 @@ RATE_COLUMNS = ["rate_name", "uom", "target_rate", "interval"]
 
 
 def selectRates():
-	"""Every rate definition, by name. Launchpad/Oee/SelectRates."""
+	"""Return every rate definition by name; same as Launchpad/Oee/SelectRates."""
 	if not _noDatabase():
 		return _named("Launchpad/Oee/SelectRates", {})
 	rows = sorted(_read(_path(RATE)),
@@ -920,10 +753,7 @@ def selectRates():
 
 
 def rateData(rateName):
-	"""One rate definition. Launchpad/Oee/SelectRateData.
-
-	Zero rows when the name is unknown, which is what the caller checks.
-	"""
+	"""Return the named rate definition (zero rows if unknown); same as Launchpad/Oee/SelectRateData."""
 	if not _noDatabase():
 		return _named("Launchpad/Oee/SelectRateData", {"rate_name": rateName})
 	out = []
@@ -933,20 +763,6 @@ def rateData(rateName):
 			            r.get("target_rate"), r.get("interval")])
 	return system.dataset.toDataSet(RATE_COLUMNS, out)
 
-
-# ---------------------------------------------------------------------------
-# proving the two implementations agree
-# ---------------------------------------------------------------------------
-# Two implementations of seven queries is two chances for the Edge build to
-# start answering something different, and neither one fails loudly when it
-# does: a drifted rollup is a plausible number on a chart.
-#
-# Unlike the alarm demo - where both implementations read one journal - these
-# two read different stores, so they cannot simply be run side by side. The
-# gate therefore MIRRORS the SQL records into a scratch file store and asks the
-# same seven questions of both over the same rows. It only runs on a gateway
-# that has a database; on Edge there is no SQL side and it says so rather than
-# reporting a vacuous pass.
 
 def _forceFile(on, scratchRoot=None):
 	_FORCE_FILE["on"] = bool(on)
@@ -962,12 +778,7 @@ def _tableColumns(table):
 
 
 def mirrorFromSql(scratchRoot):
-	"""Copy every OEE record out of SQL and into a file store at scratchRoot.
-
-	This is what makes the comparison honest: the file implementation is asked
-	about the SAME rows the SQL implementation is, rather than about a second
-	generated history that would differ in every random number.
-	"""
+	"""Copy every OEE record from SQL into a file store at scratchRoot; return row counts per table."""
 	from java.io import File
 	_deleteTree(File(scratchRoot))
 	for sub in ("", "/" + HOUR, "/" + SHIFT):
@@ -975,20 +786,8 @@ def mirrorFromSql(scratchRoot):
 	counts = {}
 	for table in (HOUR, SHIFT, RATE, CONFIG):
 		columns = _tableColumns(table)
-		# Every column TWICE: once as itself, once as SQLite's own idea of
-		# what it is holding.
-		#
-		# The OEE schema declares target_production_count INTEGER and the
-		# generator writes 7091.25 into it. SQLite keeps the REAL - typeof()
-		# says so - but the JDBC driver honours the DECLARED type and hands
-		# back 7091, while SUM() is computed inside SQLite and keeps the .25.
-		# So the shipped standard build already disagrees with itself: a row
-		# read shows 7091 and a rollup of that one row shows 7091.25.
-		#
-		# It matters here because a mirror that reads through the driver
-		# truncates, and then reports the file implementation as wrong for
-		# holding the number that was actually written. Ask for the REAL where
-		# SQLite says the value is one.
+		# SQLite keeps 7091.25 in an INTEGER column but the JDBC driver returns 7091,
+		# so each column is also read as typeof() and CAST AS REAL.
 		select = []
 		for c in columns:
 			select.append(c)
@@ -1018,15 +817,7 @@ def mirrorFromSql(scratchRoot):
 
 
 def _comparable(value):
-	"""A dataset as something two answers can be ==.
-
-	Reduced to plain values because the two implementations build theirs from
-	different primitives - a Date out of the JDBC driver on one side and out of
-	system.date.fromMillis on the other - and the comparison is about the
-	ANSWER, not the types it arrived in. Floats are rounded because a sum of
-	the same numbers in a different order is the same number to any reader and
-	not always to the last bit.
-	"""
+	"""Reduce a dataset to plain values (dates as millis, numbers rounded) so two answers compare with ==."""
 	from java.util import Date as JDate
 	rows = []
 	for r in range(value.getRowCount()):
@@ -1036,10 +827,7 @@ def _comparable(value):
 			if isinstance(v, JDate):
 				v = long(system.date.toMillis(v))
 			elif isinstance(v, (int, long, float)):
-				# By VALUE, not by type. SUM over an INTEGER column comes back
-				# from the driver as a Long and out of the file implementation
-				# as a float; 4879 and 4879.0 are the same answer and a gate
-				# that calls them a difference is a gate nobody will read.
+				# Compare by value: SUM returns a Long from the driver and a float from the file store.
 				v = round(float(v), 4)
 			elif v is not None and not isinstance(v, (unicode, str)):
 				v = unicode(v)
@@ -1049,12 +837,7 @@ def _comparable(value):
 
 
 def parity(lineName="", tagFolder=None, hours=720):
-	"""Ask both implementations the same seven questions over the same records.
-
-	Returns {ok, comparable, results:[{name, match, rows, sqlSample, ...}]}.
-	The two answers are included only where they differ - a matching pair is a
-	line saying so, not a wall of numbers.
-	"""
+	"""Run the read functions on SQL and on a mirrored file store; return {ok, comparable, results}."""
 	if _noDatabase():
 		return {"ok": True, "comparable": False,
 		        "note": (u"this gateway has no database, so there is no SQL "
@@ -1062,11 +845,7 @@ def parity(lineName="", tagFolder=None, hours=720):
 		                 u"is the only one that runs here")}
 
 	folder = tagFolder or launchpad.oee.BASE_TAG_FOLDER
-	# The window STOPS at the top of the current hour. The demo is running
-	# while this runs: the live engine rewrites the hour in progress on every
-	# tick, so a window that includes it compares two reads of a moving row and
-	# reports a difference that is only elapsed time. Seen on a 24-hour window,
-	# where it looked exactly like a boundary bug in the file implementation.
+	# Stop at the top of the hour: the live engine rewrites the current hour every tick.
 	now = system.date.now()
 	end = system.date.setTime(now, system.date.getHour24(now), 0, 0)
 	start = system.date.addHours(end, -int(hours))
@@ -1082,7 +861,7 @@ def parity(lineName="", tagFolder=None, hours=720):
 		("selectRates", lambda: selectRates()),
 		("rateData", lambda: rateData("default")),
 	]
-	# topProduction needs a real line name; "" means every line to the others
+	# topProduction needs a real line name; "" means all lines to the others.
 	lines = launchpad.oee.getLineNames(folder)
 	if lines:
 		first = lineName or lines[0]

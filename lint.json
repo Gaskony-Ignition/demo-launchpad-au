@@ -7,6 +7,8 @@
     {"file": "Configuration/Widget Edit Wrapper/view.json", "rule": "UnusedCustomPropertiesRule", "match": "params.widgetId:",
      "reason": "launchpad.dashboard.code.py passes this in each widget instance's viewParams (lines 113, 214) and reads it back as row.viewParams.widgetId (line 421) when saving the edited dashboard - live state for the controller script, not something the view itself reads"},
     {"file": "Configuration/Widget Edit Wrapper/view.json", "rule": "UnusedCustomPropertiesRule", "match": "params.widgetName:",
-     "reason": "same as widgetId - passed in by dashboard/code.py (lines 113, 214) and read back as row.viewParams.widgetName (line 421) when saving the edited dashboard"}
+     "reason": "same as widgetId - passed in by dashboard/code.py (lines 113, 214) and read back as row.viewParams.widgetName (line 421) when saving the edited dashboard"},
+    {"file": "final/KPI/ignition/script-python/launchpad/init/code.py", "rule": "S6", "match": "repairBackfill",
+     "reason": "the table is the historian's current partition, read from its own sqlth_partitions table, and a table name cannot be a bound parameter"}
   ]
 }

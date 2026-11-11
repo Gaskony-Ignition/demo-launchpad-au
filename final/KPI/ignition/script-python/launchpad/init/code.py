@@ -1,16 +1,11 @@
 DATABASE_NAME = "KPI"
 
 def db():
-	"""The database connection to use.
-
-	This project owns a SQLite database named after itself, so the connection
-	list on a gateway says which project each database belongs to. The globals
-	lookup stays as an override hook for anyone pointing the project at a
-	differently named connection; nothing in this project writes it.
-	"""
+	"""Return the database connection name: the launchpad.database global if set, else KPI."""
 	return system.util.getGlobals().get("launchpad.database") or DATABASE_NAME
 
 def initDashboard():
+	"""Create and seed the dashboard tables (or ensure the store on an edition with no database)."""
 	query = """
 CREATE TABLE ex_lp_widget_parameter_types (
   id integer PRIMARY KEY AUTOINCREMENT,
@@ -210,24 +205,16 @@ INSERT INTO ex_lp_dashboards VALUES(1,'Dashboard 1','dashboard','dash1','Anonymo
 INSERT INTO ex_lp_dashboards VALUES(2,'Dashboard 2','dashboard','dash2','Anonymous','stretch',100,29,6,29,6,'2025-06-05 20:45:49');
 """
 	if not launchpad.edition.hasDatabase():
-		# There is no schema to create - the dashboards are files - and the
-		# store carries the same rows this script seeds, checked against it by
-		# tools/kpi_seed.py.
+		# No schema here: the dashboards are files, and the store holds the same rows.
 		return launchpad.store.ensure()
-	# History paths must reference THIS gateway: histprov 'launchpad', driver = local system name.
+	# History paths must name this gateway's system name as the driver.
 	query = query.replace("{HIST}", launchpad.init.historyPrefix())
 	system.db.runUpdateQuery(query, database=db())
 
 
 def historyPrefix():
-	"""The history path prefix the dashboards' tag-history parameters use.
-
-	A history path names the historian PROVIDER, the driver (this gateway's
-	system name) and the tag provider, and all three differ on Edge: the
-	historian is the platform's own, and the realtime provider is the one Edge
-	permits rather than this demo's. A widget pointed at the wrong one draws
-	nothing and says nothing.
-	"""
+	"""Return the history path prefix for the dashboards' tag-history parameters."""
+	# Provider, driver and tag provider all differ on Edge; a wrong one draws nothing, silently.
 	sysName = system.tag.readBlocking(
 		["[System]Gateway/SystemName"])[0].value.lower()
 	if launchpad.edition.isEdge():
@@ -236,27 +223,16 @@ def historyPrefix():
 	return "histprov:launchpad:/drv:%s:launchpad:/tag:kpi/" % sysName
 
 def _driverIds():
-	"""The sqlth_drv ids belonging to THIS gateway.
-
-	The historian keys everything on the gateway's system name, and keeps the old
-	rows when that name changes -- so a database can hold several generations. A
-	renamed gateway (or one reusing an Examples database) ends up with two entries
-	per tag path and two sets of partitions, and only the current generation is
-	what the charts read. Everything below filters on these ids.
-	"""
+	"""Return (system name, sqlth_drv ids for this gateway)."""
+	# The historian keeps old rows when the system name changes; only the current ids are read.
 	sysName = system.tag.readBlocking(["[System]Gateway/SystemName"])[0].value
 	rows = system.db.runPrepQuery(
 		"SELECT id FROM sqlth_drv WHERE lower(name) = ?", [sysName.lower()], database=db())
 	return sysName, [r["id"] for r in rows]
 
 def _partitions(drvIds):
-	"""This gateway's data partitions, as [(name, startMs, endMs)].
-
-	Partition names encode a driver id and a month (sqlt_data_<drvid>_<yyyy>_<mm>),
-	neither of which is safe to assume: the driver id is not always 1, and the month
-	is whatever month it happens to be. The historian creates these as it writes, so
-	we look up what actually exists rather than composing a name.
-	"""
+	"""Return this gateway's data partitions as [(name, startMs, endMs)]."""
+	# Names are sqlt_data_<drvid>_<yyyy>_<mm>; read them from sqlth_partitions, never compose one.
 	if not drvIds:
 		return []
 	rows = system.db.runQuery(
@@ -266,18 +242,18 @@ def _partitions(drvIds):
 		for r in rows if r["drvid"] in drvIds]
 
 def _partitionFor(tsMs, parts):
+	"""Return the name of the partition covering tsMs, or None."""
 	for name, start, end in parts:
 		if start <= tsMs < end:
 			return name
 	return None
 
 def _liveTagIds(drvIds):
-	"""(tagid, tagpath, datatype) for the kpi tags of the current gateway generation."""
+	"""Return (tagid, tagpath, datatype) for the kpi tags of the current gateway."""
 	if not drvIds:
 		return {}
 	marks = ",".join(["?"] * len(drvIds))
-	# concatenated, not %-formatted: the SQL contains a literal 'kpi/%' wildcard and
-	# %-formatting reads that % as the start of a format spec
+	# Concatenated, not %-formatted: the literal 'kpi/%' wildcard would read as a format spec.
 	rows = system.db.runPrepQuery(
 		"SELECT te.id AS id, te.tagpath AS tagpath, te.datatype AS datatype "
 		"FROM sqlth_te te JOIN sqlth_scinfo sc ON te.scid = sc.id "
@@ -285,8 +261,7 @@ def _liveTagIds(drvIds):
 		"AND sc.drvid IN (" + marks + ")", list(drvIds), database=db())
 	return [(r["id"], r["tagpath"], r["datatype"]) for r in rows]
 
-# History paths (lowercase, as sqlth_te stores them) whose shape the generic
-# band below would misrepresent. See the comment at the point of use.
+# Lowercase sqlth_te paths that are not sensors, so the generic sine band would misrepresent them.
 _SHAPES = {
 	"kpi/dailyproduction": "ramp",
 	"kpi/dailyproductionexpected": "flat",
@@ -294,14 +269,8 @@ _SHAPES = {
 
 
 def registeredTagCount():
-	"""How many of this project's tags the historian has actually registered.
-
-	A tag appears in sqlth_te only once it has recorded its first value, so on a
-	gateway built from nothing this climbs from zero to the full set over a minute or
-	two. The backfill seeds the tags it finds, and its own guard then counts the
-	window as already seeded -- so seeding early does not just under-fill, it locks
-	in the under-fill. Callers wait on this before seeding at all.
-	"""
+	"""Return how many of this project's tags the historian has registered."""
+	# A tag registers after its first value; seeding before all do locks in a partial backfill.
 	try:
 		if not launchpad.edition.hasDatabase():
 			return len(historisedTags())
@@ -312,22 +281,12 @@ def registeredTagCount():
 
 
 def historisedTags():
-	"""(path, isInteger) for every KPI tag this gateway records history for.
-
-	The no-database answer to _liveTagIds. There is no sqlth_te to ask - the
-	historian is internal - so the question is asked of the TAGS: which of this
-	demo's own tags are configured to record. That is a better question anyway;
-	sqlth_te only knows a tag once it has written its first sample, which is
-	what makes the SQL side have to wait before seeding.
-	"""
+	"""Return (path, isInteger) for every KPI tag configured to record history."""
 	base = "[%s]KPI" % launchpad.setup.PROVIDER
 	out = []
 	for node in system.tag.browse(base, {"recursive": True}).getResults():
 		path = unicode(node["fullPath"])
-		# Atomic tags only. A UDT instance has a path and a history flag of its
-		# own but no value to write, and handing one to storeDataPoints costs a
-		# refusal per tag and a twenty-second wait for a value that will never
-		# arrive.
+		# Atomic tags only: a UDT instance has no value to write and stalls storeDataPoints.
 		if unicode(node["tagType"]) != "AtomicTag":
 			continue
 		cfg = system.tag.getConfiguration(path, False)
@@ -342,23 +301,7 @@ def historisedTags():
 
 
 def baseValue(path, shape, attempts=10):
-	"""The live value to build a tag's generated history around.
-
-	Waits for one, and for a MEANINGFUL one where the shape needs it. A tag
-	created moments ago has not produced its first value - an expression tag
-	has to resolve what it references - and skipping it is the worst option
-	available: the series then has no history at all and the chart draws a flat
-	zero for the whole window with one live point at the right-hand edge, which
-	reads as a broken chart rather than as missing data.
-
-	Zero is the case that bites. The generic band treats a zero base as 1.0 so
-	the band is not degenerate, which is fine for a sensor. It is not fine for
-	the two tags that are not sensors: a TARGET seeded from a zero draws a
-	target of one for two days, and a target that low is not a target - it is
-	the chart's Expected series looking absent. Measured on a gateway where the
-	seed ran a second before the target tag published, and the Expected series
-	was empty on every chart while every other series was right.
-	"""
+	"""Return the live value to centre a tag's generated history on, waiting for a non-zero one for flat and ramp shapes."""
 	import time
 	needsReal = shape in ("flat", "ramp")
 	for attempt in range(attempts):
@@ -371,20 +314,7 @@ def baseValue(path, shape, attempts=10):
 
 
 def sampleValue(path, base, engHigh, tsMs, amp, shape):
-	"""One generated sample, in the shape that path actually has.
-
-	Shared by both implementations so the two histories look alike. Two of
-	these tags are not measurements and "the live value plus a band" describes
-	them wrongly rather than approximately:
-
-	  dailyproduction is a ramp - EngHigh * (ms since local midnight)/86400000 -
-	  so anchoring it to the live value freezes the whole window at whatever
-	  fraction of the day had elapsed when setup ran. An install at 06:00 seeds
-	  a plant that made 28% of its target in every hour of the last two days.
-
-	  dailyproductionexpected is a constant target. A band around it draws a
-	  target that wanders, which is not a thing a target does.
-	"""
+	"""Return one generated sample at tsMs: a daily ramp, a flat target, or a sine band around base."""
 	import math, random
 	if shape == "ramp" and engHigh:
 		midnight = system.date.toMillis(
@@ -397,11 +327,7 @@ def sampleValue(path, base, engHigh, tsMs, amp, shape):
 
 
 def historyRowsSince(since):
-	"""How many history samples this project has recorded since `since`.
-
-	The no-database answer to counting the historian's partition tables. Asked
-	of system.historian, tag by tag, because there is no table to count.
-	"""
+	"""Return how many history samples this project's tags have recorded since `since`, via system.historian."""
 	end = system.date.now()
 	total = 0
 	for path, _isInt in historisedTags():
@@ -414,18 +340,8 @@ def historyRowsSince(since):
 
 
 def backfillEdge(hours=48, step=15, force=False):
-	"""Seed KPI tag history on a gateway with no database.
-
-	`system.tag.storeTagHistory` is NOT the way. It is a legacy bridge: against
-	Edge's Internal Historian it accepts the call, logs nothing, moves no
-	store-and-forward metric and stores nothing at all - which is exactly how
-	"Edge history cannot be seeded" comes to look true. `system.historian` is
-	the 8.3 API and it works: measured at 480 backdated points across 20 days
-	on a real Edge gateway, read back through both APIs.
-
-	Edge caps its historian at roughly 35 days, so the window this seeds - two
-	days by default - sits well inside it.
-	"""
+	"""Seed KPI tag history through system.historian on a gateway with no database."""
+	# system.tag.storeTagHistory accepts the call against Edge's historian but stores nothing.
 	import math, random
 	random.seed(7)
 	tags = historisedTags()
@@ -440,11 +356,7 @@ def backfillEdge(hours=48, step=15, force=False):
 	stamps = [int(startMs + i * stepMs) for i in range(count)]
 
 	if not force:
-		# Is the OLD end of the window already populated? A backfill is the
-		# only thing that can have put samples there - live recording fills the
-		# recent end and nothing else - so counting the whole window instead
-		# would report a gateway whose historian has been running ten minutes
-		# as fully seeded, and skip every tag.
+		# Probe the old end of the window: only a backfill writes there, live recording fills the recent end.
 		try:
 			probe = system.historian.queryRawPoints(
 				paths=[tags[0][0]],
@@ -458,9 +370,7 @@ def backfillEdge(hours=48, step=15, force=False):
 			pass
 
 	total, skipped, skippedPaths = 0, 0, []
-	# Wait ONCE for the set to come alive, then per tag only where the shape
-	# needs a meaningful value - they all publish together, so waiting the full
-	# ten attempts per tag would turn twenty seconds into twenty minutes.
+	# Wait once for the set to publish; per-tag waits would multiply the delay.
 	import time
 	for _attempt in range(10):
 		if any([v.value is not None
@@ -492,7 +402,6 @@ def backfillEdge(hours=48, step=15, force=False):
 			values.append(int(round(v)) if isInt else v)
 			quals.append(192)
 			times.append(system.date.fromMillis(ts))
-		# In chunks, so one call never carries an absurd payload
 		chunk = 500
 		for i in range(0, len(values), chunk):
 			n = len(values[i:i + chunk])
@@ -507,7 +416,7 @@ def backfillEdge(hours=48, step=15, force=False):
 
 
 def backfill(hours=48, step=15, force=False):
-	"""Seed KPI tag history so the example charts have something to draw."""
+	"""Seed KPI tag history into the historian's partition tables; returns a summary dict."""
 	import math, random
 	if not launchpad.edition.hasDatabase():
 		return backfillEdge(hours, step, force)
@@ -521,9 +430,7 @@ def backfill(hours=48, step=15, force=False):
 	count = hours * 60 / step
 	startMs = nowMs - count * stepMs
 
-	# a sample can only be written where a partition already exists; group the
-	# timestamps by partition and report any that fall outside one, rather than
-	# quietly seeding a shorter window than was asked for
+	# Samples can only go where a partition exists; count the ones outside any.
 	buckets = {}
 	unpartitioned = 0
 	for i in range(count):
@@ -539,8 +446,7 @@ def backfill(hours=48, step=15, force=False):
 				 "let the historian record for a minute, then retry"}
 
 	if force:
-		# re-seeding after a units change: the old samples are on the previous scale,
-		# so drop them rather than leaving two scales mixed in one series
+		# Drop old samples so a re-seed does not mix two scales in one series.
 		ids = [t[0] for t in tags]
 		if ids:
 			marks = ",".join(["?"] * len(ids))
@@ -552,11 +458,8 @@ def backfill(hours=48, step=15, force=False):
 	skipped = 0
 	skippedPaths = []
 	for tagid, path, datatype in tags:
-		# datatype 0 = integer, 1 = float. An int tag reads back from intvalue; writing
-		# its samples into floatvalue leaves intvalue NULL, which the chart plots as 0.
+		# datatype 0 = integer, 1 = float; an int sample in floatvalue leaves intvalue NULL (plots as 0).
 		isInt = (datatype == 0)
-		# take the live value as the centre of the generated band. The shape is
-		# worked out first because it decides whether a zero is acceptable.
 		shape = _SHAPES.get(path.lower())
 		base = baseValue("[Launchpad]" + path, shape)
 		if base is None or isinstance(base, basestring):
@@ -567,35 +470,15 @@ def backfill(hours=48, step=15, force=False):
 		if base == 0.0:
 			base = 1.0
 		amp = abs(base) * 0.12
-		# Two of these tags are not measurements, and "the live value plus a band"
-		# describes them wrongly rather than approximately.
-		#
-		#   dailyproduction is a ramp -- EngHigh * (ms since local midnight)/86400000
-		#   -- so anchoring it to the live value freezes the whole window at whatever
-		#   fraction of the day had elapsed when setup ran. An install at 06:00 seeds
-		#   a plant that made 28% of its target in every hour of the last two days.
-		#
-		#   dailyproductionexpected is a constant target. A band around it draws a
-		#   target that wanders, which is not a thing a target does.
-		#
-		# Reproduce those two. Everything else really is a sensor and the band is
-		# right. `shape` was decided above, before the base was read.
+		# dailyproduction ramps to EngHigh over the day; dailyproductionexpected is a constant.
 		engHigh = None
 		if shape == "ramp":
 			engHigh = system.tag.readBlocking(["[Launchpad]" + path + ".EngHigh"])[0].value
 			if not engHigh:
 				shape = None
 		if not force:
-			# runScalarPrepQuery, NOT runScalarQuery: the plain form does not bind
-			# args, so this guard silently counted 0 and re-seeded every run.
-			#
-			# Ask whether the OLD end of the window is populated. A backfill is the
-			# only thing that can have put samples there; live recording fills the
-			# recent end and nothing else. Counting the whole window instead means a
-			# gateway whose historian has been running for ten minutes looks fully
-			# seeded and every tag is skipped -- so the install reports success and
-			# the charts stay empty, which is the failure this guard exists to
-			# prevent rather than cause.
+			# Skip if the old end of the window is populated (only a backfill writes there).
+			# runScalarQuery does not bind args; use runScalarPrepQuery.
 			oldest = None
 			for p in buckets:
 				v = system.db.runScalarPrepQuery(
@@ -620,7 +503,6 @@ def backfill(hours=48, step=15, force=False):
 					phase = (ts / 3600000.0) * (math.pi / 12.0)
 					v = base + amp * math.sin(phase) + random.uniform(-amp * 0.35, amp * 0.35)
 				vals.append((tagid, v, ts))
-			# insert in chunks so one statement never gets absurdly long
 			chunk = 200
 			for s in range(0, len(vals), chunk):
 				part = vals[s:s + chunk]
@@ -640,14 +522,9 @@ def backfill(hours=48, step=15, force=False):
 	return out
 
 def repairBackfill():
-	"""Move mis-columned samples for integer tags into intvalue.
-
-	Only affects rows this endpoint's backfill wrote -- the historian itself always
-	writes an int tag to intvalue, so no genuinely-recorded sample has a floatvalue.
-	"""
+	"""Move integer tags' samples from floatvalue into intvalue in the current partition."""
 	if not launchpad.edition.hasDatabase():
-		# There are no columns to mis-write into: system.historian is given the
-		# value, not a column, and stores it as the tag's own type.
+		# system.historian picks the column itself.
 		return {"rowsRepaired": 0, "note": "not applicable on this edition"}
 	sysName, drvIds = _driverIds()
 	nowMs = system.date.toMillis(system.date.now())
