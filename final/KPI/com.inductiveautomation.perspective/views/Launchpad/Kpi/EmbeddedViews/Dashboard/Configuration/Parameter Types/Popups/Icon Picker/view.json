@@ -189,7 +189,7 @@
               "dom": {
                 "onClick": {
                   "config": {
-                    "script": "\tpage = self.view.getChild(\"root\").custom.page\n\tpages = self.view.getChild(\"root\").custom.pages\n\t\n\tif (page - 1) >= 0:\n\t\tpage -= 1\n\t\n\tself.view.getChild(\"root\").custom.page = page\n\t\t"
+                    "script": "\tpage = self.view.getChild(\"root\").custom.page\n\t\n\tif (page - 1) >= 0:\n\t\tpage -= 1\n\t\n\tself.view.getChild(\"root\").custom.page = page\n\t\t"
                   },
                   "scope": "G",
                   "type": "script"

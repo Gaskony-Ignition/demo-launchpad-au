@@ -274,7 +274,7 @@ def registeredTagCount():
 	try:
 		if not launchpad.edition.hasDatabase():
 			return len(historisedTags())
-		sysName, drvIds = _driverIds()
+		drvIds = _driverIds()[1]
 		return len(_liveTagIds(drvIds))
 	except:
 		return 0
@@ -342,7 +342,7 @@ def historyRowsSince(since):
 def backfillEdge(hours=48, step=15, force=False):
 	"""Seed KPI tag history through system.historian on a gateway with no database."""
 	# system.tag.storeTagHistory accepts the call against Edge's historian but stores nothing.
-	import math, random
+	import random
 	random.seed(7)
 	tags = historisedTags()
 	if not tags:
@@ -526,7 +526,7 @@ def repairBackfill():
 	if not launchpad.edition.hasDatabase():
 		# system.historian picks the column itself.
 		return {"rowsRepaired": 0, "note": "not applicable on this edition"}
-	sysName, drvIds = _driverIds()
+	drvIds = _driverIds()[1]
 	nowMs = system.date.toMillis(system.date.now())
 	p = _partitionFor(nowMs, _partitions(drvIds))
 	if p is None:

@@ -1839,7 +1839,6 @@ def iconPickerPageInstances(self, value):
 	icons = value["icons"]
 	page = value["page"]
 	total = value["total"]
-	pages = value["pages"]
 	pageSize = value["pageSize"]
 	startIdx = page * pageSize
 	endIdx = startIdx + pageSize
@@ -1851,7 +1850,6 @@ def iconPickerPreviousPageOnKey(self, event):
 	"""On Enter or Space, step the icon picker back one page, stopping at the first."""
 	if event.key in ('Enter', ' '):
 		page = self.view.getChild("root").custom.page
-		pages = self.view.getChild("root").custom.pages
 		
 		if (page - 1) >= 0:
 			page -= 1

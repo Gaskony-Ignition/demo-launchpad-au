@@ -302,7 +302,6 @@ def lineRatesSetRate(self, event):
 		
 	currentShift = self.view.custom.currentShift
 	lineName = self.view.custom.selectedLine
-	newTargetRateName = data.rate_name
 	hourTimestamp = self.view.custom.currentHourTimestamp
 	if currentShift > 0:
 		launchpad.oee.recordShiftRateChange(currentShift,  lineName, lineBasePath, newTargetRate, data.rate_name)

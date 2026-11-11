@@ -6,7 +6,6 @@ Tables are whole files under data/launchpad-kpi/; new ids are MAX + 1.
 
 from java.lang import System as JSystem
 from java.lang import Throwable as JThrowable
-from java.util import Date as JDate
 from java.util.concurrent.locks import ReentrantLock
 
 LOG = system.util.getLogger("launchpad.store")

@@ -7,7 +7,6 @@ def getDashboards(ds):
 		name = row["name"]
 		icon = row["icon"]
 		dashboardUrl = row["url"]
-		username = row["username"]
 		grid = row["grid"]
 		cellSize = row["cell_size"]
 		gridRows = row["grid_rows"]
@@ -395,7 +394,9 @@ def popupMessage(icon, message, displayClass):
 	params = {"icon":icon, "display":message, "class":displayClass}
 	system.perspective.openPopup(id="message", view="Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Popup/Message", params=params, showCloseIcon=True, draggable=False, resizable=True, modal=True, overlayDismiss=False)
 	
-def showConfirmation(message, function, params={}):
+def showConfirmation(message, function, params=None):
 	"""Open a confirmation popup; `function` is called with `params` if the user presses Yes."""
+	if params is None:
+		params = {}
 	params = {"icon":"help", "display":message, "class":"Text", "function":{"script":function, "params":params}}
 	system.perspective.openPopup(id="confirmation", view="Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Popup/Confirmation", params=params, showCloseIcon=True, draggable=False, resizable=True, modal=True, overlayDismiss=False)

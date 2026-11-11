@@ -129,10 +129,6 @@ def _short(outcome):
 	if outcome is None:
 		return ""
 	if isinstance(outcome, dict):
-		WORDS = {"shiftRows": None,                 # handled below
-		         "tagsWritten": "tags written",
-		         "healed": "interval(s) re-anchored",
-		         "state": None}
 		if "shiftRows" in outcome:
 			return "%s shift + %s hour rows" % (outcome.get("shiftRows"),
 			                                    outcome.get("hourRows"))
@@ -436,7 +432,7 @@ def historyRows(withinHours=24):
 		drvIds = launchpad.init._driverIds()[1]
 		total = 0
 		# _partitions returns tuples of (name, startMs, endMs), not dicts
-		for name, startMs, endMs in launchpad.init._partitions(drvIds):
+		for name, _, _ in launchpad.init._partitions(drvIds):
 			total += system.db.runScalarPrepQuery(
 			    "SELECT COUNT(*) FROM %s WHERE t_stamp >= ?" % name,
 			    [system.date.toMillis(since)], database=_db())
@@ -686,12 +682,11 @@ def ensureTags(force=False):
 		_write(dest, text)
 		written += 1
 	# requestScan is asynchronous and does nothing while the previous scan is running, so scan, wait, retry.
-	for attempt in range(6):
+	for _attempt in range(6):
 		_configScan()
 		if _waitFor(tagsPresent, 20, 2):
 			return "installed %d resources" % written
 	raise Exception("tags did not appear at %s after %d scans" % (_probeTag(), 6))
-	return "installed %d resources" % written
 
 
 # The provider name baked into the compressed tag payload; payloadFiles rewrites it, since a build-time sed cannot reach inside.

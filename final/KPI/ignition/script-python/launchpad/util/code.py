@@ -1,5 +1,7 @@
-def popup(self, viewPath, viewParams = {}, popupTitle = ''):
+def popup(self, viewPath, viewParams = None, popupTitle = ''):
 	"""Open viewPath as a full-screen modal popup below 1000 px viewport width, else a desktop popup."""
+	if viewParams is None:
+		viewParams = {}
 	if self.page.props.dimensions.viewport.width < 1000:
 		mobilePosition = {"width": "100%", "height": "100%"}
 		system.perspective.openPopup(
