@@ -96,7 +96,7 @@
         },
         "transforms": [
           {
-            "code": "\tdef getRealtimePath(historicalPath):\n\t\ttagDelim = \":/tag:\"\n\t\t\n\t\tparts = historicalPath.rsplit(tagDelim, 1)\n\t\t\n\t\textractedPath = \"\"\n\t\t\n\t\tif len(parts) > 1:\n\t\t\textractedPath = parts[1]\n\t\telse:\n\t\t\textractedPath = historicalPath\n\t\n\t\t# Default fallback.\n\t\tprovName = \"default\"\n\t\t\n\t\tif tagDelim in historicalPath:\n\t\t\tsegBeforeTagDelim = historicalPath.split(tagDelim, 1)[0]\n\t\t\tlastColonIndex = segBeforeTagDelim.rfind(\":\")\n\t\t\t\n\t\t\tif lastColonIndex != -1:\n\t\t\t\tprovName = segBeforeTagDelim[lastColonIndex + 1:]\n\t\t\telse:\n\t\t\t\tprovName = segBeforeTagDelim.rsplit(\":\", 1)[-1]\n\t\t\t\t\n\t\t\t\tif provName.startswith(\"histprov\"):\n\t\t\t\t\tprovName = provName.split(\":\", 1)[-1]\n\t\t\t\tif not provName:\n\t\t\t\t\tprovName = \"default\"\n\t\t\t\t\t\n\t\treturn \"[{}]{}\".format(provName, extractedPath)\n\t\n\treturn getRealtimePath(value) if \":/tag:\" in value else value",
+            "code": "\treturn launchpad.views.sparklineRealtimePath(self, value)",
             "type": "script"
           }
         ],
@@ -116,7 +116,7 @@
         "type": "expr-struct",
         "transforms": [
           {
-            "code": "\t# The struct above only gathers the pieces -- without this step props.points\n\t# receives the {history, tag} map itself, the component cannot coerce it, and\n\t# every tile silently keeps drawing this view's design-time placeholder.\n\thistory = value['history']\n\ttags = value['tag']\n\tif not history or not tags:\n\t\treturn []\n\t# Wide format keys each value column by the alias custom.tags built\n\tkey = tags[0]['alias']\n\trows = list(history)\n\ttry:\n\t\trows.sort(key = lambda r: r['t_stamp'])\n\texcept:\n\t\tpass\n\tpoints = []\n\tfor row in rows:\n\t\ttry:\n\t\t\tv = row[key]\n\t\texcept:\n\t\t\tcontinue\n\t\t# depending on how the binding serialises, a cell can arrive as the bare\n\t\t# number or as the qualified value that carries it\n\t\tif hasattr(v, 'value'):\n\t\t\tv = v.value\n\t\telif isinstance(v, dict):\n\t\t\tv = v.get('value')\n\t\tif v is None:\n\t\t\tcontinue\n\t\ttry:\n\t\t\tpoints.append(float(v))\n\t\texcept:\n\t\t\tcontinue\n\treturn points",
+            "code": "\treturn launchpad.views.sparklinePoints(self, value)",
             "type": "script"
           }
         ]
@@ -148,7 +148,7 @@
         },
         "transforms": [
           {
-            "code": "\tdef getTagName(tagPath):\n\t\t# Get name from Documentation of tag.\n\t\ttagName = system.tag.read('{tagPath}.Documentation'.format(tagPath = tagPath)).value\n\t\t\n\t\tif not tagName:\n\t\t\t# No name found in Documentation. Use tag name instead.\n\t\t\tsplitByProv = tagPath.split(']')\n\t\t\tpathNoProv = splitByProv[len(splitByProv) - 1]\n\t\n\t\t\t# Now, get the tag name.\n\t\t\tsplitByForwardSlash = pathNoProv.split('/')\n\t\t\ttagName = splitByForwardSlash[len(splitByForwardSlash) - 1]\n\t\t\t\n\t\t# Get the eng units of tag.\n\t\tengUnit = system.tag.read('{tagPath}.engUnit'.format(tagPath = tagPath)).value\n\t\t\n\t\tif engUnit:\n\t\t\treturn '{tagName} ({engUnit})'.format(tagName = tagName, engUnit = engUnit)\n\t\telse:\n\t\t\treturn tagName\n\t\t\t\n\tdef getRealtimePath(historicalPath):\n\t\ttag = \":/tag:\"\n\t\n\t\tparts = historicalPath.rsplit(tag, 1)\n\t\n\t\tif len(parts) > 1:\n\t\t\tresult = parts[1]\n\t\telse:\n\t\t\tresult = historicalPath\n\t\t\n\t\treturn result\t\n\t\n\ttagPath = value[\"path\"]\n\t\n\tif tagPath:\n\t\trealtimePath = getRealtimePath(tagPath)\n\t\t\n\t\treturn [{\"path\": tagPath, \"alias\": getTagName(realtimePath), \"aggregate\": value[\"aggMode\"]}]\n\telse:\n\t\treturn []",
+            "code": "\treturn launchpad.views.sparklineTags(self, value)",
             "type": "script"
           }
         ],
@@ -308,7 +308,7 @@
               },
               "transforms": [
                 {
-                  "code": "\tif not value:\n\t\treturn {'low': '', 'high': ''}\n\tminVal = min(value)\n\tmaxVal = max(value)\n\tif minVal != maxVal:\n\t\treturn {'low': minVal, 'high': maxVal}\n\t# a dead-flat series has no range of its own; give it room either side so the\n\t# line lands mid-tile instead of on an edge\n\treturn {'low': minVal * 0.50, 'high': maxVal * 1.50}",
+                  "code": "\treturn launchpad.views.sparklineRange(self, value)",
                   "type": "script"
                 }
               ],

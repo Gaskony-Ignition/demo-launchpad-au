@@ -58,7 +58,7 @@
               },
               "transforms": [
                 {
-                  "code": "\tif self.view.params.showAllOption:\n\t\tlines = [{\"value\":\"\",\"label\":\"<All Lines>\"}]\n\t\tlines.extend( [{\"value\":lineName,\"label\":lineName} for lineName in value])\n\t\treturn lines\n\telse:\n\t\treturn [{\"value\":lineName,\"label\":lineName} for lineName in value]\n\t",
+                  "code": "\treturn launchpad.views.lineSelectionOptions(self, value)",
                   "type": "script"
                 }
               ],
@@ -88,7 +88,7 @@
           "component": {
             "onActionPerformed": {
               "config": {
-                "script": "\tlineFolderPath = launchpad.oee.BASE_TAG_FOLDER\n\tlines = launchpad.oee.getLineNames(lineFolderPath) \n\tself.session.custom.launchpad.oee.lineTagFolder = lineFolderPath\n\tself.session.custom.launchpad.oee.lines = lines\n\tself.session.custom.launchpad.oee.selectedLine = \"\"\n\tif len(lines)>0:\n\t\tself.session.custom.launchpad.oee.selectedLine = lines[0]"
+                "script": "\tlaunchpad.views.lineSelectionRefreshLines(self, event)"
               },
               "scope": "G",
               "type": "script"

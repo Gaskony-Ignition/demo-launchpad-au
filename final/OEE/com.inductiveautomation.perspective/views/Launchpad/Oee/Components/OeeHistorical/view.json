@@ -51,7 +51,7 @@
         },
         "transforms": [
           {
-            "code": "\tif value:\n\t\tstats = [\n\t\t\t{\"stat\": \"OEE\", \"value\": value.oee},\n\t\t\t{\"stat\": \"A\", \"value\": 1-value.availability},\n\t\t\t{\"stat\": \"P\", \"value\": 1-value.performance},\n\t\t\t{\"stat\": \"Q\", \"value\": 1-value.quality}\n\t\t\t]\n\telse:\n\t\tstats = [\n\t\t\t{\"stat\": \"OEE\", \"value\": 1},\n\t\t\t{\"stat\": \"A\", \"value\": 1},\n\t\t\t{\"stat\": \"P\", \"value\": 1},\n\t\t\t{\"stat\": \"Q\", \"value\": 1}\n\t\t\t]\n\treturn stats",
+            "code": "\treturn launchpad.views.oeeHistoricalStats(self, value)",
             "type": "script"
           }
         ],

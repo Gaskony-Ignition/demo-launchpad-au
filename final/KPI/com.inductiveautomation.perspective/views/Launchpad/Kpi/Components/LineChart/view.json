@@ -67,7 +67,7 @@
         },
         "transforms": [
           {
-            "code": "\tdef getTagName(tagPath):\n\t\t# Get name from Documentation of tag.\n\t\ttagName = system.tag.read('{tagPath}.Documentation'.format(tagPath = tagPath)).value\n\t\t\n\t\tif not tagName:\n\t\t\t# No name found in Documentation. Use tag name instead.\n\t\t\ttagName = system.tag.read('{tagPath}.name'.format(tagPath = tagPath)).value\n\t\t\t\n\t\t# Get the eng units of tag.\n\t\tengUnit = system.tag.read('{tagPath}.engUnit'.format(tagPath = tagPath)).value\n\t\t\n\t\tif engUnit:\n\t\t\treturn '{tagName} ({engUnit})'.format(tagName = tagName, engUnit = engUnit)\n\t\telse:\n\t\t\treturn tagName\n\t\t\t\n\tdef getRealtimePath(historicalPath):\n\t\ttagDelim = \":/tag:\"\n\t\t\n\t\tparts = historicalPath.rsplit(tagDelim, 1)\n\t\t\n\t\textractedPath = \"\"\n\t\t\n\t\tif len(parts) > 1:\n\t\t\textractedPath = parts[1]\n\t\telse:\n\t\t\textractedPath = historicalPath\n\t\n\t\t# Default fallback.\n\t\tprovName = \"default\"\n\t\t\n\t\tif tagDelim in historicalPath:\n\t\t\tsegBeforeTagDelim = historicalPath.split(tagDelim, 1)[0]\n\t\t\tlastColonIndex = segBeforeTagDelim.rfind(\":\")\n\t\t\t\n\t\t\tif lastColonIndex != -1:\n\t\t\t\tprovName = segBeforeTagDelim[lastColonIndex + 1:]\n\t\t\telse:\n\t\t\t\tprovName = segBeforeTagDelim.rsplit(\":\", 1)[-1]\n\t\t\t\t\n\t\t\t\tif provName.startswith(\"histprov\"):\n\t\t\t\t\tprovName = provName.split(\":\", 1)[-1]\n\t\t\t\tif not provName:\n\t\t\t\t\tprovName = \"default\"\n\t\t\t\t\t\n\t\treturn \"[{}]{}\".format(provName, extractedPath)\n\t\t\n\ttags = []\n\t\n\ttagPath1 = value.get('tagPath1')\n\ttagPath2 = value.get('tagPath2')\n\t\n\trealtimePath1 = getRealtimePath(tagPath1) if \":/tag:\" in tagPath1 else tagPath1\n\trealtimePath2 = getRealtimePath(tagPath2) if \":/tag:\" in tagPath2 else tagPath2\n\t\n\tif tagPath1:\n\t\ttags.append({\"aggregate\": value.get('aggMode'), \"alias\": getTagName(realtimePath1), \"path\": realtimePath1})\n\t\t\n\tif tagPath2:\n\t\ttags.append({\"aggregate\": value.get('aggMode'), \"alias\": getTagName(realtimePath2), \"path\": realtimePath2})\n\t\t\n\treturn tags",
+            "code": "\treturn launchpad.views.lineChartTags(self, value)",
             "type": "script"
           }
         ],
@@ -292,7 +292,7 @@
               },
               "transforms": [
                 {
-                  "code": "\tcolumns = []\n\t\n\tcolors = [\"var(--kpi-primary)\", \"var(--kpi-highlight)\"]\n\tindex = 0\n\t\n\tfor tag in value:\n\t\ttry:\n\t\t\tcolor = colors[index]\n\t\texcept:\n\t\t\t# Widget is designed to handle two tags. But if more than 1 tag is added\n\t\t\t# then let the chart pick a color.\n\t\t\tcolor = None\n\t\t\n\t\tcolumn = {\"key\": tag.get('alias'), \"color\": color, \"styles\": {\"normal\": {\"stroke\": {\"color\": \"\", \"width\": 2, \"opacity\": None, \"dashArray\": None},\n\t\t\t\"fill\": {\"color\": \"\", \"opacity\": None}}, \"highlighted\": {\"stroke\": {\"color\": \"\", \"width\": 2, \"opacity\": None, \"dashArray\": None},\n\t\t\t\"fill\": {\"color\": \"\", \"opacity\": None}}, \"selected\": {\"stroke\": {\"color\": \"\", \"width\": 2, \"opacity\": None, \"dashArray\": None},\n\t\t\t\"fill\": {\"color\": \"\",\"opacity\": None}}, \"muted\": {\"stroke\": {\"color\": \"\", \"width\": 2, \"opacity\": None, \"dashArray\": None},\n\t\t\t\"fill\": {\"color\": \"\", \"opacity\": None}}}}\n\t\t\t\n\t\tcolumns.append(column)\n\t\t\n\t\tindex = index + 1\n\t\t\n\treturn columns",
+                  "code": "\treturn launchpad.views.lineChartTrendColumns(self, value)",
                   "type": "script"
                 }
               ],
@@ -362,7 +362,7 @@
       "dom": {
         "onClick": {
           "config": {
-            "script": "\tviewPath = 'Launchpad/Kpi/EmbeddedViews/PopupDualTag'\n\ttags = self.view.custom.tags\n\tif len(tags) == 0:\n\t\tpath1 = ''\n\t\tpath2 = ''\n\telif len(tags) == 1:\n\t\tpath1 = tags[0]['path']\n\t\tpath2 = ''\n\telse:\n\t\tpath1 = tags[0]['path']\n\t\tpath2 = tags[1]['path']\n\t\n\tviewParams = {'path1': path1, 'path2': path2, 'historyProvider': self.session.custom.launchpad.historyProvider}\n\tpopupTitle = self.view.params.title\n\tlaunchpad.util.popup(self, viewPath, viewParams, popupTitle)"
+            "script": "\tlaunchpad.views.lineChartOpenHistoryPopup(self, event)"
           },
           "scope": "G",
           "type": "script"
@@ -371,7 +371,7 @@
           "type": "script",
           "scope": "G",
           "config": {
-            "script": "\tif event.key in ('Enter', ' '):\n\t\tviewPath = 'Launchpad/Kpi/EmbeddedViews/PopupDualTag'\n\t\ttags = self.view.custom.tags\n\t\tif len(tags) == 0:\n\t\t\tpath1 = ''\n\t\t\tpath2 = ''\n\t\telif len(tags) == 1:\n\t\t\tpath1 = tags[0]['path']\n\t\t\tpath2 = ''\n\t\telse:\n\t\t\tpath1 = tags[0]['path']\n\t\t\tpath2 = tags[1]['path']\n\t\t\n\t\tviewParams = {'path1': path1, 'path2': path2, 'historyProvider': self.session.custom.launchpad.historyProvider}\n\t\tpopupTitle = self.view.params.title\n\t\tlaunchpad.util.popup(self, viewPath, viewParams, popupTitle)"
+            "script": "\tlaunchpad.views.lineChartOpenHistoryPopupOnKey(self, event)"
           }
         }
       }

@@ -315,7 +315,7 @@
         "transforms": [
           {
             "type": "script",
-            "code": "\t# The expression carries the parameters through as text so that its\n\t# references, not this script, are what make the binding re-evaluate.\n\tparts = (value or u\"\").split(u\"|~|\")\n\tif len(parts) != 4:\n\t\t# A date that has not arrived yet leaves the expression short. The\n\t\t# query this replaced was simply not run in that state, so nothing\n\t\t# is the honest answer - and an empty result renders, where an\n\t\t# exception renders as a red box over the chart.\n\t\treturn None\n\tline_name = parts[0]\n\ttag_folder = parts[1]\n\tif not parts[2].isdigit():\n\t\treturn None\n\tstart_time = system.date.fromMillis(long(parts[2]))\n\tif not parts[3].isdigit():\n\t\treturn None\n\tstop_time = system.date.fromMillis(long(parts[3]))\n\treturn launchpad.store.rowsAsJson(launchpad.store.hourlyStatsAverage(line_name, tag_folder, start_time, stop_time))"
+            "code": "\treturn launchpad.views.hourlyStatsAverageJson(self, value)"
           }
         ]
       },
@@ -334,7 +334,7 @@
         },
         "transforms": [
           {
-            "code": "\tif value.mode == \"Realtime\":\n\t\tif value.rate.time == \"minute\":\n\t\t\ttime = value.secondsElapsed/60.0\n\t\telif value.rate.time == \"hour\":\n\t\t\ttime = value.secondsElapsed/3600.0\n\t\telse:\n\t\t\ttime = value.secondsElapsed\n\t\t\t\n\t\treturn round(value.units/time,2)\n\t\t\n\telse:\n\t\treturn self.custom.averages[0].target_rate",
+            "code": "\treturn launchpad.views.oeeCardCurrentRate(self, value)",
             "type": "script"
           },
           {
@@ -483,7 +483,7 @@
         },
         "transforms": [
           {
-            "code": "\tname = \"default\"\n\tif value:\n\t\tif value.RateName != None:\n\t\t\tname = value.RateName\n\t\tnumber = value.TargetRate\n\t\ttime = value.RateTime\n\t\tif time == \"hour\":\n\t\t\tnumber *= 60\n\t\treturn {\"name\": name, \"number\": number, \"time\": time}\n\telse:\n\t\treturn {\"name\": \"\", \"number\": 0, \"time\": \"minute\"}",
+            "code": "\treturn launchpad.views.oeeCardRate(self, value)",
             "type": "script"
           }
         ],
@@ -504,7 +504,7 @@
         },
         "transforms": [
           {
-            "code": "\t# Always true when in historical mode, except if there is no data to show\n\tif value.mode == \"Historical\":\n\t\tif value.averages == None:\n\t\t\treturn False\n\t\telif len(value.averages) < 1:\n\t\t\treturn False\n\t\t\t\n\t\telse:\n\t\t\treturn True\n\t# current shift is not 0, the it's currently in a scheduled shift\n\telif value.schedule.CurrentShift > 0 or value.interval == \"Day\":\n\t\treturn True\n\t\n\t# if no shifts are scheduled, return true for day/hour view (but not shift)\n\telif value.schedule[1].ShiftEnabled == False and value.schedule[2].ShiftEnabled == False and value.schedule[3].ShiftEnabled == False and value.interval != \"Shift\":\n\t\treturn True\n\t\n\telse:\n\t\treturn False",
+            "code": "\treturn launchpad.views.oeeCardScheduledOn(self, value)",
             "type": "script"
           }
         ],
@@ -759,7 +759,7 @@
                       },
                       "transforms": [
                         {
-                          "code": "\ttime = \"\"\n\tif value.rate.time == \"hour\":\n\t\ttime = \"hr\"\n\telif value.rate.time == \"minute\":\n\t\ttime = \"min\"\n\telif value.rate.time == \"day\":\n\t\ttime = \"d\"\n\telse:\n\t\ttime = value.rate.time[0]\n\t\t\n\treturn str(round(value.rate.number,2)) + \" / \" + time",
+                          "code": "\treturn launchpad.views.oeeCardRateText(self, value)",
                           "type": "script"
                         }
                       ],
@@ -1604,7 +1604,7 @@
                           },
                           "transforms": [
                             {
-                              "code": "\tduration = \"\"\n\tif value.rate.time == \"hour\":\n\t\tduration = \"hr\"\n\telif value.rate.time == \"minute\":\n\t\tduration = \"min\"\n\telse:\n\t\tduration = value.rate.time[0]\n\treturn \"%.1f\" % value.currentRate + \" / \" + duration",
+                              "code": "\treturn launchpad.views.oeeCardCurrentRateText(self, value)",
                               "type": "script"
                             }
                           ],
@@ -1928,7 +1928,7 @@
               },
               "transforms": [
                 {
-                  "code": "\tmessages = [\"Not Scheduled\", \"No History Data\"]\n\t\n\tpos = 0\n\t\n\t# if historical mode but no data, show \"no history data\"\n\tif value.mode == \"Historical\":\n\t\tif value.averages == None:\n\t\t\tpos = 1\n\t\telif len(value.averages) < 1:\n\t\t\tpos = 1\n\t\n\treturn messages[pos]",
+                  "code": "\treturn launchpad.views.oeeCardUnavailableMessage(self, value)",
                   "type": "script"
                 }
               ],

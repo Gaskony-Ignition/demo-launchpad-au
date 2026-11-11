@@ -863,7 +863,7 @@
                   "component": {
                     "onActionPerformed": {
                       "config": {
-                        "script": "\t#add or edit record\n\ttableName = \"ex_launchpad_oee_rate\"\n\tdatabaseName = launchpad.oee.db()\n\trate_name = self.parent.parent.getChild(\"NameEntry\").getChild(\"TextEntry\").props.text\n\tinterval = self.parent.parent.getChild(\"RateEntry\").getChild(\"Interval\").props.value\n\tuom = self.parent.parent.getChild(\"RateEntry\").getChild(\"UnitsEntry\").props.text\n\ttarget_rate = self.parent.parent.getChild(\"RateEntry\").getChild(\"RateValue\").props.value\n\t\n\tif self.parent.parent.parent.getChild(\"AddEdit\").custom.updateMode:\n\t\t#update record\n\t\tdata = {\"rate_name\": rate_name , \"uom\": uom, \"target_rate\": target_rate, \"interval\": interval}\n\t\tkey_rate_name = self.parent.parent.parent.getChild(\"RateTable\").props.selection.data[0].rate_name\n\t\tkeys = {\"rate_name\": key_rate_name }\n\t\tlaunchpad.sql.runDatabaseUpdate(tableName, databaseName, data, keys)\n\telse:\n\t\t#add record\n\t\tdata = {\"rate_name\": rate_name , \"uom\": uom, \"target_rate\": target_rate, \"interval\": interval}\n\t\tlaunchpad.sql.runDatabaseInsert(tableName, databaseName, data)\n\tsystem.perspective.sendMessage(\"launchpadOeeRateMode\", payload = {\"mode\": \"\"} , scope=\"page\")\n\tsystem.perspective.sendMessage(\"launchpadOeeRefreshRatesTable\", scope=\"page\")\t\n\tsystem.perspective.sendMessage(\"launchpadOeeRefreshRates\", scope=\"page\")\n\t\n\t\t\n\t\t"
+                        "script": "\tlaunchpad.views.ratesSave(self, event)"
                       },
                       "scope": "G",
                       "type": "script"
@@ -962,7 +962,7 @@
                       "component": {
                         "onActionPerformed": {
                           "config": {
-                            "script": "\t\n\ttableName = \"ex_launchpad_oee_rate\"\n\n\tkey_rate_name = self.parent.parent.parent.parent.getChild(\"RateTable\").props.selection.data[0].rate_name\n\tdatabaseName = launchpad.oee.db()\n\tlaunchpad.sql.runDatabaseDelete(tableName, databaseName, idValue=key_rate_name, idField=\"rate_name\")\n\t\n\tsystem.perspective.sendMessage(\"launchpadOeeRefreshRatesTable\", scope=\"page\")\t\n\tsystem.perspective.sendMessage(\"launchpadOeeRefreshRates\", scope=\"page\")\n\tself.parent.parent.parent.getChild(\"Actions\").custom.deleteMode = False\n\tsystem.perspective.sendMessage(\"launchpadOeeTableReset\", scope=\"page\")\n\tsystem.perspective.sendMessage(\"launchpadOeeRateMode\", payload = {\"mode\": \"\"} , scope=\"page\")"
+                            "script": "\tlaunchpad.views.ratesDelete(self, event)"
                           },
                           "scope": "G",
                           "type": "script"
@@ -1073,7 +1073,7 @@
             {
               "messageType": "launchpadOeeRateMode",
               "pageScope": true,
-              "script": "\t# set update or add mode \n\tmode = payload[\"mode\"]\n\tself.print(\"mode set\")\n\tif mode == \"add\":\n\t\tself.custom.addMode = True\n\t\tself.custom.updateMode = False\n\telif mode == \"update\":\n\t\tself.custom.addMode = False\n\t\tself.custom.updateMode = True\n\telse:\n\t\tself.custom.addMode = False\n\t\tself.custom.updateMode = False\t\n\t\t",
+              "script": "\tlaunchpad.views.ratesSetAddEditMode(self, payload)",
               "sessionScope": false,
               "viewScope": false
             }

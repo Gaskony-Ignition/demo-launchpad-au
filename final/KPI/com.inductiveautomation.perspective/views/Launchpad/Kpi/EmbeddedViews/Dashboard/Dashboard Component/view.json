@@ -129,7 +129,7 @@
               },
               "transforms": [
                 {
-                  "code": "\t# If on a mobile device, call the getWidgetsRows function to get the total\n\t# number of rows that the dashboard\\u0027s widgets span (because the widgets are\n\t# laid out in a single column on mobile, and the dashboard needs to know the\n\t# total number of rows needed to display the widgets).\n\t\n\tmobile \u003d value[\"mobile\"]\n\tgridRows \u003d value[\"gridRows\"]\n\twidgets \u003d value[\"widgets\"]\n\t\n\tif mobile:\n\t\treturn launchpad.dashboard.getWidgetsRows(widgets, gridRows)\n\telse:\n\t\treturn gridRows",
+                  "code": "\treturn launchpad.views.dashboardWidgetGridRowCount(self, value)",
                   "type": "script"
                 }
               ],

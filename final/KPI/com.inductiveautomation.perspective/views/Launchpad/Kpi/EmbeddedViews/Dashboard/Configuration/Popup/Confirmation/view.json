@@ -127,7 +127,7 @@
               "component": {
                 "onActionPerformed": {
                   "config": {
-                    "script": "\tparams = launchpad.dashboard.copyDictionary(self.view.params.function.params)\n\t\t\n\tif len(params):\n\t\tscript = \"%s(self, params)\" % self.view.params.function.script\n\telse:\n\t\tscript = \"%s(self)\" % self.view.params.function.script\n\t\n\ttry:\n\t\texec(script)\n\texcept:\n\t\tpass\n\t\t\n\tsystem.perspective.closePopup(id=\"confirmation\")"
+                    "script": "\tlaunchpad.views.confirmationYes(self, event)"
                   },
                   "scope": "G",
                   "type": "script"

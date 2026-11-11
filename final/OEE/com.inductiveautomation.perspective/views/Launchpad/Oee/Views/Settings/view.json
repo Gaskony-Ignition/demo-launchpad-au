@@ -146,7 +146,7 @@
                   "component": {
                     "onActionPerformed": {
                       "config": {
-                        "script": "    # Run on a worker thread so the session can paint the transcript as it goes.\n    # A bare gateway takes up to a minute, and a synchronous click just freezes the\n    # button for that whole time with nothing to say it is doing anything.\n    view = self.view\n    view.custom.setupResult = \"starting...\"\n    def build():\n        def progress(message):\n            view.custom.setupResult = message\n        report = launchpad.setup.run(progress=progress)\n        # run() builds a transcript as it works -- one line per step with its\n        # result -- and that is what the person watching needs to keep. Fall back\n        # to the summary only if an older run() did not produce one.\n        view.custom.setupResult = report.get(\"detail\") or \\\n            launchpad.setup.detail(report)\n    system.util.invokeAsynchronous(build)"
+                        "script": "\tlaunchpad.views.settingsRunSetup(self, event)"
                       },
                       "scope": "G",
                       "type": "script"
@@ -174,7 +174,7 @@
                   "component": {
                     "onActionPerformed": {
                       "config": {
-                        "script": "\t# read-only: reports what is and is not in place, changes nothing\n\tview = self.view\n\tview.custom.setupResult = \"checking...\"\n\tdef look():\n\t\tview.custom.setupResult = launchpad.setup.detail(\n\t\t\tlaunchpad.setup.check())\n\tsystem.util.invokeAsynchronous(look)"
+                        "script": "\tlaunchpad.views.settingsCheckSetup(self, event)"
                       },
                       "scope": "G",
                       "type": "script"
@@ -202,7 +202,7 @@
                   "component": {
                     "onActionPerformed": {
                       "config": {
-                        "script": "    # Reinstalls the tag definitions, which no ordinary Setup press will do: writing\n    # them over a live subscription leaves the previous definition's script running\n    # too. That is why this is a separate button and why it says to restart -- the\n    # old subscription does not go away until the gateway does.\n    view = self.view\n    view.custom.setupResult = \"updating the tag definitions...\"\n    def build():\n        def progress(message):\n            view.custom.setupResult = message\n        report = launchpad.setup.run(progress=progress, force=True, tags=True)\n        view.custom.setupResult = launchpad.setup.detail(report) + (\n            \"\\n\\nRESTART THE GATEWAY to finish: until you do, the previous \"\n            \"definition's script is still subscribed as well and the demo counts \"\n            \"more than once per tick.\")\n    system.util.invokeAsynchronous(build)"
+                        "script": "\tlaunchpad.views.settingsUpdateTags(self, event)"
                       },
                       "scope": "G",
                       "type": "script"

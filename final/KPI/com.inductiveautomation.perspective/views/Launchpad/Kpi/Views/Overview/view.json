@@ -77,7 +77,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\treturn launchpad.views.greyOutWhenEmptyStyle(self, value)",
                       "type": "script"
                     }
                   ],
@@ -110,7 +110,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\treturn launchpad.views.greyOutWhenEmptyStyle(self, value)",
                       "type": "script"
                     }
                   ],
@@ -176,7 +176,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\treturn launchpad.views.greyOutWhenEmptyStyle(self, value)",
                       "type": "script"
                     }
                   ],
@@ -208,7 +208,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\treturn launchpad.views.greyOutWhenEmptyStyle(self, value)",
                       "type": "script"
                     }
                   ],
@@ -222,7 +222,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\treturn launchpad.views.greyOutWhenEmptyStyle(self, value)",
                       "type": "script"
                     }
                   ],
@@ -236,7 +236,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\treturn launchpad.views.greyOutWhenEmptyStyle(self, value)",
                       "type": "script"
                     }
                   ],
@@ -250,7 +250,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\treturn launchpad.views.greyOutWhenEmptyStyle(self, value)",
                       "type": "script"
                     }
                   ],
@@ -264,7 +264,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\treturn launchpad.views.greyOutWhenEmptyStyle(self, value)",
                       "type": "script"
                     }
                   ],
@@ -278,7 +278,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\treturn launchpad.views.greyOutWhenEmptyStyle(self, value)",
                       "type": "script"
                     }
                   ],
@@ -292,7 +292,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\treturn launchpad.views.greyOutWhenEmptyStyle(self, value)",
                       "type": "script"
                     }
                   ],
@@ -306,7 +306,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\treturn launchpad.views.greyOutWhenEmptyStyle(self, value)",
                       "type": "script"
                     }
                   ],
@@ -395,7 +395,7 @@
                   },
                   "transforms": [
                     {
-                      "code": "\tif value == '':\n\t\treturn {\n\t\t\t\"filter\": \"contrast(0) brightness(0.26)\",\n\t\t\t\"pointer-events\": \"none\"\n\t\t}\n\telse:\n\t\treturn {}",
+                      "code": "\treturn launchpad.views.greyOutWhenEmptyStyle(self, value)",
                       "type": "script"
                     }
                   ],

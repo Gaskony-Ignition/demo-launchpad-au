@@ -13,7 +13,7 @@
         },
         "transforms": [
           {
-            "code": "\tdashboard = self.params.dashboard\n\t\n\ttry:\n\t\tpaths = value.split(\"/\")\n\t\tdashboard = paths[-1]\n\texcept:\n\t\tpass\n\t\n\tself.session.custom.launchpad.dashboard.options.url = dashboard \n\treturn dashboard",
+            "code": "\treturn launchpad.views.dashboardViewName(self, value)",
             "type": "script"
           }
         ],

@@ -104,7 +104,7 @@
               },
               "transforms": [
                 {
-                  "code": "\t\n\n\tpt = []\n\tfor row in range(value.rowCount):\n\t\trunTime = value.getValueAt(row,\"SecondsRunning\") /60.0\n\t\tpt.append(runTime*value.getValueAt(row,\"RateValue\"))\n\t\n\n\tvalue= system.dataset.addColumn(value,   pt, \"TargetProd\", float)\n\treturn value\n",
+                  "code": "\treturn launchpad.views.oeeValuesAddTargetProduction(self, value)",
                   "type": "script"
                 }
               ],

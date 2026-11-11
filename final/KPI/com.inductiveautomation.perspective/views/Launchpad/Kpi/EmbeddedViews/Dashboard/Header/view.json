@@ -61,7 +61,7 @@
               "component": {
                 "onActionPerformed": {
                   "config": {
-                    "script": "\toptions = self.props.options\n\tselectedValue = self.props.value\n\t\n\tfor option in options:\n\t\tif option.get('value') == selectedValue:\n\t\t\tdashboardUrl = option.get('url')\n\t\t\tbreak\n\t\t\t\n\tsystem.perspective.navigate(dashboardUrl)"
+                    "script": "\tlaunchpad.views.dashboardHeaderSelectDashboard(self, event)"
                   },
                   "scope": "G",
                   "type": "script"

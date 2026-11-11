@@ -176,7 +176,7 @@
               },
               "transforms": [
                 {
-                  "code": "\ttitle = \"\"\n\tfor i in range(len(value.documentation)):\n\t\tif i > 0:\n\t\t\ttitle += \" and \"\n\t\tif len(value.documentation[i]) > 0:\n\t\t\ttitle += value.documentation[i]\n\t\n\t\telse:\n\t\t\ttitle +=  value.tagName[i]\n\t\n\treturn title + \" Historical Data\"",
+                  "code": "\treturn launchpad.views.popupDualTagHeaderText(self, value)",
                   "type": "script"
                 }
               ],

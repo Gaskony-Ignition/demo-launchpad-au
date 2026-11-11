@@ -9,6 +9,14 @@
     {"file": "Configuration/Widget Edit Wrapper/view.json", "rule": "UnusedCustomPropertiesRule", "match": "params.widgetName:",
      "reason": "same as widgetId - passed in by dashboard/code.py (lines 113, 214) and read back as row.viewParams.widgetName (line 421) when saving the edited dashboard"},
     {"file": "final/KPI/ignition/script-python/launchpad/init/code.py", "rule": "S6", "match": "repairBackfill",
-     "reason": "the table is the historian's current partition, read from its own sqlth_partitions table, and a table name cannot be a bound parameter"}
+     "reason": "the table is the historian's current partition, read from its own sqlth_partitions table, and a table name cannot be a bound parameter"},
+    {"file": "Parameter Types/Popups/Tag Tree/view.json", "rule": "UnusedCustomPropertiesRule", "match": "params.id:",
+     "reason": "read as self.view.params.id by launchpad.views.tagTreeSelect, the Select button's handler; the linter does not look into the script library"},
+    {"file": "Configuration/Popup/Confirmation/view.json", "rule": "UnusedCustomPropertiesRule", "match": "params.function:",
+     "reason": "read as self.view.params.function by launchpad.views.confirmationYes, the Yes button's handler; the linter does not look into the script library"},
+    {"file": "Kpi/Views/Dashboard/view.json", "rule": "UnusedCustomPropertiesRule", "match": "params.dashboard:",
+     "reason": "the page route's :dashboard parameter, read as self.params.dashboard by launchpad.views.dashboardViewName, the custom.dashboard transform"},
+    {"file": "Oee/EmbeddedViews/LineSelection/view.json", "rule": "UnusedCustomPropertiesRule", "match": "params.showAllOption:",
+     "reason": "read as self.view.params.showAllOption by launchpad.views.lineSelectionOptions, the line dropdown's options transform"}
   ]
 }

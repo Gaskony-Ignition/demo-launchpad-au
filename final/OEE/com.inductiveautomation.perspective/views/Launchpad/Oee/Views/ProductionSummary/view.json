@@ -938,7 +938,7 @@
         "transforms": [
           {
             "type": "script",
-            "code": "\t# The expression carries the parameters through as text so that its\n\t# references, not this script, are what make the binding re-evaluate.\n\tparts = (value or u\"\").split(u\"|~|\")\n\tif len(parts) != 4:\n\t\t# A date that has not arrived yet leaves the expression short. The\n\t\t# query this replaced was simply not run in that state, so nothing\n\t\t# is the honest answer - and an empty result renders, where an\n\t\t# exception renders as a red box over the chart.\n\t\treturn None\n\tline_name = parts[0]\n\ttag_folder = parts[1]\n\tif not parts[2].isdigit():\n\t\treturn None\n\tstart_time = system.date.fromMillis(long(parts[2]))\n\tif not parts[3].isdigit():\n\t\treturn None\n\tstop_time = system.date.fromMillis(long(parts[3]))\n\treturn launchpad.store.dailyStats(line_name, tag_folder, start_time, stop_time)"
+            "code": "\treturn launchpad.views.productionSummaryDailyStats(self, value)"
           }
         ]
       },
@@ -968,7 +968,7 @@
         "transforms": [
           {
             "type": "script",
-            "code": "\t# The expression carries the parameters through as text so that its\n\t# references, not this script, are what make the binding re-evaluate.\n\tparts = (value or u\"\").split(u\"|~|\")\n\tif len(parts) != 4:\n\t\t# A date that has not arrived yet leaves the expression short. The\n\t\t# query this replaced was simply not run in that state, so nothing\n\t\t# is the honest answer - and an empty result renders, where an\n\t\t# exception renders as a red box over the chart.\n\t\treturn None\n\tline_name = parts[0]\n\ttag_folder = parts[1]\n\tif not parts[2].isdigit():\n\t\treturn None\n\tstart_time = system.date.fromMillis(long(parts[2]))\n\tif not parts[3].isdigit():\n\t\treturn None\n\tstop_time = system.date.fromMillis(long(parts[3]))\n\treturn launchpad.store.hourlyStats(line_name, tag_folder, start_time, stop_time)"
+            "code": "\treturn launchpad.views.hourlyStatsJson(self, value)"
           }
         ]
       },
@@ -983,7 +983,7 @@
         "transforms": [
           {
             "type": "script",
-            "code": "\t# The expression carries the parameters through as text so that its\n\t# references, not this script, are what make the binding re-evaluate.\n\tparts = (value or u\"\").split(u\"|~|\")\n\tif len(parts) != 4:\n\t\t# A date that has not arrived yet leaves the expression short. The\n\t\t# query this replaced was simply not run in that state, so nothing\n\t\t# is the honest answer - and an empty result renders, where an\n\t\t# exception renders as a red box over the chart.\n\t\treturn None\n\tline_name = parts[0]\n\ttag_folder = parts[1]\n\tif not parts[2].isdigit():\n\t\treturn None\n\tstart_time = system.date.fromMillis(long(parts[2]))\n\tif not parts[3].isdigit():\n\t\treturn None\n\tstop_time = system.date.fromMillis(long(parts[3]))\n\treturn launchpad.store.shiftStats(line_name, tag_folder, start_time, stop_time)"
+            "code": "\treturn launchpad.views.productionSummaryShiftStats(self, value)"
           }
         ]
       },
@@ -998,7 +998,7 @@
         "transforms": [
           {
             "type": "script",
-            "code": "\t# The expression carries the parameters through as text so that its\n\t# references, not this script, are what make the binding re-evaluate.\n\tparts = (value or u\"\").split(u\"|~|\")\n\tif len(parts) != 4:\n\t\t# A date that has not arrived yet leaves the expression short. The\n\t\t# query this replaced was simply not run in that state, so nothing\n\t\t# is the honest answer - and an empty result renders, where an\n\t\t# exception renders as a red box over the chart.\n\t\treturn None\n\tline_name = parts[0]\n\ttag_folder = parts[1]\n\tif not parts[2].isdigit():\n\t\treturn None\n\tstart_time = system.date.fromMillis(long(parts[2]))\n\tif not parts[3].isdigit():\n\t\treturn None\n\tstop_time = system.date.fromMillis(long(parts[3]))\n\treturn launchpad.store.hourlyStatsAverage(line_name, tag_folder, start_time, stop_time)"
+            "code": "\treturn launchpad.views.productionSummaryHourlyAverage(self, value)"
           }
         ]
       }
