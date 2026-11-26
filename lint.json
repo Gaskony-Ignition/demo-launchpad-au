@@ -8,5 +8,9 @@
      "reason": "same as widgetId - passed in by dashboard/code.py (lines 113, 214) and read back as row.viewParams.widgetName (line 421) when saving the edited dashboard"},
     {"file": "final/KPI/ignition/script-python/launchpad/init/code.py", "rule": "S6", "match": "repairBackfill",
      "reason": "the table is the historian's current partition, read from its own sqlth_partitions table, and a table name cannot be a bound parameter"}
-  ]
+  ],
+  "cssVariables": {
+    "stylesheets": ["final/OEE/com.inductiveautomation.perspective/stylesheet/stylesheet.css", "final/KPI/com.inductiveautomation.perspective/stylesheet/stylesheet.css"],
+    "prefixes": ["--oee-", "--kpi-", "--neutral-", "--error"]
+  }
 }
