@@ -1,16 +1,124 @@
 {
   "exceptions": [
-    {"file": "Configuration/Widget Edit Wrapper/view.json", "rule": "UnusedCustomPropertiesRule", "match": "params.configuring:",
-     "reason": "drives its own onChange handler, which opens the Widget Edit popup when toggled true; the linter only checks for reads of view.params.X, not onChange triggers on the param itself"},
-    {"file": "Configuration/Widget Edit Wrapper/view.json", "rule": "UnusedCustomPropertiesRule", "match": "params.widgetId:",
-     "reason": "launchpad.dashboard.code.py passes this in each widget instance's viewParams (lines 113, 214) and reads it back as row.viewParams.widgetId (line 421) when saving the edited dashboard - live state for the controller script, not something the view itself reads"},
-    {"file": "Configuration/Widget Edit Wrapper/view.json", "rule": "UnusedCustomPropertiesRule", "match": "params.widgetName:",
-     "reason": "same as widgetId - passed in by dashboard/code.py (lines 113, 214) and read back as row.viewParams.widgetName (line 421) when saving the edited dashboard"},
-    {"file": "final/KPI/ignition/script-python/launchpad/init/code.py", "rule": "S6", "match": "repairBackfill",
-     "reason": "the table is the historian's current partition, read from its own sqlth_partitions table, and a table name cannot be a bound parameter"}
+    {
+      "file": "Configuration/Widget Edit Wrapper/view.json",
+      "rule": "UnusedCustomPropertiesRule",
+      "match": "params.configuring:",
+      "reason": "drives its own onChange handler, which opens the Widget Edit popup when toggled true; the linter only checks for reads of view.params.X, not onChange triggers on the param itself"
+    },
+    {
+      "file": "Configuration/Widget Edit Wrapper/view.json",
+      "rule": "UnusedCustomPropertiesRule",
+      "match": "params.widgetId:",
+      "reason": "launchpad.dashboard.code.py passes this in each widget instance's viewParams (lines 113, 214) and reads it back as row.viewParams.widgetId (line 421) when saving the edited dashboard - live state for the controller script, not something the view itself reads"
+    },
+    {
+      "file": "Configuration/Widget Edit Wrapper/view.json",
+      "rule": "UnusedCustomPropertiesRule",
+      "match": "params.widgetName:",
+      "reason": "same as widgetId - passed in by dashboard/code.py (lines 113, 214) and read back as row.viewParams.widgetName (line 421) when saving the edited dashboard"
+    },
+    {
+      "file": "final/KPI/ignition/script-python/launchpad/init/code.py",
+      "rule": "S6",
+      "match": "repairBackfill",
+      "reason": "the table is the historian's current partition, read from its own sqlth_partitions table, and a table name cannot be a bound parameter"
+    },
+    {
+      "file": "final/KPI/com.inductiveautomation.perspective/views/Launchpad/Kpi/Components/Notepad/",
+      "rule": "BadComponentReferenceRule",
+      "match": "EditIcon.events.dom",
+      "reason": "resolves: EditIcon sits in Header under the view root, so parent.parent is the root and getChild('Notes') is its direct child (checked against the view tree). It toggles Notes.props.enabled, a component prop with no view-level home to bind through"
+    },
+    {
+      "file": "final/OEE/com.inductiveautomation.perspective/views/Launchpad/Oee/Components/Notepad/",
+      "rule": "BadComponentReferenceRule",
+      "match": "EditIcon.events.dom",
+      "reason": "resolves: same as the KPI Notepad - EditIcon in Header, parent.parent is the root, Notes is its direct child; the toggle flips a component prop"
+    },
+    {
+      "file": "final/KPI/com.inductiveautomation.perspective/views/Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Details/",
+      "rule": "BadComponentReferenceRule",
+      "match": "CellSize.propConfig.position.display",
+      "reason": "resolves: {../Grid/Grid/Grid.props.controlValue} from CellSize reaches DashDetails/Grid/Grid/Grid, which exists; shows the cell-size control only for the matching grid mode"
+    },
+    {
+      "file": "final/KPI/com.inductiveautomation.perspective/views/Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Parameter Types/Icon/",
+      "rule": "BadComponentReferenceRule",
+      "match": "Sample.propConfig",
+      "reason": "resolves: {../Field.props.text} is the sibling Field text field in the same Row; the sample icon previews what is typed"
+    },
+    {
+      "file": "final/KPI/com.inductiveautomation.perspective/views/Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Parameter Types/Icon/",
+      "rule": "BadComponentReferenceRule",
+      "match": "Search.events.dom.onKeyDown",
+      "reason": "resolves: getChild('root').getChild('Row').getChild('Field') matches root/Row/Field; reads the typed icon name to seed the picker popup"
+    },
+    {
+      "file": "final/KPI/com.inductiveautomation.perspective/views/Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Parameter Types/Popups/Icon Picker/",
+      "rule": "BadComponentReferenceRule",
+      "match": "custom.searchIcons",
+      "reason": "resolves: {./SearchContainer/SearchText.props.text} is root/SearchContainer/SearchText, which exists; the search box is the only source of the filter text"
+    },
+    {
+      "file": "final/KPI/com.inductiveautomation.perspective/views/Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Parameter Types/Popups/Icon Picker/",
+      "rule": "BadComponentReferenceRule",
+      "match": "PreviewContainer",
+      "reason": "resolves: {../IconName.props.text} is the sibling IconName in PreviewContainer; the preview icon follows the name label"
+    },
+    {
+      "file": "final/KPI/com.inductiveautomation.perspective/views/Launchpad/Kpi/EmbeddedViews/Dashboard/Configuration/Parameter Types/Popups/Icon Picker/",
+      "rule": "BadComponentReferenceRule",
+      "match": "PageContainer",
+      "reason": "resolves: self.view.getChild('root') is the view root, whose custom.page/pages the pager buttons step; getChild on the view root is the only way a script reaches a component's own custom props from an event"
+    },
+    {
+      "file": "final/OEE/com.inductiveautomation.perspective/views/Launchpad/Oee/Components/TimePicker/",
+      "rule": "BadComponentReferenceRule",
+      "match": ".events.component.onActionPerformed",
+      "reason": "resolves: Hours and Minutes are siblings under the view root; each handler combines its own value with the other's (HHMM) into view.custom.value"
+    },
+    {
+      "file": "final/OEE/com.inductiveautomation.perspective/views/Launchpad/Oee/EmbeddedViews/LineDisplayOptions/",
+      "rule": "BadComponentReferenceRule",
+      "match": "props.value.onChange",
+      "reason": "resolves: getSibling('RangeDropdown') is a sibling of StartDate/StopDate in HistoricalOptions; the handler clears the dropdown when the user types a custom date"
+    },
+    {
+      "file": "final/OEE/com.inductiveautomation.perspective/views/Launchpad/Oee/EmbeddedViews/ReportDisplayOptions/",
+      "rule": "BadComponentReferenceRule",
+      "match": "props.value.onChange",
+      "reason": "resolves: getSibling('RangeDropdown') is a sibling of StartDate/StopDate in HistoricalOptions; the handler clears the dropdown when the user types a custom date"
+    },
+    {
+      "file": "final/OEE/com.inductiveautomation.perspective/views/Launchpad/Oee/EmbeddedViews/Popups/LineRates/",
+      "rule": "BadComponentReferenceRule",
+      "match": "CurrentRate",
+      "reason": "resolves: ./CurrentRate, ../CurrentRate/CurrentRate (from root/CurrentRateValue) and ../CurrentRate (from RateLabel) all reach root/CurrentRate/CurrentRate, which exists; the label and display flag track the rate entry"
+    },
+    {
+      "file": "final/OEE/com.inductiveautomation.perspective/views/Launchpad/Oee/Views/ProductionSummary/",
+      "rule": "BadComponentReferenceRule",
+      "match": "propConfig.position.display",
+      "reason": "resolves: {.../TimeSelection/Interval/RangeDropdown.props.value} climbs two levels from Data/<chart> to Large|Small, where TimeSelection/Interval/RangeDropdown exists in both layouts; each chart shows only for its interval"
+    },
+    {
+      "file": "final/OEE/com.inductiveautomation.perspective/views/Launchpad/Oee/Views/Rates/",
+      "rule": "BadComponentReferenceRule",
+      "match": "AddEdit",
+      "reason": "resolves: ../RateTable and ..../RateTable climb to the root, where RateTable and AddEdit are direct children; the self.parent chains in Delete/Cancel/DeleteConfirm reach Actions, AddEdit and the root, and the getChild names exist at each stop (all checked against the view tree). The form fields follow the table selection and add mode"
+    }
   ],
   "cssVariables": {
-    "stylesheets": ["final/OEE/com.inductiveautomation.perspective/stylesheet/stylesheet.css", "final/KPI/com.inductiveautomation.perspective/stylesheet/stylesheet.css"],
-    "prefixes": ["--oee-", "--kpi-", "--neutral-", "--error"]
+    "stylesheets": [
+      "final/OEE/com.inductiveautomation.perspective/stylesheet/stylesheet.css",
+      "final/KPI/com.inductiveautomation.perspective/stylesheet/stylesheet.css"
+    ],
+    "prefixes": [
+      "--oee-",
+      "--kpi-",
+      "--neutral-",
+      "--error"
+    ]
   }
 }
